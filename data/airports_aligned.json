@@ -1,0 +1,105 @@
+{
+  "comment": "Phase 1 airport data for the Condor Skopje landscape. Coordinates are WGS-84 decimal degrees; elevations are metres MSL. Runway true headings are geographic (true) bearings.",
+  "airports": [
+    {
+      "icao": "LWSK",
+      "name": "Skopje International",
+      "lat": 41.963792,
+      "lon": 21.620672,
+      "elevation_m": 238,
+      "source": "Macedonian eAIP AD 2 LWSK; aerodrome chart true bearings and threshold coordinates",
+      "runways": [
+        {
+          "designation": "16/34",
+          "length_m": 2950,
+          "width_m": 45,
+          "surface": "asphalt",
+          "true_heading": 167.16,
+          "center_lat": 41.958368,
+          "center_lon": 21.62276,
+          "ends": [
+            {
+              "designation": "16",
+              "lat": 41.97666,
+              "lon": 21.616191,
+              "elevation_m": 237.85
+            },
+            {
+              "designation": "34",
+              "lat": 41.950925,
+              "lon": 21.625153,
+              "elevation_m": 234.13
+            }
+          ],
+          "_aligned_from_imagery": true
+        }
+      ]
+    },
+    {
+      "icao": "LWSN",
+      "name": "Stenkovec",
+      "lat": 42.059444,
+      "lon": 21.38875,
+      "elevation_m": 318,
+      "source": "Aeroklub Skopje VFR manual / airfield chart; ARP and runway-end coordinates",
+      "runways": [
+        {
+          "designation": "12/30",
+          "length_m": 1200,
+          "width_m": 50,
+          "surface": "grass",
+          "true_heading": 120.81,
+          "center_lat": 42.059444,
+          "center_lon": 21.38875,
+          "ends": [
+            {
+              "designation": "12",
+              "lat": 42.062222,
+              "lon": 21.3825,
+              "elevation_m": 318.5
+            },
+            {
+              "designation": "30",
+              "lat": 42.056667,
+              "lon": 21.395,
+              "elevation_m": 318.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LW67",
+      "name": "Kumanovo",
+      "lat": 42.1578,
+      "lon": 21.693858,
+      "elevation_m": 371,
+      "source": "OurAirports / OpenStreetMap aerodrome and runway data; OSM runway tags length=1200 m, width=43 m, ref=12/30",
+      "runways": [
+        {
+          "designation": "12/30",
+          "length_m": 1200,
+          "width_m": 43,
+          "surface": "grass",
+          "true_heading": 128.04,
+          "center_lat": 42.1578,
+          "center_lon": 21.693858,
+          "ends": [
+            {
+              "designation": "12",
+              "lat": 42.154471,
+              "lon": 21.699575,
+              "elevation_m": 371
+            },
+            {
+              "designation": "30",
+              "lat": 42.161129,
+              "lon": 21.68814,
+              "elevation_m": 371
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

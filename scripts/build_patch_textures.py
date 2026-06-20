@@ -17,6 +17,15 @@ import numpy as np
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Import the grid from condor_grid so texture registration matches the mesh
+# (.trn/.tr3). condor_grid now uses EXACTLY XDIM=30.0 — the old hardcoded
+# 29.9869848156182 drifted the texture grid ~30 m from the mesh at the SE corner.
+from condor_grid import (
+    ULXMAP, ULYMAP, XDIM, WIDTH, HEIGHT, BR_EASTING, BR_NORTHING,
+    PATCH_SIZE_M, PATCHES_X, PATCHES_Y, patch_bounds_utm,
+)
+
 ROOT = Path(__file__).resolve().parent.parent
 VRT = ROOT / ".sandbox" / "ortho_utm_work" / "ortho_6316.vrt"
 WORK = ROOT / ".sandbox" / "patch_textures"
@@ -25,29 +34,7 @@ GDALWARP = "C:/Program Files/QGIS 4.0.0/bin/gdalwarp.exe"
 GDAL_TRANSLATE = "C:/Program Files/QGIS 4.0.0/bin/gdal_translate.exe"
 NVCOMPRESS = "C:/Program Files/NVIDIA Corporation/NVIDIA Texture Tools/nvcompress.exe"
 
-# Landscape calibration
-ULXMAP = 506880.0
-ULYMAP = 4700160.0
-XDIM = 29.9869848156182
-WIDTH = 2305
-HEIGHT = 2305
-BR_EASTING = ULXMAP + (WIDTH - 1) * XDIM
-BR_NORTHING = ULYMAP - (HEIGHT - 1) * XDIM
-
-# Patch geometry
-PATCH_SIZE_M = 5760.0  # 5.76 km
-PATCHES_X = 12
-PATCHES_Y = 12
 TEX_SIZE = 2048  # pixels per patch texture (matches Slovenia2)
-
-
-def patch_bounds_utm(col, row):
-    """Condor patch (col, row) where col=0 east, row=0 south."""
-    e_max = BR_EASTING - col * PATCH_SIZE_M
-    e_min = e_max - PATCH_SIZE_M
-    n_min = BR_NORTHING + row * PATCH_SIZE_M
-    n_max = n_min + PATCH_SIZE_M
-    return e_min, n_min, e_max, n_max
 
 
 def process_patch(col, row):

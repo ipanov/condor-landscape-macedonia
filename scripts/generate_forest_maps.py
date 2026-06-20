@@ -1,27 +1,44 @@
 #!/usr/bin/env python3
 """
-Generate improved 512x512 uint8 forest masks for each Condor patch.
+Generate per-patch 512x512 uint8 forest masks for the MacedoniaSkopje
+Condor 2 landscape.
 
-Forest value encoding (matching Slovenia2 .for conventions):
+Forest value encoding (matching Slovenia2 .for conventions, verified):
     0 = no trees
     1 = coniferous forest
-    2 = deciduous forest
+    2 = deciduous (broadleaved) forest
 
-Data sources:
-  - OSM landuse=forest / natural=wood polygons (forest extent)
-  - OSM leaf_type / leaf_cycle tags (explicit type when present)
-  - EEA CORINE Land Cover 2018 WMS (broadleaved / coniferous / mixed)
-  - Copernicus GLO-30 DEM (elevation & aspect driven mixing)
-  - OSM roads, railways, buildings, water, runways (exclusions)
+ORIENTATION (critical)
+----------------------
+Condor stores ``.for`` (like ``.tr3``) as the ANTI-TRANSPOSE of a north-up
+GDAL array: ``arr.T[::-1, ::-1]``.  Verified against Slovenia2 (anti-transpose
+IoU 0.62 vs identity 0.39).  Therefore EVERY mask in this script is authored
+north-up (row 0 = north, col 0 = west) and the anti-transpose is applied as the
+very last step before ``tofile``.  File names are ``CCRR.for`` (no prefix),
+CC = patch column (00 = EAST), RR = patch row (00 = SOUTH).
 
-The script writes:
-  - C:/Condor2/Landscapes/MacedoniaSkopje/ForestMaps/CCRR.for
-  - .sandbox/forest_validation/ overview images
+Data sources
+------------
+  - OSM landuse=forest / natural=wood polygons   -> crisp forest footprints
+  - Copernicus HRL Dominant Leaf Type 2018 (DLT) -> species (1 broadleaf, 2 conifer)
+  - Copernicus HRL Tree Cover Density 2018 (TCD) -> canopy %, fragmentation
+  - ESA WorldCover 2021 (class 10 = tree)        -> tree presence
+  - EEA CORINE Land Cover 2018 (311/312/313)     -> species fallback
+  - Copernicus GLO-30 DEM (elevation & aspect)   -> species model + Vodno bias
+  - OSM roads, rail, water, buildings, URBAN landuse, runways -> exclusions
+
+The forest classification rasters (DLT/TCD/WorldCover) are produced by
+``download_forest_rasters.py`` and cached, already warped onto the landscape
+grid, in ``.sandbox/forest_rasters/``.
+
+Outputs
+-------
+  - C:/Condor2/Landscapes/MacedoniaSkopje/ForestMaps/CCRR.for  (144 files)
+  - validation/forest/  (overview + per-patch stats + orientation overlays)
 """
 
 import json
 import math
-import urllib.parse
 from pathlib import Path
 
 import numpy as np
@@ -29,7 +46,7 @@ import pyproj
 import requests
 from PIL import Image
 from scipy import ndimage
-from shapely.geometry import Polygon, LineString, shape, box
+from shapely.geometry import Polygon, shape, box
 from shapely.ops import transform as shp_transform
 from shapely.prepared import prep
 from shapely.strtree import STRtree
@@ -47,10 +64,13 @@ from forest_utils import (
     patch_elevations,
     patch_aspect,
     load_geojson_features,
+    load_forest_raster,
+    patch_raster,
     buffer_roads,
     buffer_railways,
     buffer_buildings,
     buffer_waterways,
+    buffer_urban,
 )
 from osm_io import load_geojson
 from rasterize import rasterize_mask
@@ -58,10 +78,16 @@ from rasterize import rasterize_mask
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OSM_DIR = PROJECT_ROOT / ".sandbox" / "osm"
+RASTER_DIR = PROJECT_ROOT / ".sandbox" / "forest_rasters"
 OUT_DIR = Path("C:/Condor2/Landscapes/MacedoniaSkopje/ForestMaps")
-VALIDATION_DIR = PROJECT_ROOT / ".sandbox" / "forest_validation"
-DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_2305_flat.raw"
+VALIDATION_DIR = PROJECT_ROOT / "validation" / "forest"
+DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
 CLC_PATH = PROJECT_ROOT / ".sandbox" / "clc2018_1024.png"
+
+# Forest classification rasters (warped to the landscape grid).
+DLT_PATH = RASTER_DIR / "dlt_utm34_30m.tif"
+TCD_PATH = RASTER_DIR / "tcd_utm34_30m.tif"
+WC_PATH = RASTER_DIR / "worldcover_utm34_30m.tif"
 
 # CLC2018 legend colours from EEA Discomap symbol definitions.
 CLC_FOREST_RGB = {
@@ -69,13 +95,38 @@ CLC_FOREST_RGB = {
     312: (0, 166, 0),     # coniferous forest   -> coniferous
     313: (77, 255, 0),    # mixed forest        -> mixed
 }
+CLC_BBOX = (41.831486767410745, 21.082855860867607,
+            42.45004875746223, 21.923851720627418)
 
-# WMS bbox used to fetch CLC image (lat,lon order for EPSG:4326 in WMS 1.3.0)
-CLC_BBOX = (41.831486767410745, 21.082855860867607, 42.45004875746223, 21.923851720627418)
+# Tree-presence and canopy thresholds.
+TCD_TREE_MIN = 40        # primary: HRL tree-cover-density % for forest presence
+TCD_WC_MIN = 30          # ESA WorldCover trees count only with >= this canopy %
+TCD_OSM_MIN = 20         # OSM-mapped forest kept where any real canopy exists
+
+# Treeline.
+TREELINE_TOP = 2300.0    # no trees above this
+TREELINE_FADE = 2100.0   # start thinning here
+
+# DLT raster codes.
+DLT_BROADLEAF = 1
+DLT_CONIFER = 2
+DLT_NODATA = {0, 254, 255}
+
+# WorldCover tree class.
+WC_TREE = 10
+
+# Mt. Vodno conifer bias (black-pine afforestation south of Skopje).  Geographic
+# Gaussian centred on the summit, applied in the 500-1100 m band.
+VODNO_E = 533395.0
+VODNO_N = 4645813.0
+VODNO_SIGMA = 9000.0     # metres (covers the Vodno + Crna Gora pine belts)
+VODNO_ELEV_LO = 500.0
+VODNO_ELEV_HI = 1100.0
+VODNO_MAX_BIAS = 0.45    # added to conifer prob at the centre of the bias
 
 
 # -----------------------------------------------------------------------------
-# CLC download / load
+# CLC load (optional fallback species source)
 # -----------------------------------------------------------------------------
 
 def download_clc_image(path: Path, width: int = 1024, height: int = 1024):
@@ -107,17 +158,15 @@ def load_clc_class_image(path: Path):
     return clc
 
 
-def clc_class_at(clc_array, lon, lat):
-    """Sample the CLC image at a WGS-84 lon/lat point."""
-    south, west, north, east = CLC_BBOX
+def clc_codes_for_patch(clc_array, lon, lat):
+    """Vectorised CLC sampling for a patch's per-pixel lon/lat arrays (north-up)."""
     h, w = clc_array.shape
-    if lon < west or lon > east or lat < south or lat > north:
-        return 0
-    px = int((lon - west) / (east - west) * w)
-    py = int((north - lat) / (north - south) * h)
-    px = np.clip(px, 0, w - 1)
-    py = np.clip(py, 0, h - 1)
-    return int(clc_array[py, px])
+    south, west, north, east = CLC_BBOX
+    pxs = ((lon - west) / (east - west) * w).astype(int)
+    pys = ((north - lat) / (north - south) * h).astype(int)
+    pxs = np.clip(pxs, 0, w - 1)
+    pys = np.clip(pys, 0, h - 1)
+    return clc_array[pys, pxs]
 
 
 # -----------------------------------------------------------------------------
@@ -127,9 +176,7 @@ def clc_class_at(clc_array, lon, lat):
 def _runway_rectangle(center_lat, center_lon, true_heading, length_m, width_m,
                       transformer_to_utm):
     """Return a UTM Polygon for a runway rectangle."""
-    # Convert center to UTM
     cx, cy = transformer_to_utm.transform(center_lon, center_lat)
-    # Heading is true bearing clockwise from north.  Compute half-diagonal corners.
     angle = math.radians(true_heading)
     perp = angle + math.pi / 2.0
     dx = (length_m / 2.0) * math.sin(angle)
@@ -145,7 +192,8 @@ def _runway_rectangle(center_lat, center_lon, true_heading, length_m, width_m,
     return Polygon(corners)
 
 
-def airport_runway_polygons():
+def airport_runway_polygons(apron_buffer=30.0):
+    """Runway rectangles from data/airports.json with an apron clearance buffer."""
     transformer = pyproj.Transformer.from_crs(WGS84_CRS, UTM_CRS, always_xy=True)
     airports_path = PROJECT_ROOT / "data" / "airports.json"
     with open(airports_path, "r", encoding="utf-8") as f:
@@ -154,27 +202,21 @@ def airport_runway_polygons():
     for ap in data.get("airports", []):
         for rwy in ap.get("runways", []):
             poly = _runway_rectangle(
-                rwy["center_lat"],
-                rwy["center_lon"],
-                rwy["true_heading"],
-                rwy["length_m"],
-                rwy["width_m"],
-                transformer,
+                rwy["center_lat"], rwy["center_lon"], rwy["true_heading"],
+                rwy["length_m"], rwy["width_m"], transformer,
             )
+            if apron_buffer:
+                poly = poly.buffer(apron_buffer)
             polys.append(poly)
     return polys
 
 
 # -----------------------------------------------------------------------------
-# Forest type assignment
+# Species probability model
 # -----------------------------------------------------------------------------
 
 def _value_noise(shape, seed):
-    """Deterministic smooth value noise in [0,1].
-
-    Uses two octaves (coarse + fine) to produce spatially coherent patches
-    that break up large monotone blobs into many smaller forest clusters.
-    """
+    """Deterministic smooth value noise in [0,1] (two octaves)."""
     h, w = shape
     rng = np.random.RandomState(seed)
 
@@ -186,40 +228,59 @@ def _value_noise(shape, seed):
         coords = np.stack([yy, xx], axis=0)
         return ndimage.map_coordinates(grid, coords, order=1, mode="reflect")
 
-    # Coarse octave: ~64 px period (landscape-scale variation)
     coarse = _octave(max(2, h // 64), max(2, w // 64), rng)
-    # Fine octave: ~16 px period (patch-scale fragmentation)
     fine = _octave(max(4, h // 16), max(4, w // 16), rng)
-
-    # Blend: 60% coarse + 40% fine.  This creates large regions with
-    # smaller internal structure, yielding many small forest clearings.
     combined = 0.6 * coarse + 0.4 * fine
     return np.clip(combined, 0.0, 1.0)
 
 
-def _conifer_probability(elev, aspect, clc_code, noise):
+def _vodno_bias(ee, nn, elev):
+    """Geographic conifer boost over the Vodno / Crna Gora pine belts.
+
+    A Gaussian in UTM space centred on Vodno summit, gated to the 500-1100 m
+    elevation band where the black-pine afforestation actually sits.
     """
-    Return probability [0,1] that a forest pixel is coniferous.
+    d2 = (ee - VODNO_E) ** 2 + (nn - VODNO_N) ** 2
+    geo = np.exp(-d2 / (2.0 * VODNO_SIGMA ** 2))
+    band = np.clip(
+        np.minimum((elev - VODNO_ELEV_LO) / 150.0,
+                   (VODNO_ELEV_HI - elev) / 150.0),
+        0.0, 1.0,
+    )
+    return VODNO_MAX_BIAS * geo * band
 
-    Macedonia vegetation zones (Skopje region):
-      < 500 m   : sub-Mediterranean oak/hornbeam  -> almost entirely deciduous
-      500-800 m : thermophilous oak zone           -> deciduous dominant, rare pine
-      800-1100 m: beech zone, some black pine      -> increasingly mixed
-      1100-1500 m: beech-fir transition            -> mixed, trending coniferous
-      1500-2000 m: coniferous (Scots/Bosnian pine, fir, spruce)
-      > 2000 m  : sub-alpine pine/juniper          -> strongly coniferous
-      > 2300 m  : treeline                         -> no trees (handled elsewhere)
 
-    South-facing slopes at mid-elevations tend toward drier pine communities;
-    north-facing slopes favour beech (deciduous).
+def conifer_probability(elev, aspect, clc_code, noise, ee, nn, dlt=None):
+    """Probability [0,1] that a forest pixel is coniferous.
+
+    Tuned for the Skopje region.  Blends an elevation response, an aspect
+    modifier (south = drier = pine), value noise for realistic mixing, a CORINE
+    class hint, the Vodno geographic bias, and (when supplied) the Copernicus
+    HRL Dominant Leaf Type as a *prior*.
+
+    DLT is used as a soft prior rather than a hard veto: the HRL product is
+    100 m-era and is known to under-map small black-pine afforestation, which is
+    extensive on Vodno / Skopska Crna Gora.  DLT==2 (conifer) is honoured
+    directly by the caller; here DLT==2 strongly boosts and DLT==1 (broadleaf)
+    nudges toward deciduous without overriding a strong elevation/Vodno signal.
+
+    Macedonia vegetation zones (Skopje):
+      < 500 m   sub-Mediterranean oak/hornbeam  -> deciduous
+      500-800 m thermophilous oak, black pine plantations on slopes
+      800-1100 m oak-beech, increasing pine
+      1100-1500 m beech-fir, trending coniferous
+      1500-2000 m coniferous
+      > 2000 m  sub-alpine pine/juniper
     """
     elev = np.asarray(elev, dtype=np.float32)
     aspect = np.asarray(aspect, dtype=np.float32)
     clc_code = np.asarray(clc_code)
     noise = np.asarray(noise, dtype=np.float32)
+    ee = np.asarray(ee, dtype=np.float64)
+    nn = np.asarray(nn, dtype=np.float64)
 
-    # Piecewise-linear elevation response tuned for Macedonia.
-    # Returns the "base" conifer probability from elevation alone.
+    # Elevation response (shifted up vs the old curve to give realistic conifer
+    # share in the dominant 500-1100 m forest band).
     p_elev = np.piecewise(
         elev,
         [
@@ -231,71 +292,104 @@ def _conifer_probability(elev, aspect, clc_code, noise):
             elev >= 2000,
         ],
         [
-            0.03,                                        # lowland deciduous
-            lambda e: 0.03 + (e - 500) / 300 * 0.07,    # 0.03 -> 0.10
-            lambda e: 0.10 + (e - 800) / 300 * 0.25,    # 0.10 -> 0.35
-            lambda e: 0.35 + (e - 1100) / 400 * 0.35,   # 0.35 -> 0.70
-            lambda e: 0.70 + (e - 1500) / 500 * 0.20,   # 0.70 -> 0.90
+            0.05,                                       # lowland deciduous
+            lambda e: 0.05 + (e - 500) / 300 * 0.15,    # 0.05 -> 0.20
+            lambda e: 0.20 + (e - 800) / 300 * 0.25,    # 0.20 -> 0.45
+            lambda e: 0.45 + (e - 1100) / 400 * 0.35,   # 0.45 -> 0.80
+            lambda e: 0.80 + (e - 1500) / 500 * 0.15,   # 0.80 -> 0.95
             0.95,                                        # sub-alpine
         ],
     )
 
-    # Aspect modifier: south-facing mid-elevation slopes get a conifer boost
-    # (drier = more pine), north-facing get a deciduous boost (cooler = beech).
+    # Aspect: south-facing mid-elevation slopes favour pine, north favours beech.
     aspect_rad = np.deg2rad(aspect)
-    south_factor = -np.cos(aspect_rad)  # +1 for south, -1 for north
-    # Aspect effect is strongest in the mixed zone (800-1500 m) and weak
-    # at extremes where the outcome is already decided.
+    south_factor = -np.cos(aspect_rad)  # +1 south, -1 north
     aspect_weight = np.clip(1.0 - np.abs(elev - 1100) / 600, 0.0, 1.0)
     p_aspect = 0.12 * south_factor * aspect_weight
 
-    # Noise introduces fine-scale realistic mixing (patches of pine among beech).
-    p_noise = 0.25 * (noise - 0.5)
+    # Fine-scale mixing.
+    p_noise = 0.22 * (noise - 0.5)
 
-    # Base probability from CORINE class when available.
-    p_base = p_elev.copy()
-    p_base = np.where(clc_code == 312, 0.90, p_base)   # CORINE coniferous
-    p_base = np.where(clc_code == 311, 0.08, p_base)   # CORINE broad-leaved
-    p_base = np.where(clc_code == 313, p_elev, p_base)  # CORINE mixed -> use elevation model
+    # CORINE class hint.
+    p = p_elev.copy()
+    p = np.where(clc_code == 312, 0.90, p)   # CORINE coniferous
+    p = np.where(clc_code == 311, 0.06, p)   # CORINE broad-leaved
+    # 313 (mixed) -> keep elevation model.
 
-    p = p_base + p_aspect + p_noise
+    p = p + p_aspect + p_noise + _vodno_bias(ee, nn, elev)
+
+    # HRL DLT soft prior (additive nudge, not a veto).
+    if dlt is not None:
+        dlt = np.asarray(dlt)
+        p = np.where(dlt == DLT_CONIFER, p + 0.45, p)     # confirmed pine -> strong boost
+        p = np.where(dlt == DLT_BROADLEAF, p - 0.18, p)   # mapped broadleaf -> mild deciduous lean
+
     return np.clip(p, 0.0, 1.0)
+
+
+# -----------------------------------------------------------------------------
+# Density-driven fragmentation
+# -----------------------------------------------------------------------------
+
+def despeckle(forest_mask):
+    """Deterministic clean-up of a north-up forest mask (no RNG -> no seams).
+
+    A 1-px binary opening removes isolated tree pixels and hairline protrusions,
+    then connected components smaller than 3 px are dropped.  Both operations are
+    local morphology, so results are identical regardless of patch tiling and
+    introduce no per-patch boundary discontinuities.
+    """
+    forest_mask = forest_mask.astype(bool)
+    if not forest_mask.any():
+        return forest_mask
+    cleaned = ndimage.binary_opening(forest_mask, iterations=1)
+    labels, n = ndimage.label(cleaned)
+    if n:
+        sizes = ndimage.sum(np.ones_like(labels), labels, index=np.arange(1, n + 1))
+        small = np.where(sizes < 3)[0] + 1
+        if small.size:
+            cleaned[np.isin(labels, small)] = False
+    return cleaned
 
 
 # -----------------------------------------------------------------------------
 # Main generation
 # -----------------------------------------------------------------------------
 
-def _utm_to_wgs84(e, n):
-    transformer = pyproj.Transformer.from_crs(UTM_CRS, WGS84_CRS, always_xy=True)
-    return transformer.transform(e, n)
-
-
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
 
-    # -------------------------------------------------------------------------
-    # Load / cache CLC image
-    # -------------------------------------------------------------------------
+    # ---- CLC (optional) ----
     if not CLC_PATH.exists():
-        download_clc_image(CLC_PATH)
-    clc_array = load_clc_class_image(CLC_PATH)
-    print(f"Loaded CLC image {clc_array.shape}, forest pixels: {(clc_array != 0).sum()}")
+        try:
+            download_clc_image(CLC_PATH)
+        except Exception as exc:
+            print(f"  CLC download failed ({exc}); proceeding without CORINE")
+    if CLC_PATH.exists():
+        clc_array = load_clc_class_image(CLC_PATH)
+        print(f"Loaded CLC image {clc_array.shape}, forest pixels: {(clc_array != 0).sum()}")
+    else:
+        clc_array = None
 
-    # -------------------------------------------------------------------------
-    # Load OSM data
-    # -------------------------------------------------------------------------
+    # ---- Forest classification rasters ----
+    for p in (DLT_PATH, TCD_PATH, WC_PATH):
+        if not p.exists():
+            raise SystemExit(
+                f"Missing forest raster: {p}\n"
+                "Run scripts/download_forest_rasters.py first."
+            )
+    dlt_arr, dlt_aff = load_forest_raster(DLT_PATH)
+    tcd_arr, tcd_aff = load_forest_raster(TCD_PATH)
+    wc_arr, wc_aff = load_forest_raster(WC_PATH)
+    print(f"Loaded DLT {dlt_arr.shape}, TCD {tcd_arr.shape}, WorldCover {wc_arr.shape}")
+
+    # ---- OSM forest footprints, split by explicit leaf tags ----
     transformer = pyproj.Transformer.from_crs(WGS84_CRS, UTM_CRS, always_xy=True)
-
     forest_features = load_geojson_features(OSM_DIR / "forest.geojson", transformer)
     print(f"Loaded {len(forest_features)} forest/wood features")
 
-    # Split OSM forest by explicit leaf_type tags.
-    osm_conifer = []
-    osm_deciduous = []
-    osm_mixed = []
-    osm_unknown = []
+    osm_conifer, osm_deciduous, osm_mixed = [], [], []
     for geom, props in forest_features:
         lt = props.get("leaf_type", "")
         lc = props.get("leaf_cycle", "")
@@ -305,22 +399,21 @@ def main():
             osm_deciduous.append(geom)
         elif lt == "mixed":
             osm_mixed.append(geom)
-        else:
-            osm_unknown.append(geom)
+    forest_geoms = [g for g, _ in forest_features]
     print(f"  OSM leaf type: conifer={len(osm_conifer)}, deciduous={len(osm_deciduous)}, "
-          f"mixed={len(osm_mixed)}, unknown={len(osm_unknown)}")
+          f"mixed={len(osm_mixed)}, untyped={len(forest_geoms)-len(osm_conifer)-len(osm_deciduous)-len(osm_mixed)}")
 
-    # Exclusion layers
-    # ---- Water bodies (polygonal: lakes, reservoirs) ----
-    water_geoms = [shape(f["geometry"]) for f in load_geojson(OSM_DIR / "water.geojson").get("features", [])]
+    # ---- Exclusion layers (rasterised as no-tree) ----
+    water_geoms = [shape(f["geometry"]) for f in
+                   load_geojson(OSM_DIR / "water.geojson").get("features", [])]
     water_geoms = [shp_transform(lambda x, y, z=None: transformer.transform(x, y), g)
                    for g in water_geoms if g and g.is_valid]
+    # +5 m shoreline clearance.
+    water_geoms = [g.buffer(5.0) for g in water_geoms]
 
-    # ---- Waterways (linear: rivers, streams, canals) ----
     waterway_features = load_geojson_features(OSM_DIR / "waterways.geojson", transformer)
     waterway_polys = buffer_waterways(waterway_features)
 
-    # ---- Roads: use roads_lines.geojson (LineStrings) for best coverage ----
     roads_lines_path = OSM_DIR / "roads_lines.geojson"
     roads_path = OSM_DIR / "roads.geojson"
     if roads_lines_path.exists():
@@ -328,216 +421,207 @@ def main():
         print(f"  Using roads_lines.geojson ({len(road_features)} line features)")
     else:
         road_features = load_geojson_features(roads_path, transformer)
-        print(f"  Fallback to roads.geojson ({len(road_features)} polygon features)")
     road_polys = buffer_roads(road_features)
 
-    # ---- Railways ----
     rail_features = load_geojson_features(OSM_DIR / "railways.geojson", transformer)
     rail_polys = buffer_railways(rail_features, radius=10.0)
 
-    # ---- Buildings (with 5 m clearance buffer) ----
     building_features = load_geojson_features(OSM_DIR / "buildings.geojson", transformer)
     building_polys = buffer_buildings(building_features, radius=5.0)
 
-    # ---- Runways ----
+    # URBAN landuse (settlements) — previously UNUSED.
+    settlement_features = load_geojson_features(OSM_DIR / "settlements.geojson", transformer)
+    urban_polys = buffer_urban(settlement_features)
+
     runway_features = load_geojson_features(OSM_DIR / "runways.geojson", transformer)
     runway_polys = [g for g, _ in runway_features]
     runway_polys.extend(airport_runway_polygons())
 
     exclusion_geoms = (water_geoms + waterway_polys + road_polys + rail_polys
-                       + building_polys + runway_polys)
-    print(f"Loaded exclusion geometries: water={len(water_geoms)}, "
-          f"waterways={len(waterway_polys)}, roads={len(road_polys)}, "
-          f"rail={len(rail_polys)}, buildings={len(building_polys)}, "
-          f"runways={len(runway_polys)}")
+                       + building_polys + urban_polys + runway_polys)
+    print(f"Exclusions: water={len(water_geoms)}, waterways={len(waterway_polys)}, "
+          f"roads={len(road_polys)}, rail={len(rail_polys)}, buildings={len(building_polys)}, "
+          f"urban={len(urban_polys)}, runways={len(runway_polys)}")
 
-    # -------------------------------------------------------------------------
-    # Load DEM
-    # -------------------------------------------------------------------------
+    # ---- DEM ----
     dem = load_dem(DEM_PATH)
     print(f"Loaded DEM {dem.shape}")
 
-    # Spatial indexes (re-used for every patch)
-    forest_geoms = [g for g, _ in forest_features]
+    # ---- Spatial indexes ----
     forest_tree = STRtree(forest_geoms)
     exclusion_tree = STRtree(exclusion_geoms)
     utm_to_wgs84 = pyproj.Transformer.from_crs(UTM_CRS, WGS84_CRS, always_xy=True)
 
-    # -------------------------------------------------------------------------
-    # Rasterize patch by patch
-    # -------------------------------------------------------------------------
-    overview = np.zeros((PATCHES_Y * PATCH_MASK_SIZE, PATCHES_X * PATCH_MASK_SIZE), dtype=np.uint8)
-    total_pixels = {"conifer": 0, "deciduous": 0}
+    # ---- Per-patch generation (everything north-up) ----
+    overview = np.zeros((PATCHES_Y * PATCH_MASK_SIZE, PATCHES_X * PATCH_MASK_SIZE),
+                        dtype=np.uint8)
+    total = {"conifer": 0, "deciduous": 0}
+    stand_count_total = 0
 
     for patch_row in range(PATCHES_Y):
         for patch_col in range(PATCHES_X):
             bounds = patch_bounds_utm(patch_col, patch_row)
             tile_box = prep(box(*bounds))
+            seed = patch_row * 100 + patch_col + 12345
 
-            # 1) Forest extent from OSM
-            forest_mask = rasterize_mask(
-                forest_geoms,
-                bounds,
-                PATCH_MASK_SIZE,
-                PATCH_MASK_SIZE,
-                foreground=1,
-                background=0,
-                tree=forest_tree,
-                prepared_box=tile_box,
-            )
-
-            # 2) Exclusions
-            exclusion_mask = rasterize_mask(
-                exclusion_geoms,
-                bounds,
-                PATCH_MASK_SIZE,
-                PATCH_MASK_SIZE,
-                foreground=1,
-                background=0,
-                tree=exclusion_tree,
-                prepared_box=tile_box,
-            )
-
-            forest_mask = (forest_mask & (~exclusion_mask.astype(bool))).astype(np.uint8)
-
-            # 3) Explicit OSM leaf-type masks
-            mask_conifer = rasterize_mask(
-                osm_conifer, bounds, PATCH_MASK_SIZE, PATCH_MASK_SIZE, foreground=1, background=0
-            ).astype(bool)
-            mask_deciduous = rasterize_mask(
-                osm_deciduous, bounds, PATCH_MASK_SIZE, PATCH_MASK_SIZE, foreground=1, background=0
-            ).astype(bool)
-            mask_mixed = rasterize_mask(
-                osm_mixed, bounds, PATCH_MASK_SIZE, PATCH_MASK_SIZE, foreground=1, background=0
-            ).astype(bool)
-
-            # 4) Elevation & aspect
-            elev = patch_elevations(dem, patch_col, patch_row)
-            aspect = patch_aspect(dem, patch_col, patch_row)
-
-            # 5) Value noise for realistic mixing
-            noise = _value_noise((PATCH_MASK_SIZE, PATCH_MASK_SIZE),
-                                 seed=patch_row * 100 + patch_col + 12345)
-
-            # 6) Sample CLC for every pixel (only inside forest)
+            # --- per-pixel UTM / lon-lat (north-up) ---
             min_e, min_n, max_e, max_n = bounds
-            xs = np.linspace(min_e, max_e, PATCH_MASK_SIZE, endpoint=False) + (max_e - min_e) / (2 * PATCH_MASK_SIZE)
-            ys = np.linspace(max_n, min_n, PATCH_MASK_SIZE, endpoint=False) - (max_n - min_n) / (2 * PATCH_MASK_SIZE)
+            xs = np.linspace(min_e, max_e, PATCH_MASK_SIZE, endpoint=False) \
+                + (max_e - min_e) / (2 * PATCH_MASK_SIZE)
+            ys = np.linspace(max_n, min_n, PATCH_MASK_SIZE, endpoint=False) \
+                - (max_n - min_n) / (2 * PATCH_MASK_SIZE)
             ee, nn = np.meshgrid(xs, ys)
             lon, lat = utm_to_wgs84.transform(ee, nn)
 
-            # vectorized CLC sampling
-            clc_codes = np.zeros((PATCH_MASK_SIZE, PATCH_MASK_SIZE), dtype=np.uint16)
-            h, w = clc_array.shape
-            south, west, north, east = CLC_BBOX
-            pxs = ((lon - west) / (east - west) * w).astype(int)
-            pys = ((north - lat) / (north - south) * h).astype(int)
-            pxs = np.clip(pxs, 0, w - 1)
-            pys = np.clip(pys, 0, h - 1)
-            clc_codes = clc_array[pys, pxs]
+            # --- forest footprint from OSM ---
+            forest_boundary = rasterize_mask(
+                forest_geoms, bounds, PATCH_MASK_SIZE, PATCH_MASK_SIZE,
+                foreground=1, background=0, tree=forest_tree, prepared_box=tile_box,
+            ).astype(bool)
 
-            # 7) Assign types
-            forest_type = np.zeros((PATCH_MASK_SIZE, PATCH_MASK_SIZE), dtype=np.uint8)
+            # --- exclusions ---
+            exclusion_mask = rasterize_mask(
+                exclusion_geoms, bounds, PATCH_MASK_SIZE, PATCH_MASK_SIZE,
+                foreground=1, background=0, tree=exclusion_tree, prepared_box=tile_box,
+            ).astype(bool)
 
-            # OSM explicit tags override everything
-            forest_type[mask_conifer & forest_mask.astype(bool)] = 1
-            forest_type[mask_deciduous & forest_mask.astype(bool)] = 2
+            # --- classification rasters sampled to the patch (north-up) ---
+            tcd = patch_raster(tcd_arr, tcd_aff, patch_col, patch_row, order=1)
+            wc = patch_raster(wc_arr, wc_aff, patch_col, patch_row, order=0)
+            dlt = patch_raster(dlt_arr, dlt_aff, patch_col, patch_row, order=0)
 
-            # Mixed / unknown / untagged forest pixels
-            decide_mask = forest_mask.astype(bool) & (~mask_conifer) & (~mask_deciduous)
-            if decide_mask.any():
-                p_conifer = _conifer_probability(
-                    elev[decide_mask],
-                    aspect[decide_mask],
-                    clc_codes[decide_mask],
-                    noise[decide_mask],
+            # --- forest EXTENT: continuous canopy threshold (NO per-patch RNG) ---
+            # .for is binary presence+species (no density channel), so stand
+            # fragmentation comes from holes in the EXTENT.  The HRL TCD raster
+            # is already naturally holey, so a continuous threshold yields
+            # realistic ragged stands WITHOUT the hard patch-boundary seams a
+            # per-patch random thinning produced (verified: density_thin made
+            # patches bimodal -> visible tree-density seams in-sim).  Primary =
+            # TCD; ESA WorldCover fills HRL gaps; OSM forest is unioned wherever
+            # any real canopy exists so digitised woods are never dropped.
+            canopy = (
+                (tcd >= TCD_TREE_MIN)
+                | ((wc == WC_TREE) & (tcd >= TCD_WC_MIN))
+                | (forest_boundary & (tcd >= TCD_OSM_MIN))
+            )
+            forest_mask = canopy & (~exclusion_mask)
+            forest_mask = despeckle(forest_mask)
+            # re-apply exclusions (opening can grow 1 px outward)
+            forest_mask = forest_mask & (~exclusion_mask)
+
+            # --- elevation / aspect / noise / CLC ---
+            elev = patch_elevations(dem, patch_col, patch_row)
+            aspect = patch_aspect(dem, patch_col, patch_row)
+            noise = _value_noise((PATCH_MASK_SIZE, PATCH_MASK_SIZE), seed=seed)
+            if clc_array is not None:
+                clc_codes = clc_codes_for_patch(clc_array, lon, lat)
+            else:
+                clc_codes = np.zeros((PATCH_MASK_SIZE, PATCH_MASK_SIZE), dtype=np.uint16)
+
+            # --- species ---
+            # Precedence: explicit OSM leaf tags win.  Everything else is decided
+            # by the probability model, which folds the HRL DLT in as a *soft
+            # prior* (DLT==2 strongly boosts conifer, DLT==1 nudges deciduous)
+            # together with elevation/aspect/Vodno/CORINE.  A hard DLT==2 floor
+            # guarantees mapped pine is always coniferous.
+            species = np.zeros((PATCH_MASK_SIZE, PATCH_MASK_SIZE), dtype=np.uint8)
+
+            osm_typed = np.zeros((PATCH_MASK_SIZE, PATCH_MASK_SIZE), dtype=bool)
+            if osm_conifer:
+                m = rasterize_mask(osm_conifer, bounds, PATCH_MASK_SIZE,
+                                   PATCH_MASK_SIZE, 1, 0).astype(bool)
+                species[m] = 1
+                osm_typed |= m
+            if osm_deciduous:
+                m = rasterize_mask(osm_deciduous, bounds, PATCH_MASK_SIZE,
+                                   PATCH_MASK_SIZE, 1, 0).astype(bool)
+                sel = (~osm_typed) & m
+                species[sel] = 2
+                osm_typed |= m
+
+            # Probability model for every forest pixel not explicitly OSM-typed.
+            dlt_valid = np.where(np.isin(dlt, list(DLT_NODATA)), 0, dlt)
+            decide = forest_mask & (~osm_typed)
+            if decide.any():
+                p = conifer_probability(
+                    elev[decide], aspect[decide], clc_codes[decide],
+                    noise[decide], ee[decide], nn[decide], dlt=dlt_valid[decide],
                 )
-                # Deterministic per-pixel choice
-                # Use the smooth probability surface directly; this creates
-                # spatially coherent conifer/deciduous patches instead of a
-                # salt-and-pepper speckle.
-                chosen = np.where(p_conifer > 0.5, 1, 2)
-                forest_type[decide_mask] = chosen.astype(np.uint8)
+                species[decide] = np.where(p > 0.5, 1, 2).astype(np.uint8)
 
-            # 7b) Treeline exclusion: remove trees above ~2300 m
-            # Gradual fade: full forest below 2100 m, random thinning
-            # 2100-2300 m, no trees above 2300 m.
-            treeline_mask = elev > 2300
-            forest_type[treeline_mask] = 0
-            # Thin out the transition zone (2100-2300 m)
-            transition = (elev >= 2100) & (elev <= 2300)
+            # Hard floor: HRL-confirmed conifer is always coniferous.
+            species[forest_mask & (dlt == DLT_CONIFER)] = 1
+
+            # Final forest type = species gated by the (fragmented) extent.
+            forest_type = (species * forest_mask).astype(np.uint8)
+
+            # --- treeline ---
+            forest_type[elev > TREELINE_TOP] = 0
+            transition = (elev >= TREELINE_FADE) & (elev <= TREELINE_TOP)
             if transition.any():
-                thin_prob = (elev[transition] - 2100.0) / 200.0  # 0 at 2100, 1 at 2300
-                thin_rng = np.random.RandomState(seed=patch_row * 100 + patch_col + 99999)
-                thin_rand = thin_rng.rand(int(transition.sum()))
+                thin_prob = (elev[transition] - TREELINE_FADE) / (TREELINE_TOP - TREELINE_FADE)
+                trng = np.random.RandomState(seed=seed + 99999)
+                trand = trng.rand(int(transition.sum()))
                 forest_type[transition] = np.where(
-                    thin_rand < thin_prob, 0, forest_type[transition]
-                ).astype(np.uint8)
+                    trand < thin_prob, 0, forest_type[transition]).astype(np.uint8)
 
-            # 8) NORTH-UP UTM (row 0 = north, col 0 = west) — identical to the
-            # .dds textures and .tr3 (3D-engine convention). forest_type is built
-            # north-up above (ys descend from north), so NO flip is applied.
+            # stand count (connected components of forest, north-up)
+            _, n_stands = ndimage.label(forest_type > 0)
+            stand_count_total += n_stands
 
-            # 9) Write
+            # --- ANTI-TRANSPOSE to Condor storage order, then write ---
+            stored = forest_type.T[::-1, ::-1]
             filename = f"{patch_col:02d}{patch_row:02d}.for"
-            out_path = OUT_DIR / filename
-            forest_type.tofile(out_path)
+            stored.tofile(OUT_DIR / filename)
 
             c1 = int((forest_type == 1).sum())
             c2 = int((forest_type == 2).sum())
-            total_pixels["conifer"] += c1
-            total_pixels["deciduous"] += c2
+            total["conifer"] += c1
+            total["deciduous"] += c2
 
-            # Fill overview (top-left orientation for validation image)
-            overview[patch_row * PATCH_MASK_SIZE:(patch_row + 1) * PATCH_MASK_SIZE,
-                     patch_col * PATCH_MASK_SIZE:(patch_col + 1) * PATCH_MASK_SIZE] = forest_type
+            # overview in TRUE geographic orientation (north up, west left) so it
+            # aligns with the north-up DEM hillshade overlaid at save time:
+            # patch row 0 = south -> bottom, patch col 0 = east -> right.
+            gy = (PATCHES_Y - 1 - patch_row) * PATCH_MASK_SIZE
+            gx = (PATCHES_X - 1 - patch_col) * PATCH_MASK_SIZE
+            overview[gy:gy + PATCH_MASK_SIZE, gx:gx + PATCH_MASK_SIZE] = forest_type
 
-            print(f"Wrote {filename}: conifer={c1:>6} deciduous={c2:>6} "
-                  f"excluded={int((forest_mask == 0).sum()):>6}")
+            print(f"{filename}: conifer={c1:>6} deciduous={c2:>6} stands={n_stands:>4}")
 
-    # -------------------------------------------------------------------------
-    # Validation images
-    # -------------------------------------------------------------------------
-    _write_validation_images(overview, dem)
+    # ---- validation ----
+    _write_validation_images(overview, dem, total, stand_count_total)
 
+    forest_px = total["conifer"] + total["deciduous"]
     print("\nForest map generation complete.")
-    print(f"  Total conifer pixels:   {total_pixels['conifer']:,}")
-    print(f"  Total deciduous pixels: {total_pixels['deciduous']:,}")
-    print(f"  Forest fraction: {(total_pixels['conifer'] + total_pixels['deciduous']) / (144 * 512 * 512):.2%}")
+    print(f"  Conifer:   {total['conifer']:,}")
+    print(f"  Deciduous: {total['deciduous']:,}")
+    print(f"  Forest fraction: {forest_px / (144 * 512 * 512):.2%}")
+    if forest_px:
+        print(f"  Conifer share of forest: {total['conifer'] / forest_px:.2%}")
+    print(f"  Total stands (connected components): {stand_count_total:,}")
 
 
-def _write_validation_images(overview, dem):
-    """Create overview RGB images of the new forest map."""
+def _write_validation_images(overview, dem, total, stand_count_total):
+    """Overview RGB image + stats text."""
     from scipy.ndimage import zoom
-    from PIL import ImageDraw as PilImageDraw
 
     oh, ow = overview.shape
-
-    # Resample DEM to overview size for hillshade background
     dem_f = dem.astype(np.float32)
     bg = zoom(dem_f, (oh / dem.shape[0], ow / dem.shape[1]), order=1)
 
-    # Simple analytical hillshade (azimuth 315, altitude 45)
     dy, dx = np.gradient(bg)
     slope = np.sqrt(dx ** 2 + dy ** 2)
     shade = (dx * 0.7071 + dy * 0.7071) / (np.sqrt(slope ** 2 + 1))
     shade = ((shade + 1) * 0.5 * 200 + 28).clip(0, 255).astype(np.uint8)
 
     rgb = np.zeros((oh, ow, 3), dtype=np.uint8)
-    rgb[..., 0] = shade
-    rgb[..., 1] = shade
-    rgb[..., 2] = shade
+    rgb[..., 0] = rgb[..., 1] = rgb[..., 2] = shade
+    rgb[overview == 1] = [34, 139, 34]    # conifer = dark green
+    rgb[overview == 2] = [210, 105, 30]   # deciduous = warm brown
 
-    # Conifer = dark green, deciduous = warm brown
-    conifer_mask = overview == 1
-    deciduous_mask = overview == 2
-    rgb[conifer_mask] = [34, 139, 34]
-    rgb[deciduous_mask] = [210, 105, 30]
-
+    from PIL import ImageDraw as PilImageDraw
     img = Image.fromarray(rgb)
     draw = PilImageDraw.Draw(img)
-
-    # Draw patch grid lines
     for col in range(PATCHES_X + 1):
         x = col * PATCH_MASK_SIZE
         if x < ow:
@@ -546,26 +630,23 @@ def _write_validation_images(overview, dem):
         y = row * PATCH_MASK_SIZE
         if y < oh:
             draw.line([(0, y), (ow - 1, y)], fill=(80, 80, 80), width=1)
-
     img.save(VALIDATION_DIR / "forest_map_overview.png")
 
-    # ---- Statistics summary ----
-    total = oh * ow
-    n_conifer = int(conifer_mask.sum())
-    n_deciduous = int(deciduous_mask.sum())
-    n_forest = n_conifer + n_deciduous
+    total_px = oh * ow
+    n_con = int((overview == 1).sum())
+    n_dec = int((overview == 2).sum())
+    n_forest = n_con + n_dec
     with open(VALIDATION_DIR / "forest_stats.txt", "w") as f:
-        f.write(f"Forest map statistics\n")
-        f.write(f"=====================\n")
-        f.write(f"Grid: {PATCHES_X}x{PATCHES_Y} patches, {PATCH_MASK_SIZE}x{PATCH_MASK_SIZE} px each\n")
-        f.write(f"Total pixels:     {total:>12,}\n")
-        f.write(f"Forest pixels:    {n_forest:>12,}  ({n_forest/total:.2%})\n")
-        f.write(f"  Coniferous:     {n_conifer:>12,}  ({n_conifer/total:.2%})\n")
-        f.write(f"  Deciduous:      {n_deciduous:>12,}  ({n_deciduous/total:.2%})\n")
-        f.write(f"  Conifer ratio:  {n_conifer/max(n_forest,1):.2%} of forest\n")
-        f.write(f"No-forest pixels: {total-n_forest:>12,}  ({(total-n_forest)/total:.2%})\n")
-
-    print(f"Saved validation images to {VALIDATION_DIR}")
+        f.write("Forest map statistics\n=====================\n")
+        f.write(f"Grid: {PATCHES_X}x{PATCHES_Y} patches, {PATCH_MASK_SIZE}x{PATCH_MASK_SIZE} px\n")
+        f.write(f"Total pixels:     {total_px:>12,}\n")
+        f.write(f"Forest pixels:    {n_forest:>12,}  ({n_forest/total_px:.2%})\n")
+        f.write(f"  Coniferous:     {n_con:>12,}  ({n_con/total_px:.2%})\n")
+        f.write(f"  Deciduous:      {n_dec:>12,}  ({n_dec/total_px:.2%})\n")
+        f.write(f"  Conifer share:  {n_con/max(n_forest,1):.2%} of forest\n")
+        f.write(f"No-forest pixels: {total_px-n_forest:>12,}\n")
+        f.write(f"Total stands:     {stand_count_total:>12,}\n")
+    print(f"Saved validation overview + stats to {VALIDATION_DIR}")
 
 
 if __name__ == "__main__":

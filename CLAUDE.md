@@ -63,18 +63,21 @@ All in `scripts/`, run with `python scripts/<name>.py`.
 6. `generate_tdm.py` — Thermal map at 768×768
 7. `generate_flight_planner_map.py` — Topographic BMP at 768×768
 
-### Phase 2 — Textures
+### Phase 2 — Textures & Forest
+> **Full pipeline reference — data sources, invariants, run order, and how to scale to all of North Macedonia: [`docs/PIPELINES.md`](docs/PIPELINES.md).**
 8. `download_mk_ortho_2023.py` — MK 2023 orthophoto (EPSG:6316, zoom 11)
 9. `download_all_quadrants.py` — Parallel download wrapper
-10. `build_patch_textures.py` — 144 patch DDS via gdalwarp + nvcompress
-11. `generate_forest_maps.py` — 512×512 forest masks (OSM + CORINE + DEM)
-12. `generate_loading_screens.py` — Loading screen JPEGs
+10. `build_patch_textures.py` — 144 patch DDS via gdalwarp + nvcompress (2048×2048 DXT1)
+11. `bake_water.py` / `fix_textures.py` — bake OSM water (→DXT3) / LAB colour-fix off-tiles, in place
+12. `download_forest_rasters.py` — Copernicus HRL TCD + DLT + ESA WorldCover → landscape grid
+13. `generate_forest_maps.py` — 512×512 forest masks; extent = continuous satellite canopy `(TCD≥40 ∪ WorldCover ∪ OSM) − exclusions`, species from DLT + OSM leaf tags. See `docs/PIPELINES.md` §3
+14. `generate_loading_screens.py` — Loading screen JPEGs
 
 ### Shared Modules
 - `condor_grid.py` — Grid constants, UTM transforms
 - `osm_io.py` — Overpass API, GeoJSON
 - `rasterize.py` — Shapely→raster masks
-- `forest_utils.py` — DEM sampling, buffer functions
+- `forest_utils.py` — DEM sampling, raster→patch resampling, OSM buffer functions
 
 ## Tools
 
@@ -91,7 +94,8 @@ All in `scripts/`, run with `python scripts/<name>.py`.
 - **Airports:** `data/airports.json`
 - **Ortho:** MK 2023 WMS (e-uslugi.katastar.gov.mk), EPSG:6316, `.sandbox/textures_mk2023_z11/`
 - **OSM:** Cached GeoJSON in `.sandbox/osm/`
-- **CORINE:** CLC2018 WMS for forest classification
+- **CORINE:** CLC2018 WMS for forest classification (species fallback)
+- **Forest canopy/species:** Copernicus HRL Tree-Cover-Density + Dominant-Leaf-Type 2018 (EEA DiscoMap), ESA WorldCover 2021 v200 → `.sandbox/forest_rasters/` via `download_forest_rasters.py`
 
 ## Airports
 
@@ -105,12 +109,10 @@ All in `scripts/`, run with `python scripts/<name>.py`.
 
 Condor 2 runs as **elevated process** with custom DirectX UI. Standard input injection (SendInput, mouse_event, PostMessage) is blocked by UIPI. The MCP `ui_click` tool works intermittently. For visual testing, coordinate with the user for clicks, then take screenshots with `screenshot_control`. DPI scaling is 125%.
 
-## Current Status (2026-06-13)
+## Current Status (2026-06-20)
 
-**Complete:** .tr3 (144), .apt, .cup, .tha/.fha, .ini, forest maps (144), DDS textures (144 at 2048×2048), flight planner map
+**Complete & verified:** .trn (768×768/90m), .tr3 (144, anti-transpose, seams 0m, runways flattened + gated), .apt, .cup, .tdm, .bmp, .ini, DDS textures (144 @2048×2048 + 86 water-baked DXT3 + 6 colour-fixed tiles), **forest maps (144, continuous satellite-canopy algorithm, 35.2% cover, IoU 0.79 vs canopy, seam-free)**, hashes (.tha/.fha regenerated). `verify_phase1.py` → 49/52 PASS.
 
-**Fixed this session:** .trn corrected to 768×768 at 90m (was 2305×2305), .bmp/.tdm resized to match, airport .c3d placeholders added
+**Needs testing:** Launch Condor (fully exit+relaunch to clear terrain cache), verify no crash, check airport positions and mesh.
 
-**Needs testing:** Launch Condor, verify no crash, check airport positions
-
-**Remaining:** Complete ortho download (76.5%, WMS down), loading screens, 3D objects
+**Remaining:** Loading screens (real MK glider photos — the only `verify_phase1` failures), 3D objects, complete ortho download. Then expand to full North Macedonia (see `docs/PIPELINES.md` §8).

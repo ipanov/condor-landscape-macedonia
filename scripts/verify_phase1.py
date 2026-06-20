@@ -17,9 +17,10 @@ PATCH_COLS = 12
 PATCH_ROWS = 12
 NUM_PATCHES = PATCH_COLS * PATCH_ROWS  # 144
 
-# Expected dimensions
-TRN_WIDTH = 2305
-TRN_HEIGHT = 2305
+# Expected .trn/.bmp/.tdm dimensions: 90 m overview = patches x 64 = 12 x 64 = 768.
+# (2305 is the full 30 m DEM .raw used only for .tr3 extraction, NOT the .trn.)
+TRN_WIDTH = 768
+TRN_HEIGHT = 768
 
 results = []
 
@@ -45,7 +46,7 @@ def section(title):
 section("1. MacedoniaSkopje.trn - Source heightmap overview")
 
 trn_path = os.path.join(LANDSCAPE_DIR, f"{NAME}.trn")
-expected_trn_size = 36 + TRN_WIDTH * TRN_HEIGHT * 2  # 10,626,086
+expected_trn_size = 36 + TRN_WIDTH * TRN_HEIGHT * 2  # 1,179,684
 
 if not os.path.exists(trn_path):
     report(".trn exists", False, f"File not found: {trn_path}")

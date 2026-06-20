@@ -14,6 +14,8 @@ The patch extraction scheme is verified against Slovenia2:
 """
 
 import os
+import sys
+import argparse
 import struct
 import numpy as np
 from pathlib import Path
@@ -70,18 +72,26 @@ def write_tr3(path: Path, patch: np.ndarray):
     patch.astype(np.uint16).tofile(path)
 
 
-def main():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    src = read_source(SOURCE_RAW)
+def main(source_raw: Path = SOURCE_RAW, out_dir: Path = OUT_DIR):
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    src = read_source(Path(source_raw))
 
     for c in range(PATCHES_X):
         for r in range(PATCHES_Y):
             patch = extract_patch(src, c, r)
             name = f"h{c:02d}{r:02d}.tr3"
-            write_tr3(OUT_DIR / name, patch)
+            write_tr3(out_dir / name, patch)
 
-    print(f"Generated {PATCHES_X * PATCHES_Y} .tr3 files in {OUT_DIR}")
+    print(f"Generated {PATCHES_X * PATCHES_Y} .tr3 files in {out_dir}")
+    print(f"  source: {source_raw}")
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser(description="Generate 144 .tr3 patches from a 30m raw DEM")
+    ap.add_argument("--source", default=str(SOURCE_RAW),
+                    help="source int16 2305x2305 raw (default: canonical 30m raw)")
+    ap.add_argument("--out", default=str(OUT_DIR),
+                    help="output HeightMaps dir (default: installed Condor HeightMaps)")
+    args = ap.parse_args()
+    main(Path(args.source), Path(args.out))

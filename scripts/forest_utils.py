@@ -27,6 +27,13 @@ from condor_grid import (
     WGS84_CRS,
 )
 
+try:
+    import rasterio
+    from rasterio.transform import Affine
+    _HAVE_RASTERIO = True
+except Exception:  # pragma: no cover - rasterio expected present
+    _HAVE_RASTERIO = False
+
 
 # -----------------------------------------------------------------------------
 # DEM helpers
@@ -78,6 +85,71 @@ def patch_aspect(dem, patch_col, patch_row, size=PATCH_MASK_SIZE):
     rows, cols = utm_to_dem_index(ee, nn)
     coords = np.stack([rows, cols], axis=0)
     return ndimage.map_coordinates(aspect, coords, order=1, mode="nearest")
+
+
+# -----------------------------------------------------------------------------
+# Forest classification raster helpers (HRL DLT/TCD, ESA WorldCover)
+# -----------------------------------------------------------------------------
+
+def load_forest_raster(path):
+    """Load a single-band GeoTIFF as ``(array, affine)``.
+
+    ``array`` is a 2-D numpy array (north-up, row 0 = north). ``affine`` is the
+    rasterio ``Affine`` mapping (col, row) -> (easting, northing) so callers can
+    convert UTM coordinates to fractional pixel indices.
+
+    The rasters produced by ``download_forest_rasters.py`` are already warped
+    onto the landscape grid (UTM 34N, 30 m), so the affine is a simple
+    axis-aligned transform.
+    """
+    path = Path(path)
+    if not _HAVE_RASTERIO:
+        raise RuntimeError("rasterio is required to load forest rasters")
+    with rasterio.open(path) as ds:
+        arr = ds.read(1)
+        affine = ds.transform
+    return arr, affine
+
+
+def patch_raster(arr, affine, patch_col, patch_row, order=0, size=PATCH_MASK_SIZE,
+                 cval=0):
+    """Sample a north-up raster onto a Condor patch grid (``size x size``).
+
+    The patch grid is north-up (row 0 = north, col 0 = west) at ``size`` px,
+    matching the convention used while *authoring* the forest masks. The
+    anti-transpose to Condor's storage order is applied later, at write time.
+
+    Parameters
+    ----------
+    arr, affine : output of :func:`load_forest_raster`
+    patch_col, patch_row : Condor patch indices (CC col 0 = east, RR row 0 = south)
+    order : interpolation order for ``scipy.ndimage.map_coordinates``
+            (0 = nearest for categorical DLT/WorldCover, 1 = bilinear for TCD)
+    cval : fill value for samples outside the raster extent
+
+    Returns
+    -------
+    numpy.ndarray, shape (size, size), dtype matching ``arr``
+    """
+    bounds = patch_bounds_utm(patch_col, patch_row)
+    min_e, min_n, max_e, max_n = bounds
+
+    # Pixel centres in UTM, north-up (ys descend from north to south).
+    xs = np.linspace(min_e, max_e, size, endpoint=False) + (max_e - min_e) / (2 * size)
+    ys = np.linspace(max_n, min_n, size, endpoint=False) - (max_n - min_n) / (2 * size)
+    ee, nn = np.meshgrid(xs, ys)
+
+    # Invert the affine: (e, n) -> fractional (col, row).
+    inv = ~affine
+    col_f, row_f = inv * (ee, nn)
+
+    coords = np.stack([row_f, col_f], axis=0)
+    sampled = ndimage.map_coordinates(
+        arr.astype(np.float32), coords, order=order, mode="constant", cval=cval
+    )
+    if np.issubdtype(arr.dtype, np.integer):
+        return np.rint(sampled).astype(arr.dtype)
+    return sampled.astype(arr.dtype)
 
 
 # -----------------------------------------------------------------------------
@@ -213,6 +285,38 @@ def buffer_waterways(features):
         width = _WATERWAY_WIDTHS.get(ww_type, 4.0)
         try:
             out.append(geom.buffer(width))
+        except Exception:
+            continue
+    return out
+
+
+# Urban landuse clearance buffers (metres) for settlement polygons.
+# Residential areas get the widest margin (gardens, yards), industrial /
+# commercial / retail a little less.
+_URBAN_BUFFERS = {
+    "residential": 8.0,
+    "industrial": 5.0,
+    "commercial": 5.0,
+    "retail": 5.0,
+}
+
+
+def buffer_urban(features, default=5.0):
+    """Buffer urban-landuse polygons (settlements) to clear trees from towns.
+
+    *features* is an iterable of ``(geom, props)`` where ``props['landuse']`` is
+    one of residential / industrial / commercial / retail.  Polygons are
+    buffered outward by a small clearance so forest stands do not bleed onto
+    the edges of built-up areas.
+    """
+    out = []
+    for geom, props in features:
+        if geom.is_empty:
+            continue
+        landuse = props.get("landuse", "")
+        radius = _URBAN_BUFFERS.get(landuse, default)
+        try:
+            out.append(geom.buffer(radius))
         except Exception:
             continue
     return out

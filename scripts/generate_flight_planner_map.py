@@ -4,20 +4,29 @@ Generate a Slovenia2-style topographic flight-planner map for the
 MacedoniaSkopje Condor 2 landscape.
 
 The script:
-  * resamples the 30 m DEM to the target map resolution
-  * computes a hypsometric tint + hillshaded relief
-  * overlays OpenStreetMap vector layers:
-      - water polygons (lakes/reservoirs)
-      - rivers and streams
-      - built-up / settlement areas
-      - major and minor roads
-  * adds a subtle UTM / tile grid and airport markers
-  * saves 24-bit BMP output at 4096x4096 (high-res) and a 32-bit BGRA Windows
-    BMP at 768x768 (Condor, matching the .trn dimensions)
+  * reads the canonical exactly-30 m DEM (macedonia_skopje_dem_30m_2305.raw,
+    int16, 2305x2305, NW pixel-centre 506880/4700160) and resamples it to the
+    map master size
+  * computes a cool, desaturated hypsometric tint + a SOFT hillshaded relief
+    (palette + shading measured from Slovenia2.bmp)
+  * overlays OpenStreetMap vector layers in Slovenia2 colours:
+      - water polygons (lakes/reservoirs)      RGB (21, 85,149)
+      - rivers / streams                        RGB (40,110,170)
+      - built-up / settlement areas (yellow)    RGB (243,227, 16)
+      - roads by class (orange majors -> dark minors)
+      - railways (near-black, thin)             RGB (31, 33, 32)
+  * adds a faint UTM / tile grid, town labels, and airport markers
+  * builds the map at a higher-resolution master, then LANCZOS-downsamples to
+    768x768 (matching the .trn dimensions) while keeping lines >= 2 px at the
+    final scale, and writes a 32-bit Windows BMP via Pillow.
 
 Vector data is fetched from the Overpass API and cached in .sandbox/osm/.
 Cached files are reused when present so the script can run offline after the
 first download.
+
+IMPORTANT (channel order): the final BMP is written with Pillow via
+``Image.fromarray(rgb, "RGB").convert("RGBA").save(path, "BMP")``. Pillow handles
+channel + row order; do NOT hand-pack BGRA bytes.
 """
 
 from __future__ import annotations
@@ -31,13 +40,9 @@ from pathlib import Path
 
 import numpy as np
 import pyproj
-import rasterio
 import requests
 from PIL import Image, ImageDraw
-from rasterio.crs import CRS
-from rasterio.transform import Affine
-from rasterio.warp import Resampling, reproject
-from shapely.geometry import LineString, MultiLineString, Point, shape
+from shapely.geometry import LineString, shape
 from shapely.ops import transform as shapely_transform
 from tqdm import tqdm
 
@@ -50,49 +55,64 @@ from condor_grid import (
     TILES_Y,
     UTM_CRS,
     WGS84_CRS,
-    WIDTH,
-    HEIGHT,
-    XDIM,
     ULXMAP,
     ULYMAP,
 )
 from rasterize import rasterize_mask
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_utm30m.bil"
+# Canonical exactly-30 m DEM: int16, 2305x2305, NW pixel-centre 506880/4700160,
+# negatives/NoData clamped to 0. Its SE corner is 576000/4631040, which is
+# exactly BOUNDS_UTM below -> relief and OSM overlays register pixel-perfectly.
+DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
+DEM_N = 2305
+DEM_CELL_M = 30.0
 OSM_DIR = PROJECT_ROOT / ".sandbox" / "osm"
 OUT_DIR = PROJECT_ROOT / "output" / "maps"
 AIRPORTS_JSON = PROJECT_ROOT / "data" / "airports.json"
 
-# Output sizes
-HIGH_SIZE = 4096
+# Output sizes. MASTER is an exact 3x multiple of 768 so the LANCZOS downsample
+# is clean and line-width scaling is predictable (a 6 px master line -> 2 px).
 LOW_SIZE = 768
+MASTER_SIZE = 2304          # 3 x 768
+DOWNSCALE = MASTER_SIZE // LOW_SIZE   # = 3
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "condor-landscape/1.0"
 
 # ---------------------------------------------------------------------------
-# Colour / style definitions (RGB)
+# Colour / style definitions (RGB), measured from Slovenia2.bmp
 # ---------------------------------------------------------------------------
+# Cool, desaturated green -> khaki -> cream hypsometric ramp. Macedonia/Skopje
+# DEM range ~194..2489 m, so the stops span that band. Interpolated linearly.
 ELEV_STOPS: list[tuple[float, tuple[int, int, int]]] = [
-    (0.0, (110, 150, 90)),      # low plains: muted green
-    (250.0, (165, 195, 125)),   # farmland/foothills
-    (550.0, (215, 215, 165)),   # rolling hills
-    (950.0, (200, 165, 115)),   # lower mountains
-    (1400.0, (165, 125, 85)),   # mountains
-    (2000.0, (190, 185, 180)),  # high peaks grey
-    (2700.0, (250, 250, 250)),  # snow/rock white
+    (150.0,  (120, 150, 138)),   # valley floor: cool grey-green
+    (300.0,  (135, 162, 145)),
+    (500.0,  (158, 178, 152)),
+    (750.0,  (185, 198, 165)),
+    (1050.0, (210, 219, 178)),
+    (1400.0, (236, 242, 192)),
+    (1800.0, (250, 252, 208)),   # high: pale cream
+    (2500.0, (252, 250, 220)),
 ]
 
-WATER_COLOR = np.array([120, 170, 220], dtype=np.uint8)
-RIVER_COLOR = np.array([80, 130, 200], dtype=np.uint8)
-URBAN_COLOR = np.array([230, 220, 80], dtype=np.uint8)    # yellow (matching Slovenia2)
-ROAD_MAJOR_COLOR = np.array([220, 50, 30], dtype=np.uint8)    # red (motorway/trunk/primary)
-ROAD_SECONDARY_COLOR = np.array([230, 140, 40], dtype=np.uint8) # orange (secondary)
-ROAD_MINOR_COLOR = np.array([180, 140, 100], dtype=np.uint8)  # light brown (tertiary and below)
-RAILWAY_COLOR = np.array([30, 30, 30], dtype=np.uint8)        # black (matching Slovenia2 railways)
-GRID_COLOR = np.array([190, 190, 190], dtype=np.uint8)
-AIRPORT_COLOR = np.array([255, 0, 0], dtype=np.uint8)
+# Overlay colours (Slovenia2-measured)
+WATER_COLOR = np.array([21, 85, 149], dtype=np.uint8)     # opaque lake/reservoir blue
+RIVER_COLOR = np.array([40, 110, 170], dtype=np.uint8)    # river/stream blue
+URBAN_COLOR = np.array([243, 227, 16], dtype=np.uint8)    # settlement yellow
+ROAD_MAJOR_COLOR = np.array([222, 88, 44], dtype=np.uint8)      # motorway/trunk/primary orange
+ROAD_SECONDARY_COLOR = np.array([232, 150, 60], dtype=np.uint8) # secondary orange
+ROAD_MINOR_COLOR = np.array([90, 70, 60], dtype=np.uint8)       # minor dark brown
+RAILWAY_COLOR = np.array([31, 33, 32], dtype=np.uint8)         # near-black, thin
+GRID_COLOR = np.array([90, 90, 90], dtype=np.uint8)
+AIRPORT_COLOR = np.array([220, 40, 40], dtype=np.uint8)
+
+# Hillshade parameters (measured from Slovenia2): soft so colours stay light.
+HS_AZIMUTH = 315.0
+HS_ALTITUDE = 45.0
+HS_Z_FACTOR = 2.0
+HS_SHADE_BASE = 0.55         # shade = HS_SHADE_BASE + HS_SHADE_GAIN * hs
+HS_SHADE_GAIN = 0.60         # -> multiplier range 0.55 .. 1.15
 
 BOUNDS_UTM = (ULXMAP, BR_NORTHING, BR_EASTING, ULYMAP)
 
@@ -161,7 +181,7 @@ def _load_geojson(path: Path) -> dict:
 
 
 def _line_feature_collection(osm_data: dict) -> dict:
-    """Convert Overpass `out geom` road/waterway elements to LineString FC."""
+    """Convert Overpass `out geom` way elements to LineString FC."""
     features = []
     for el in osm_data.get("elements", []):
         if el.get("type") != "way":
@@ -222,6 +242,14 @@ def _roads_query(south: float, west: float, north: float, east: float) -> str:
 out geom;"""
 
 
+def _railways_query(south: float, west: float, north: float, east: float) -> str:
+    return f"""[out:json][timeout:300][bbox:{south},{west},{north},{east}];
+(
+  way["railway"~"^(rail|light_rail|narrow_gauge|tram|subway)$"];
+);
+out geom;"""
+
+
 def _waterways_query(south: float, west: float, north: float, east: float) -> str:
     return f"""[out:json][timeout:300][bbox:{south},{west},{north},{east}];
 (
@@ -270,10 +298,27 @@ def project_features(fc: dict):
     return geoms, props
 
 
+def _load_or_fetch_lines(path: Path, query_fn, bbox, label: str):
+    """Load a cached LineString GeoJSON or fetch+cache it from Overpass."""
+    south, west, north, east = bbox
+    if path.exists():
+        print(f"[OSM] Using cached {label}: {path}")
+        return _load_geojson(path)
+    try:
+        data = fetch_overpass(query_fn(south, west, north, east), label)
+        fc = _line_feature_collection(data)
+        _save_geojson(fc, path)
+        return fc
+    except Exception as exc:
+        print(f"[OSM] WARNING: could not fetch {label}: {exc}")
+        return {"type": "FeatureCollection", "features": []}
+
+
 def load_osm_layers() -> dict:
     """Load or fetch all OSM vector layers needed by the map."""
     OSM_DIR.mkdir(parents=True, exist_ok=True)
-    south, west, north, east = _wgs84_bbox()
+    bbox = _wgs84_bbox()
+    south, west, north, east = bbox
     print(f"[OSM] Landscape WGS84 bbox: {south:.6f},{west:.6f} -> {north:.6f},{east:.6f}")
 
     layers: dict[str, tuple[list, list]] = {}
@@ -288,34 +333,21 @@ def load_osm_layers() -> dict:
         layers["water"] = ([], [])
 
     # Road lines
-    roads_path = OSM_DIR / "roads_lines.geojson"
-    if roads_path.exists():
-        print(f"[OSM] Using cached road lines: {roads_path}")
-        fc = _load_geojson(roads_path)
-    else:
-        try:
-            data = fetch_overpass(_roads_query(south, west, north, east), "roads")
-            fc = _line_feature_collection(data)
-            _save_geojson(fc, roads_path)
-        except Exception as exc:
-            print(f"[OSM] WARNING: could not fetch roads: {exc}")
-            fc = {"type": "FeatureCollection", "features": []}
-    layers["roads"] = project_features(fc)
+    layers["roads"] = project_features(
+        _load_or_fetch_lines(OSM_DIR / "roads_lines.geojson", _roads_query, bbox, "roads")
+    )
+
+    # Railway centre-lines (thin near-black). NB: the cached railways.geojson is
+    # POLYGON corridors built by the polygon importer and is unsuitable for thin
+    # lines, so we keep railway *lines* in a separate file.
+    layers["railways"] = project_features(
+        _load_or_fetch_lines(OSM_DIR / "railways_lines.geojson", _railways_query, bbox, "railways")
+    )
 
     # Waterway lines
-    waterways_path = OSM_DIR / "waterways.geojson"
-    if waterways_path.exists():
-        print(f"[OSM] Using cached waterways: {waterways_path}")
-        fc = _load_geojson(waterways_path)
-    else:
-        try:
-            data = fetch_overpass(_waterways_query(south, west, north, east), "waterways")
-            fc = _line_feature_collection(data)
-            _save_geojson(fc, waterways_path)
-        except Exception as exc:
-            print(f"[OSM] WARNING: could not fetch waterways: {exc}")
-            fc = {"type": "FeatureCollection", "features": []}
-    layers["waterways"] = project_features(fc)
+    layers["waterways"] = project_features(
+        _load_or_fetch_lines(OSM_DIR / "waterways.geojson", _waterways_query, bbox, "waterways")
+    )
 
     # Settlement / built-up polygons
     settlements_path = OSM_DIR / "settlements.geojson"
@@ -325,7 +357,6 @@ def load_osm_layers() -> dict:
     else:
         try:
             data = fetch_overpass(_settlements_query(south, west, north, east), "settlements")
-            # Re-use the project's polygon builder for multipolygon relations
             from osm_io import osm_json_to_geojson
             fc = osm_json_to_geojson(data)
             _save_geojson(fc, settlements_path)
@@ -334,7 +365,7 @@ def load_osm_layers() -> dict:
             fc = {"type": "FeatureCollection", "features": []}
     layers["settlements"] = project_features(fc)
 
-    # Place nodes (towns/villages) -- optional markers
+    # Place nodes (towns/villages) -- markers + labels
     places_path = OSM_DIR / "places.geojson"
     if places_path.exists():
         fc = _load_geojson(places_path)
@@ -354,68 +385,61 @@ def load_osm_layers() -> dict:
 # ---------------------------------------------------------------------------
 # DEM / relief
 # ---------------------------------------------------------------------------
-def load_dem(width: int, height: int) -> np.ndarray:
-    """Resample the 30 m DEM to the requested map size."""
-    print(f"[DEM] Resampling DEM to {width}x{height}...")
-    min_e, min_n, max_e, max_n = BOUNDS_UTM
-    dst_transform = (
-        Affine.translation(min_e, max_n)
-        * Affine.scale((max_e - min_e) / width, -(max_n - min_n) / height)
-    )
+def load_dem(size: int) -> np.ndarray:
+    """Read the canonical 30 m int16 DEM and resample to ``size``x``size``.
 
-    with rasterio.open(DEM_PATH) as src:
-        dst = np.empty((height, width), dtype=np.float32)
-        reproject(
-            rasterio.band(src, 1),
-            dst,
-            src_transform=src.transform,
-            src_crs=UTM_CRS,
-            dst_transform=dst_transform,
-            dst_crs=UTM_CRS,
-            resampling=Resampling.bilinear,
-            src_nodata=src.nodata,
-            dst_nodata=-32768.0,
+    The DEM's geographic extent equals BOUNDS_UTM exactly (NW pixel-centre
+    506880/4700160, 2305 px, 30 m -> SE 576000/4631040), so a straight resize
+    keeps relief registered with the OSM overlays. Negatives/NoData are clamped
+    to 0 (per the DEM header).
+    """
+    print(f"[DEM] Reading {DEM_PATH.name} ({DEM_N}x{DEM_N} int16) and resampling to {size}x{size}...")
+    raw = np.fromfile(DEM_PATH, dtype="<i2")
+    if raw.size != DEM_N * DEM_N:
+        raise ValueError(
+            f"DEM {DEM_PATH} has {raw.size} samples, expected {DEM_N*DEM_N} "
+            f"({DEM_N}x{DEM_N})"
         )
-    dem = np.where(dst <= -32000, np.nan, dst)
-    # Fill small no-data holes with the minimum valid elevation
-    fill_val = float(np.nanmin(dem)) if np.any(np.isfinite(dem)) else 0.0
-    dem = np.nan_to_num(dem, nan=fill_val)
+    dem = raw.astype(np.float32).reshape(DEM_N, DEM_N)
+    dem = np.where(dem < 0, 0.0, dem)
+
+    if size != DEM_N:
+        # Bilinear resample via Pillow F-mode (float32) for a smooth relief.
+        dem_img = Image.fromarray(dem, mode="F").resize((size, size), Image.Resampling.BILINEAR)
+        dem = np.asarray(dem_img, dtype=np.float32)
     print(f"[DEM] Elevation range: {dem.min():.0f} - {dem.max():.0f} m")
     return dem
 
 
 def colorize_elevation(dem: np.ndarray) -> np.ndarray:
-    """Apply a hypsometric colour table to the DEM."""
+    """Apply the cool hypsometric colour table to the DEM (RGB uint8)."""
     stops = ELEV_STOPS
     zs = np.array([s[0] for s in stops], dtype=np.float32)
     cols = np.array([s[1] for s in stops], dtype=np.float32)
     img = np.zeros((*dem.shape, 3), dtype=np.float32)
     z = dem.astype(np.float32)
 
-    # below first stop
-    img[z < zs[0]] = cols[0]
-    # between stops
+    img[z <= zs[0]] = cols[0]
     for i in range(len(stops) - 1):
-        mask = (z >= zs[i]) & (z < zs[i + 1])
+        mask = (z > zs[i]) & (z <= zs[i + 1])
         if not np.any(mask):
             continue
         t = (z[mask] - zs[i]) / (zs[i + 1] - zs[i])
         img[mask] = (1.0 - t)[:, None] * cols[i] + t[:, None] * cols[i + 1]
-    # above last stop
-    img[z >= zs[-1]] = cols[-1]
+    img[z > zs[-1]] = cols[-1]
     return np.clip(img, 0, 255).astype(np.uint8)
 
 
-def hillshade(dem: np.ndarray, cellsize: float, azimuth: float = 315, altitude: float = 45) -> np.ndarray:
-    """Simple analytical hillshade multiplier (0..1)."""
-    dx, dy = np.gradient(dem, cellsize, cellsize)
-    slope = np.pi / 2.0 - np.arctan(np.sqrt(dx * dx + dy * dy))
+def hillshade(dem: np.ndarray, cellsize: float) -> np.ndarray:
+    """Soft analytical hillshade multiplier in 0.55 .. 1.15 (light, not dark)."""
+    dy, dx = np.gradient(dem * HS_Z_FACTOR, cellsize, cellsize)
+    slope = np.pi / 2.0 - np.arctan(np.hypot(dx, dy))
     aspect = np.arctan2(-dx, dy)
-    az = math.radians(azimuth)
-    alt = math.radians(altitude)
-    shaded = np.sin(alt) * np.sin(slope) + np.cos(alt) * np.cos(slope) * np.cos(az - aspect)
-    shaded = (shaded * 0.5 + 0.5)
-    return np.clip(shaded, 0.35, 1.35)
+    az = math.radians(HS_AZIMUTH)
+    alt = math.radians(HS_ALTITUDE)
+    hs = np.sin(alt) * np.sin(slope) + np.cos(alt) * np.cos(slope) * np.cos(az - aspect)
+    hs = np.clip(hs, 0.0, 1.0)
+    return HS_SHADE_BASE + HS_SHADE_GAIN * hs
 
 
 # ---------------------------------------------------------------------------
@@ -467,7 +491,6 @@ def draw_line_layer(geoms, props, width, height, width_fn, color_fn, desc):
     for geom, prop in tqdm(items, desc=desc, mininterval=5):
         if geom.is_empty:
             continue
-        # collect coordinate sequences
         sequences = []
         if geom.geom_type == "LineString":
             sequences.append(list(geom.coords))
@@ -483,40 +506,43 @@ def draw_line_layer(geoms, props, width, height, width_fn, color_fn, desc):
             pts = [_utm_to_px(x, y, width, height) for x, y, *_ in seq]
             if len(pts) < 2:
                 continue
-            draw.line(pts, fill=(*color, 255), width=w_px)
+            draw.line(pts, fill=(int(color[0]), int(color[1]), int(color[2]), 255),
+                      width=w_px, joint="curve")
     return layer
 
 
 def draw_grid_layer(width: int, height: int) -> Image.Image:
-    """Draw Condor tile boundaries and a faint UTM 10 km grid."""
+    """Draw faint Condor tile boundaries and a fainter UTM 10 km grid."""
     layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
     min_e, min_n, max_e, max_n = BOUNDS_UTM
 
-    # Condor tile grid (3x3)
-    tile_color = (*GRID_COLOR, 140)
+    line_w = max(1, DOWNSCALE - 1)  # ~1 px at final 768 scale
+
+    # Condor tile grid (3x3) -- faint
+    tile_color = (int(GRID_COLOR[0]), int(GRID_COLOR[1]), int(GRID_COLOR[2]), 60)
     for col in range(TILES_X + 1):
         e = BR_EASTING - col * TILE_SIZE_M
         if min_e <= e <= max_e:
             x, _ = _utm_to_px(e, max_n, width, height)
-            draw.line([(x, 0), (x, height)], fill=tile_color, width=2)
+            draw.line([(x, 0), (x, height)], fill=tile_color, width=line_w)
     for row in range(TILES_Y + 1):
         n = BR_NORTHING + row * TILE_SIZE_M
         if min_n <= n <= max_n:
             _, y = _utm_to_px(min_e, n, width, height)
-            draw.line([(0, y), (width, y)], fill=tile_color, width=2)
+            draw.line([(0, y), (width, y)], fill=tile_color, width=line_w)
 
     # UTM 10 km grid (very faint)
-    utm_color = (*GRID_COLOR, 50)
+    utm_color = (int(GRID_COLOR[0]), int(GRID_COLOR[1]), int(GRID_COLOR[2]), 35)
     e = math.ceil(min_e / 10000.0) * 10000.0
     while e <= max_e:
         x, _ = _utm_to_px(e, max_n, width, height)
-        draw.line([(x, 0), (x, height)], fill=utm_color, width=1)
+        draw.line([(x, 0), (x, height)], fill=utm_color, width=max(1, DOWNSCALE - 1))
         e += 10000.0
     n = math.ceil(min_n / 10000.0) * 10000.0
     while n <= max_n:
         _, y = _utm_to_px(min_e, n, width, height)
-        draw.line([(0, y), (width, y)], fill=utm_color, width=1)
+        draw.line([(0, y), (width, y)], fill=utm_color, width=max(1, DOWNSCALE - 1))
         n += 10000.0
 
     return layer
@@ -532,15 +558,16 @@ def draw_airports(width: int, height: int) -> Image.Image:
     with open(AIRPORTS_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    r = max(5, 3 * DOWNSCALE)
     for ap in data.get("airports", []):
         try:
             e, n = transformer.transform(ap["lon"], ap["lat"])
             x, y = _utm_to_px(e, n, width, height)
-            r = 7
             draw.ellipse(
                 [(x - r, y - r), (x + r, y + r)],
-                fill=(*AIRPORT_COLOR, 200),
+                fill=(int(AIRPORT_COLOR[0]), int(AIRPORT_COLOR[1]), int(AIRPORT_COLOR[2]), 220),
                 outline=(0, 0, 0, 255),
+                width=max(1, DOWNSCALE),
             )
         except Exception:
             continue
@@ -548,28 +575,33 @@ def draw_airports(width: int, height: int) -> Image.Image:
 
 
 def draw_place_markers(geoms, props, width, height) -> Image.Image:
-    """Draw city/town dots with name labels (matching Slovenia2 style)."""
+    """Draw city/town dots with name labels (dark text, light halo)."""
     from PIL import ImageFont
     layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     if not geoms:
         return layer
     draw = ImageDraw.Draw(layer)
 
-    # Load fonts for labels
-    font_city = None
-    font_town = None
-    font_village = None
+    font_city = font_town = font_village = None
     try:
-        from pathlib import Path
         bold = Path("C:/Windows/Fonts/arialbd.ttf")
         regular = Path("C:/Windows/Fonts/arial.ttf")
         if bold.exists():
-            font_city = ImageFont.truetype(str(bold), max(14, width // 250))
-            font_town = ImageFont.truetype(str(bold), max(11, width // 340))
+            font_city = ImageFont.truetype(str(bold), max(14, width // 90))
+            font_town = ImageFont.truetype(str(bold), max(11, width // 130))
         if regular.exists():
-            font_village = ImageFont.truetype(str(regular), max(9, width // 420))
+            font_village = ImageFont.truetype(str(regular), max(9, width // 170))
     except Exception:
         pass
+
+    def _halo_text(tx, ty, name, font, text_color):
+        # Light halo (8-neighbour) for readability over relief, then dark text.
+        halo = (250, 250, 250, 200)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                if dx or dy:
+                    draw.text((tx + dx, ty + dy), name, font=font, fill=halo)
+        draw.text((tx, ty), name, font=font, fill=text_color)
 
     for geom, prop in zip(geoms, props):
         if geom.geom_type != "Point":
@@ -579,74 +611,56 @@ def draw_place_markers(geoms, props, width, height) -> Image.Image:
         name = prop.get("name", prop.get("name:en", ""))
 
         if place == "city":
-            r = 5
-            dot_color = (40, 40, 40, 220)
+            r = max(4, 2 * DOWNSCALE)
+            dot_color = (40, 40, 40, 230)
             font = font_city
-            text_color = (30, 30, 30, 240)
+            text_color = (25, 25, 25, 245)
         elif place == "town":
-            r = 4
-            dot_color = (60, 60, 60, 200)
+            r = max(3, DOWNSCALE + 1)
+            dot_color = (60, 60, 60, 210)
             font = font_town
-            text_color = (40, 40, 40, 220)
+            text_color = (35, 35, 35, 230)
         elif place == "village":
-            r = 2
-            dot_color = (80, 80, 80, 160)
+            r = max(2, DOWNSCALE)
+            dot_color = (80, 80, 80, 170)
             font = font_village
-            text_color = (60, 60, 60, 180)
+            text_color = (55, 55, 55, 200)
         else:
-            r = 2
-            dot_color = (100, 80, 60, 140)
-            font = font_village
-            text_color = (60, 60, 60, 150)
+            continue  # skip hamlets/other to avoid clutter
 
-        # Draw dot
         draw.ellipse(
             [(x - r, y - r), (x + r, y + r)],
             fill=dot_color,
-            outline=(0, 0, 0, 200),
+            outline=(0, 0, 0, 210),
         )
 
-        # Draw label with shadow
         if name and font and place in ("city", "town", "village"):
-            tx = x + r + 4
+            tx = x + r + 3
             ty = y - r - 2
-            # Shadow
-            draw.text((tx + 1, ty + 1), name, font=font, fill=(255, 255, 255, 140))
-            # Text
-            draw.text((tx, ty), name, font=font, fill=text_color)
+            _halo_text(tx, ty, name, font, text_color)
 
     return layer
 
 
 # ---------------------------------------------------------------------------
-# Road / river styling functions
+# Road / river / railway styling functions
 # ---------------------------------------------------------------------------
 def road_width(prop: dict, scale: float) -> int:
     cls = prop.get("highway", "")
     base = {
-        "motorway": 4,
-        "trunk": 4,
-        "primary": 3,
-        "secondary": 3,
-        "tertiary": 2,
-        "unclassified": 2,
-        "residential": 2,
-        "living_street": 2,
-        "service": 2,
-        "track": 2,
-        "path": 1,
-        "cycleway": 1,
-        "pedestrian": 2,
-        "road": 2,
+        "motorway": 4, "trunk": 4, "primary": 3,
+        "secondary": 3, "tertiary": 2, "unclassified": 2,
+        "residential": 2, "living_street": 2, "service": 2,
+        "track": 2, "path": 1, "cycleway": 1,
+        "pedestrian": 2, "road": 2,
     }.get(cls, 2)
-    return max(1, int(round(base * scale)))
+    return max(2, int(round(base * scale)))
 
 
 def road_color(prop: dict) -> np.ndarray:
     cls = prop.get("highway", "")
-    if cls in ("motorway", "motorway_link", "trunk", "trunk_link"):
-        return ROAD_MAJOR_COLOR  # red for major roads
-    if cls in ("primary", "primary_link"):
+    if cls in ("motorway", "motorway_link", "trunk", "trunk_link",
+               "primary", "primary_link"):
         return ROAD_MAJOR_COLOR
     if cls in ("secondary", "secondary_link"):
         return ROAD_SECONDARY_COLOR
@@ -656,66 +670,134 @@ def road_color(prop: dict) -> np.ndarray:
 def river_width(prop: dict, scale: float) -> int:
     cls = prop.get("waterway", "")
     base = {"river": 3, "canal": 3, "stream": 2}.get(cls, 2)
-    return max(1, int(round(base * scale)))
+    return max(2, int(round(base * scale)))
+
+
+def railway_width(prop: dict, scale: float) -> int:
+    # Thin near-black lines.
+    return max(2, int(round(2 * scale)))
 
 
 # ---------------------------------------------------------------------------
 # Main map generation
 # ---------------------------------------------------------------------------
-def generate_map(size: int, layers: dict) -> Image.Image:
+def generate_master(size: int, layers: dict) -> Image.Image:
+    """Render the full map at the master resolution (RGB)."""
     width = height = size
-    scale = size / HIGH_SIZE
+    scale = size / MASTER_SIZE
     bounds = BOUNDS_UTM
-    print(f"\n[Map] Generating {width}x{height} map (scale={scale:.3f})...")
+    print(f"\n[Map] Generating {width}x{height} master (scale={scale:.3f})...")
 
-    # Relief
-    dem = load_dem(width, height)
+    # Relief + soft hillshade
+    dem = load_dem(size)
     relief = colorize_elevation(dem)
     cellsize = (bounds[2] - bounds[0]) / width
     shade = hillshade(dem, cellsize)
     base = (relief.astype(np.float32) * shade[..., None]).clip(0, 255).astype(np.uint8)
 
-    # Layers (composite order matters)
+    # Composite order:
+    #   relief+hillshade -> water -> rivers -> settlements -> minor roads ->
+    #   secondary -> major roads -> railways -> grid -> labels -> airports
     print("[Render] Compositing layers...")
-    base = _blend(base, rasterize_polygon_layer(layers["water"][0], bounds, width, height,
-                                                WATER_COLOR, 0.92, "water"))
-    base = _blend(base, rasterize_polygon_layer(layers["settlements"][0], bounds, width, height,
-                                                URBAN_COLOR, 0.55, "settlements"))
-    base = _blend(base, draw_line_layer(layers["waterways"][0], layers["waterways"][1],
-                                        width, height,
-                                        lambda p: river_width(p, scale),
-                                        lambda p: RIVER_COLOR, "rivers/streams"))
-    base = _blend(base, draw_line_layer(layers["roads"][0], layers["roads"][1],
-                                        width, height,
-                                        lambda p: road_width(p, scale),
-                                        road_color, "roads"))
+
+    # Water polygons (opaque)
+    base = _blend(base, rasterize_polygon_layer(
+        layers["water"][0], bounds, width, height, WATER_COLOR, 1.0, "water"))
+
+    # Rivers / streams
+    base = _blend(base, draw_line_layer(
+        layers["waterways"][0], layers["waterways"][1], width, height,
+        lambda p: river_width(p, scale), lambda p: RIVER_COLOR, "rivers/streams"))
+
+    # Settlements (yellow, semi-opaque)
+    base = _blend(base, rasterize_polygon_layer(
+        layers["settlements"][0], bounds, width, height, URBAN_COLOR, 0.72, "settlements"))
+
+    # Roads, drawn minor -> secondary -> major so majors stay on top.
+    road_geoms, road_props = layers["roads"]
+    minor_idx, sec_idx, major_idx = [], [], []
+    for i, p in enumerate(road_props):
+        cls = p.get("highway", "")
+        if cls in ("motorway", "motorway_link", "trunk", "trunk_link",
+                   "primary", "primary_link"):
+            major_idx.append(i)
+        elif cls in ("secondary", "secondary_link"):
+            sec_idx.append(i)
+        else:
+            minor_idx.append(i)
+
+    def _subset(idxs):
+        return [road_geoms[i] for i in idxs], [road_props[i] for i in idxs]
+
+    g, pr = _subset(minor_idx)
+    base = _blend(base, draw_line_layer(g, pr, width, height,
+                  lambda p: road_width(p, scale), road_color, "minor roads"))
+    g, pr = _subset(sec_idx)
+    base = _blend(base, draw_line_layer(g, pr, width, height,
+                  lambda p: road_width(p, scale), road_color, "secondary roads"))
+    g, pr = _subset(major_idx)
+    base = _blend(base, draw_line_layer(g, pr, width, height,
+                  lambda p: road_width(p, scale), road_color, "major roads"))
+
+    # Railways (near-black, thin) -- above roads
+    base = _blend(base, draw_line_layer(
+        layers["railways"][0], layers["railways"][1], width, height,
+        lambda p: railway_width(p, scale), lambda p: RAILWAY_COLOR, "railways"))
+
+    # Faint grid
     base = _blend(base, draw_grid_layer(width, height))
+
+    # Town labels
     base = _blend(base, draw_place_markers(layers["places"][0], layers["places"][1], width, height))
+
+    # Airport markers (top)
     base = _blend(base, draw_airports(width, height))
 
     return Image.fromarray(base, mode="RGB")
 
 
 def main():
+    import shutil
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     print("=" * 60)
     print("Generating Slovenia2-style topographic flight planner map")
     print(f"Bounds UTM34: {BOUNDS_UTM}")
+    print(f"Master {MASTER_SIZE}x{MASTER_SIZE} -> {LOW_SIZE}x{LOW_SIZE} (x{DOWNSCALE})")
     print("=" * 60)
 
     layers = load_osm_layers()
 
     # High-res master
-    img_high = generate_map(HIGH_SIZE, layers)
-    high_path = OUT_DIR / "MacedoniaSkopje_4096.bmp"
-    img_high.save(high_path, format="BMP")
-    print(f"[Out] Saved high-res map: {high_path} ({high_path.stat().st_size / (1024*1024):.1f} MB)")
+    img_master = generate_master(MASTER_SIZE, layers)
+    master_path = OUT_DIR / f"MacedoniaSkopje_{MASTER_SIZE}.bmp"
+    img_master.save(master_path, format="BMP")
+    print(f"[Out] Saved master map: {master_path} "
+          f"({master_path.stat().st_size / (1024*1024):.1f} MB)")
 
-    # Condor-sized downsample (must match .trn dimensions)
-    img_low = img_high.resize((LOW_SIZE, LOW_SIZE), Image.Resampling.LANCZOS)
+    # Condor-sized downsample (must match .trn dimensions: 768x768, 32-bit).
+    img_low = img_master.resize((LOW_SIZE, LOW_SIZE), Image.Resampling.LANCZOS)
     low_path = OUT_DIR / "MacedoniaSkopje.bmp"
+    # RGB -> RGBA -> BMP: Pillow writes a 32-bit bottom-up Windows BMP with the
+    # correct channel order. Do NOT hand-pack BGRA bytes.
     img_low.convert("RGBA").save(low_path, format="BMP")
-    print(f"[Out] Saved Condor map: {low_path} ({low_path.stat().st_size / (1024*1024):.1f} MB)")
+    print(f"[Out] Saved Condor map: {low_path} "
+          f"({low_path.stat().st_size:,} bytes)")
+
+    # Install into the Condor landscape, backing up the existing file first.
+    installed = Path("C:/Condor2/Landscapes/MacedoniaSkopje/MacedoniaSkopje.bmp")
+    if installed.parent.exists():
+        if installed.exists():
+            backup = installed.with_suffix(".bmp.bak")
+            if not backup.exists():
+                shutil.copy2(installed, backup)
+                print(f"[Install] Backed up existing -> {backup}")
+            else:
+                print(f"[Install] Backup already exists -> {backup} (left as-is)")
+        shutil.copy2(low_path, installed)
+        print(f"[Install] Installed -> {installed} ({installed.stat().st_size:,} bytes)")
+    else:
+        print(f"[Install] WARNING: {installed.parent} not found; skipped install")
 
     print("\nDone.")
 

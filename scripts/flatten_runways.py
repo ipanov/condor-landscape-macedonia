@@ -2,32 +2,38 @@
 """
 flatten_runways.py
 
-Reads data/airports.json and flattens each runway polygon in the
-2304x2304 signed 16-bit little-endian raw heightmap.
+Flatten each runway footprint in the CANONICAL exactly-30m UTM heightmap, with a
+graded skirt so the flattened plateau blends into the surrounding terrain instead
+of leaving a vertical mesh cliff.
 
-Projection:
-    - WGS-84 lat/lon  ->  UTM zone 34N (EPSG:32634)
-    - UTM (E, N)      ->  pixel indices (top-left origin)
-        px = (E - ULXMAP) / XDIM
-        py = (ULYMAP - N) / YDIM
+Input  : sources/dem/macedonia_skopje_dem_30m_2305.raw   (int16 LE, 2305x2305,
+         NW pixel CENTER 506880/4700160, exactly 30 m/px, EPSG:32634)
+Output : sources/dem/macedonia_skopje_dem_30m_2305_flat.raw  (same format)
 
-The heightmap is assumed to use metres directly (orthometric / MSL). No geoid
-offset is applied unless evidence of an ellipsoidal DEM is found.
+Runway parameters come from data/airports_aligned.json when present (centers /
+true headings validated against the ortho imagery in scripts/align_runways.py),
+otherwise from data/airports.json.
 
-Output:
-    sources/dem/macedonia_skopje_dem_utm30m_flat.raw
-    tools/flatten_runways_summary.txt
+Per runway:
+  * Flatten an ORIENTED rectangle (rotated to the runway true heading) of size
+    (L + 120) x (W + 80) m -- L+120 adds ~60 m overrun at each end, W+80 adds
+    ~40 m lateral margin -- to the integer target elevation.
+  * GRADED SKIRT: over the next SKIRT_M (= 90 m, 3 px at 30 m) beyond the
+    rectangle, linearly blend the flat elevation back to the original terrain
+    (~1:3 visual slope for a 30 m plateau-to-terrain step). The blend uses the
+    signed distance to the oriented rectangle, so corners round naturally.
+
+Only the heightmap is written; .trn / textures / forests are untouched.
+
+Outputs a human-readable summary to tools/flatten_runways_summary.txt.
 """
 
 import json
 import math
-import struct
 from pathlib import Path
 
 import numpy as np
 import pyproj
-from shapely.geometry import Point, Polygon
-from shapely.prepared import prep
 
 # ---------------------------------------------------------------------------
 # Project layout
@@ -37,229 +43,207 @@ DATA_DIR = PROJECT_ROOT / "data"
 TOOLS_DIR = PROJECT_ROOT / "tools"
 DEM_DIR = PROJECT_ROOT / "sources" / "dem"
 
+AIRPORTS_ALIGNED = DATA_DIR / "airports_aligned.json"
 AIRPORTS_JSON = DATA_DIR / "airports.json"
-INPUT_BIL = DEM_DIR / "macedonia_skopje_dem_2305.bil"
-OUTPUT_RAW = DEM_DIR / "macedonia_skopje_dem_2305_flat.raw"
+INPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305.raw"
+OUTPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305_flat.raw"
 SUMMARY_TXT = TOOLS_DIR / "flatten_runways_summary.txt"
 
 # ---------------------------------------------------------------------------
-# Heightmap geometry (from sources/dem/macedonia_skopje_dem_2305.hdr)
-# 2305 x 2305 samples are required so that 12 x 12 Condor patches can share
-# vertices (each patch is 193 x 193 = 192 intervals).
+# Heightmap geometry -- canonical exactly-30m raw.
 # ---------------------------------------------------------------------------
 NROWS = 2305
 NCOLS = 2305
-NBANDS = 1
-XDIM = 29.9869848156182  # metres per pixel, easting
-YDIM = 29.9869848156182  # metres per pixel, northing
-ULXMAP = 506880.0        # easting of the centre of the top-left pixel
-ULYMAP = 4700160.0       # northing of the centre of the top-left pixel
-NODATA = -32768
+XDIM = 30.0              # metres per pixel, easting (EXACT)
+YDIM = 30.0              # metres per pixel, northing (EXACT)
+ULXMAP = 506880.0        # easting of the CENTRE of the top-left pixel
+ULYMAP = 4700160.0       # northing of the CENTRE of the top-left pixel
+
+# Flatten rectangle padding and skirt.
+PAD_LEN_M = 120.0        # total extra length (overrun), 60 m each end
+PAD_WID_M = 80.0         # total extra width (lateral margin), 40 m each side
+SKIRT_M = 90.0           # graded blend distance beyond the rectangle (3 px)
 
 # ---------------------------------------------------------------------------
-# Coordinate transforms
+# Coordinate transform: WGS-84 -> UTM 34N
 # ---------------------------------------------------------------------------
-# WGS-84 (EPSG:4326) -> UTM 34N (EPSG:32634)
-_utm_crs = pyproj.CRS.from_epsg(32634)
-_wgs84_crs = pyproj.CRS.from_epsg(4326)
-_transformer = pyproj.Transformer.from_crs(_wgs84_crs, _utm_crs, always_xy=True)
+_transformer = pyproj.Transformer.from_crs(4326, 32634, always_xy=True)
 
 
 def wgs84_to_utm(lon: float, lat: float) -> tuple[float, float]:
-    """Return (easting, northing) in UTM 34N."""
     return _transformer.transform(lon, lat)
 
 
-def pixel_to_utm(px: float, py: float) -> tuple[float, float]:
-    """Return the UTM coordinate of the centre of pixel (px, py)."""
-    easting = ULXMAP + px * XDIM
-    northing = ULYMAP - py * YDIM
-    return easting, northing
+def load_airports() -> tuple[dict, str]:
+    """Prefer the imagery-aligned airports file; fall back to the raw json."""
+    if AIRPORTS_ALIGNED.exists():
+        return json.loads(AIRPORTS_ALIGNED.read_text(encoding="utf-8")), str(AIRPORTS_ALIGNED)
+    if AIRPORTS_JSON.exists():
+        return json.loads(AIRPORTS_JSON.read_text(encoding="utf-8")), str(AIRPORTS_JSON)
+    raise FileNotFoundError("No airports json found (aligned or base).")
 
 
-def utm_to_pixel(easting: float, northing: float) -> tuple[float, float]:
-    """Return floating-point pixel coordinates for a UTM position."""
-    px = (easting - ULXMAP) / XDIM
-    py = (ULYMAP - northing) / YDIM
-    return px, py
-
-
-def runway_polygon(easting: float, northing: float, length_m: float,
-                   width_m: float, true_heading_deg: float) -> Polygon:
+def flatten_one(dem: np.ndarray, e_c: float, n_c: float, length_m: float,
+                width_m: float, hdg_deg: float, target_i16: int) -> int:
     """
-    Build a shapely Polygon for a runway rectangle.
+    Flatten one oriented runway rectangle (with graded skirt) into `dem`
+    in place. Returns the number of pixels modified (plateau + skirt).
 
-    true_heading_deg is the clockwise bearing from true north for the
-    low-numbered runway direction (e.g. 165 for runway 16).
+    The rectangle is (length_m + PAD_LEN_M) x (width_m + PAD_WID_M), oriented to
+    the true heading. A pixel's signed distance to the rectangle is:
+        d = max(|along| - hl, |perp| - hw)   (negative inside; positive outside)
+    where (along, perp) are the pixel's offsets from the centre resolved along /
+    across the centreline. Inside (d <= 0) -> target elevation. In the skirt
+    (0 < d <= SKIRT_M) -> linear blend target<->original. Beyond -> untouched.
     """
-    theta = math.radians(true_heading_deg)
+    hl = (length_m + PAD_LEN_M) / 2.0
+    hw = (width_m + PAD_WID_M) / 2.0
+    reach = max(hl, hw) + SKIRT_M  # bounding radius incl. skirt
 
-    # Unit vector along the runway centreline (E, N components)
-    sin_t = math.sin(theta)
-    cos_t = math.cos(theta)
+    # Pixel bounding box around the centre (limit work to a local window).
+    px_c = (e_c - ULXMAP) / XDIM
+    py_c = (ULYMAP - n_c) / YDIM
+    half_px = reach / XDIM + 2
+    px0 = max(0, int(math.floor(px_c - half_px)))
+    px1 = min(NCOLS - 1, int(math.ceil(px_c + half_px)))
+    py0 = max(0, int(math.floor(py_c - half_px)))
+    py1 = min(NROWS - 1, int(math.ceil(py_c + half_px)))
 
-    # Half-length and half-width vectors in UTM (E, N) space
-    hl = length_m / 2.0
-    hw = width_m / 2.0
+    # Local pixel grid -> UTM (pixel centres).
+    ys, xs = np.mgrid[py0:py1 + 1, px0:px1 + 1]
+    E = ULXMAP + xs * XDIM
+    N = ULYMAP - ys * YDIM
+    dE = E - e_c
+    dN = N - n_c
 
-    # Centreline half vector
-    de_c = hl * sin_t
-    dn_c = hl * cos_t
+    th = math.radians(hdg_deg)
+    a_e, a_n = math.sin(th), math.cos(th)     # unit vector along centreline
+    p_e, p_n = math.cos(th), -math.sin(th)    # unit vector perpendicular (+90)
+    along = dE * a_e + dN * a_n
+    perp = dE * p_e + dN * p_n
 
-    # Perpendicular half vector (rotated +90 deg)
-    de_p = hw * cos_t
-    dn_p = -hw * sin_t
+    # Signed distance to the oriented rectangle (metres, negative inside).
+    d = np.maximum(np.abs(along) - hl, np.abs(perp) - hw)
 
-    corners = [
-        (easting - de_c - de_p, northing - dn_c - dn_p),
-        (easting + de_c - de_p, northing + dn_c - dn_p),
-        (easting + de_c + de_p, northing + dn_c + dn_p),
-        (easting - de_c + de_p, northing - dn_c + dn_p),
-    ]
-    return Polygon(corners)
+    sub = dem[py0:py1 + 1, px0:px1 + 1]
+    orig = sub.astype(np.float64)
+
+    inside = d <= 0.0
+    skirt = (d > 0.0) & (d <= SKIRT_M)
+
+    new = sub.copy()
+    # plateau
+    new[inside] = target_i16
+    # graded skirt: w=1 at rect edge -> 0 at skirt outer edge
+    w = np.clip(1.0 - d / SKIRT_M, 0.0, 1.0)
+    blended = np.rint(target_i16 * w + orig * (1.0 - w)).astype(sub.dtype)
+    new[skirt] = blended[skirt]
+
+    changed = int(np.sum(new != sub))
+    dem[py0:py1 + 1, px0:px1 + 1] = new
+    return changed
 
 
 def flatten_runways() -> dict:
-    """Load the heightmap and flatten every runway. Return summary stats."""
+    if not INPUT_RAW.exists():
+        raise FileNotFoundError(f"Input DEM not found: {INPUT_RAW}")
 
-    if not AIRPORTS_JSON.exists():
-        raise FileNotFoundError(f"Airports file not found: {AIRPORTS_JSON}")
-    if not INPUT_BIL.exists():
-        raise FileNotFoundError(f"Input DEM not found: {INPUT_BIL}")
+    data, src_json = load_airports()
 
-    with open(AIRPORTS_JSON, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    airports = data.get("airports", [])
-
-    # Load signed 16-bit little-endian BIL heightmap
-    dem = np.fromfile(INPUT_BIL, dtype=np.int16).reshape(NROWS, NCOLS)
+    dem = np.fromfile(INPUT_RAW, dtype=np.int16)
+    if dem.size != NROWS * NCOLS:
+        raise ValueError(f"Expected {NROWS*NCOLS} samples, got {dem.size}")
+    dem = dem.reshape(NROWS, NCOLS)
     original = dem.copy()
 
     summary = {
-        "input_file": str(INPUT_BIL),
+        "input_file": str(INPUT_RAW),
         "output_file": str(OUTPUT_RAW),
-        "input_shape": dem.shape,
+        "airports_source": src_json,
+        "input_shape": list(dem.shape),
         "input_dtype": str(dem.dtype),
-        "airports": []
+        "pad_len_m": PAD_LEN_M,
+        "pad_wid_m": PAD_WID_M,
+        "skirt_m": SKIRT_M,
+        "airports": [],
     }
 
-    for airport in airports:
-        icao = airport["icao"]
-        elevation_m = airport["elevation_m"]
-        elevation_i16 = int(round(elevation_m))
+    for ap in data.get("airports", []):
+        icao = ap["icao"]
+        elev_i16 = int(round(ap["elevation_m"]))
+        ap_sum = {"icao": icao, "name": ap.get("name", ""),
+                  "elevation_m": ap["elevation_m"], "runways": []}
 
-        airport_summary = {
-            "icao": icao,
-            "name": airport.get("name", ""),
-            "elevation_m": elevation_m,
-            "runways": []
-        }
-
-        for rwy in airport.get("runways", []):
-            designation = rwy["designation"]
-            length_m = rwy["length_m"]
-            width_m = rwy["width_m"]
-            heading = rwy["true_heading"]
-            center_lat = rwy["center_lat"]
-            center_lon = rwy["center_lon"]
-
-            easting, northing = wgs84_to_utm(center_lon, center_lat)
-            poly = runway_polygon(easting, northing, length_m, width_m, heading)
-            prepared_poly = prep(poly)
-
-            # Bounding box in pixel indices (inclusive)
-            min_e, min_n, max_e, max_n = poly.bounds
-            px_min_f, py_min_f = utm_to_pixel(min_e, max_n)  # top-left
-            px_max_f, py_max_f = utm_to_pixel(max_e, min_n)  # bottom-right
-
-            px_min = max(0, int(math.floor(px_min_f)))
-            px_max = min(NCOLS - 1, int(math.ceil(px_max_f)))
-            py_min = max(0, int(math.floor(py_min_f)))
-            py_max = min(NROWS - 1, int(math.ceil(py_max_f)))
-
-            flattened = 0
-            for py in range(py_min, py_max + 1):
-                for px in range(px_min, px_max + 1):
-                    # Pixel centre in UTM
-                    e, n = pixel_to_utm(px + 0.5, py + 0.5)
-                    if prepared_poly.contains(Point(e, n)):
-                        # Only overwrite real elevation pixels, leave NODATA as-is
-                        if dem[py, px] != NODATA:
-                            dem[py, px] = elevation_i16
-                            flattened += 1
-
-            airport_summary["runways"].append({
-                "designation": designation,
-                "length_m": length_m,
-                "width_m": width_m,
+        for rwy in ap.get("runways", []):
+            L = rwy["length_m"]
+            Wm = rwy["width_m"]
+            hdg = rwy["true_heading"]
+            e_c, n_c = wgs84_to_utm(rwy["center_lon"], rwy["center_lat"])
+            changed = flatten_one(dem, e_c, n_c, L, Wm, hdg, elev_i16)
+            ap_sum["runways"].append({
+                "designation": rwy["designation"],
+                "length_m": L, "width_m": Wm,
                 "surface": rwy.get("surface", ""),
-                "true_heading": heading,
-                "flattened_pixels": flattened,
-                "center_utm_easting": round(easting, 3),
-                "center_utm_northing": round(northing, 3)
+                "true_heading": hdg,
+                "aligned_from_imagery": bool(rwy.get("_aligned_from_imagery", False)),
+                "center_utm_e": round(e_c, 1),
+                "center_utm_n": round(n_c, 1),
+                "target_elev_i16": elev_i16,
+                "changed_pixels": changed,
             })
+        summary["airports"].append(ap_sum)
 
-        summary["airports"].append(airport_summary)
-
-    # Write flattened heightmap in the same raw format
     dem.astype(np.int16).tofile(OUTPUT_RAW)
 
-    # Verify output size
-    expected_bytes = NROWS * NCOLS * NBANDS * 2
-    output_size = OUTPUT_RAW.stat().st_size
-    summary["expected_bytes"] = expected_bytes
-    summary["output_bytes"] = output_size
-    summary["size_ok"] = output_size == expected_bytes
-
-    # Overall changed pixel count
-    changed = int(np.sum(original != dem))
-    summary["total_changed_pixels"] = changed
-
+    expected = NROWS * NCOLS * 2
+    out_sz = OUTPUT_RAW.stat().st_size
+    summary["expected_bytes"] = expected
+    summary["output_bytes"] = out_sz
+    summary["size_ok"] = out_sz == expected
+    summary["total_changed_pixels"] = int(np.sum(original != dem))
     return summary
 
 
-def write_summary(summary: dict) -> None:
-    """Write a human-readable summary of the flattening run."""
-    lines = []
-    lines.append("Runway flattening summary")
-    lines.append("=" * 50)
-    lines.append(f"Input:  {summary['input_file']}")
-    lines.append(f"Output: {summary['output_file']}")
-    lines.append(f"Heightmap shape: {summary['input_shape']}")
-    lines.append(f"Expected output bytes: {summary['expected_bytes']}")
-    lines.append(f"Actual output bytes:   {summary['output_bytes']}")
-    lines.append(f"Size matches: {summary['size_ok']}")
-    lines.append(f"Total pixels changed: {summary['total_changed_pixels']}")
-    lines.append("")
-
-    for ap in summary["airports"]:
-        lines.append(f"Airport: {ap['icao']} - {ap['name']}")
-        lines.append(f"  Elevation (m): {ap['elevation_m']}")
-        for rwy in ap["runways"]:
-            lines.append(
-                f"  Runway {rwy['designation']}: "
-                f"{rwy['length_m']} m x {rwy['width_m']} m, "
-                f"surface={rwy['surface']}, true_heading={rwy['true_heading']:.2f} deg, "
-                f"flattened_pixels={rwy['flattened_pixels']}"
-            )
-            lines.append(
-                f"    UTM centre: E={rwy['center_utm_easting']} N={rwy['center_utm_northing']}"
-            )
-        lines.append("")
-
-    SUMMARY_TXT.write_text("\n".join(lines), encoding="utf-8")
+def write_summary(s: dict) -> None:
+    L = []
+    L.append("Runway flattening summary (exactly-30m raw, graded skirt)")
+    L.append("=" * 58)
+    L.append(f"Input:           {s['input_file']}")
+    L.append(f"Output:          {s['output_file']}")
+    L.append(f"Airports source: {s['airports_source']}")
+    L.append(f"Shape:           {s['input_shape']}  dtype {s['input_dtype']}")
+    L.append(f"Pad L/W:         +{s['pad_len_m']} / +{s['pad_wid_m']} m   "
+             f"Skirt: {s['skirt_m']} m")
+    L.append(f"Output bytes:    {s['output_bytes']} (expected {s['expected_bytes']}) "
+             f"OK={s['size_ok']}")
+    L.append(f"Total changed:   {s['total_changed_pixels']} px")
+    L.append("")
+    for ap in s["airports"]:
+        L.append(f"{ap['icao']} - {ap['name']}  (elev {ap['elevation_m']} m)")
+        for r in ap["runways"]:
+            tag = " [aligned-to-imagery]" if r["aligned_from_imagery"] else ""
+            L.append(f"  {r['designation']}: {r['length_m']}x{r['width_m']} m  "
+                     f"hdg {r['true_heading']:.2f}  elev {r['target_elev_i16']} m  "
+                     f"changed {r['changed_pixels']} px{tag}")
+            L.append(f"    UTM centre E={r['center_utm_e']} N={r['center_utm_n']}")
+        L.append("")
+    SUMMARY_TXT.write_text("\n".join(L), encoding="utf-8")
 
 
 def main() -> None:
-    summary = flatten_runways()
-    write_summary(summary)
-
-    print(f"Wrote flattened heightmap to: {summary['output_file']}")
-    print(f"Output size: {summary['output_bytes']} bytes "
-          f"(expected {summary['expected_bytes']}) - OK={summary['size_ok']}")
-    print(f"Total pixels flattened: {summary['total_changed_pixels']}")
-    print(f"Summary written to: {SUMMARY_TXT}")
+    s = flatten_runways()
+    write_summary(s)
+    print(f"Input : {s['input_file']}")
+    print(f"Output: {s['output_file']}  ({s['output_bytes']} bytes, "
+          f"OK={s['size_ok']})")
+    print(f"Airports: {s['airports_source']}")
+    print(f"Total pixels changed: {s['total_changed_pixels']}")
+    for ap in s["airports"]:
+        for r in ap["runways"]:
+            print(f"  {ap['icao']} {r['designation']}: {r['changed_pixels']} px "
+                  f"-> {r['target_elev_i16']} m"
+                  f"{'  [aligned]' if r['aligned_from_imagery'] else ''}")
+    print(f"Summary: {SUMMARY_TXT}")
 
 
 if __name__ == "__main__":

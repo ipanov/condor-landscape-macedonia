@@ -16,8 +16,10 @@ otherwise from data/airports.json.
 
 Per runway:
   * Flatten an ORIENTED rectangle (rotated to the runway true heading) of size
-    (L + 120) x (W + 80) m -- L+120 adds ~60 m overrun at each end, W+80 adds
-    ~40 m lateral margin -- to the integer target elevation.
+    (L + 350) x (W + 100) m -- ~175 m flat past each threshold + 50 m lateral
+    margin each side -- to the integer target elevation. The generous along-track
+    flat zone stops Condor's spline terrain from bending the runway mid-strip, and
+    covers the ~170 m threshold-offset ground-start spawn (see generate_apt.py).
   * GRADED SKIRT: over the next SKIRT_M (= 90 m, 3 px at 30 m) beyond the
     rectangle, linearly blend the flat elevation back to the original terrain
     (~1:3 visual slope for a 30 m plateau-to-terrain step). The blend uses the
@@ -60,9 +62,15 @@ ULXMAP = 506880.0        # easting of the CENTRE of the top-left pixel
 ULYMAP = 4700160.0       # northing of the CENTRE of the top-left pixel
 
 # Flatten rectangle padding and skirt.
-PAD_LEN_M = 120.0        # total extra length (overrun), 60 m each end
-PAD_WID_M = 80.0         # total extra width (lateral margin), 40 m each side
-SKIRT_M = 90.0           # graded blend distance beyond the rectangle (3 px)
+# Condor renders terrain as a SPLINE through the .tr3 grid points, so a plateau
+# only as long as the runway still bends mid-strip (Condor forum t=18380, t=20379).
+# The flat (zero-slope) core must extend well past each threshold and the graded
+# skirt must begin OUTSIDE it. The .apt also spawns the glider ~170 m in from its
+# runway end, so generate_apt.py extends the declared length by ~340 m to put the
+# start on the real threshold -- the flat core below is sized to cover that.
+PAD_LEN_M = 350.0        # total extra length: ~175 m flat past each threshold
+PAD_WID_M = 100.0        # total extra width: 50 m flat lateral margin each side
+SKIRT_M = 90.0           # graded blend distance beyond the flat rectangle (3 px)
 
 # ---------------------------------------------------------------------------
 # Coordinate transform: WGS-84 -> UTM 34N

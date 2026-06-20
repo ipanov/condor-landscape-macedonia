@@ -24,6 +24,7 @@ import struct
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+AIRPORTS_ALIGNED = PROJECT_ROOT / "data" / "airports_aligned.json"
 AIRPORTS_JSON = PROJECT_ROOT / "data" / "airports.json"
 OUT_APT = Path("C:/Condor2/Landscapes/MacedoniaSkopje/MacedoniaSkopje.apt")
 
@@ -39,11 +40,19 @@ def encode_airport(ap: dict, index: int) -> bytes:
         raise ValueError(f"Airport {ap.get('icao')} has no runways")
     rwy = runways[0]
 
-    lat = float(ap["lat"])
-    lon = float(ap["lon"])
+    # .apt position must be the runway MIDPOINT (Condor reconstructs the strip as
+    # midpoint +/- length/2 and spawns ~170 m in from the end). Use the aligned
+    # runway centre so it coincides with the flattened plateau; fall back to the
+    # airport reference point.
+    lat = float(rwy.get("center_lat", ap["lat"]))
+    lon = float(rwy.get("center_lon", ap["lon"]))
     elev = float(ap["elevation_m"])
     rwdir = int(round(rwy["true_heading"]))
-    rwlen = int(rwy["length_m"])
+    # Condor spawns a ground start ~170 m IN from the .apt runway end (into wind),
+    # NOT at the threshold. Extend the declared length by ~340 m (2x170) so the
+    # spawn lands on the REAL threshold; the flattened plateau (flatten_runways.py)
+    # is sized to cover it. Verified: Condor forum t=19413 / t=22592.
+    rwlen = int(rwy["length_m"]) + 340
     # Use a synthetic airport ID / frequency
     freq = int(ap.get("frequency_khz", 0)) or (120000 + index * 250)
 
@@ -54,15 +63,22 @@ def encode_airport(ap: dict, index: int) -> bytes:
     record += struct.pack("<fff", lat, lon, elev)
     record += struct.pack("<iii", rwdir, rwlen, freq)
     record += struct.pack("<I", 1)            # has_aviation / enabled
-    record += struct.pack("<f", 150.0)        # flatten radius metres
+    # Offset 64 is NOT a flatten radius -- Condor never flattens terrain from the
+    # .apt (flattening is done in the .tr3 heightmap; see flatten_runways.py).
+    # Slovenia2 stores a constant 123.5 here; we match it. The value has no effect.
+    record += struct.pack("<f", 123.5)
     record += struct.pack("<I", 0x00000100)   # flags pattern from Slovenia2
     assert len(record) == 72, f"Record length is {len(record)}"
     return record
 
 
 def main():
-    with open(AIRPORTS_JSON, "r", encoding="utf-8") as f:
+    # Prefer imagery-aligned geometry so the .apt midpoint matches the flattened
+    # plateau (flatten_runways.py uses the same aligned centres).
+    src = AIRPORTS_ALIGNED if AIRPORTS_ALIGNED.exists() else AIRPORTS_JSON
+    with open(src, "r", encoding="utf-8") as f:
         data = json.load(f)
+    print(f"Source: {src.name}")
 
     airports = data.get("airports", [])
     OUT_APT.parent.mkdir(parents=True, exist_ok=True)

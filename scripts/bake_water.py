@@ -48,6 +48,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from condor_grid import (
     patch_bounds_utm, PATCHES_X, PATCHES_Y, UTM_CRS, WGS84_CRS, PATCH_SIZE_M,
 )
+from forest_utils import load_forest_raster, patch_raster
 
 ROOT = Path(__file__).resolve().parent.parent
 OSM = ROOT / ".sandbox" / "osm"
@@ -66,7 +67,33 @@ RIVER_LEN_THRESH = 400.0     # m of non-intermittent river inside a patch
 
 # Slovenia2 water blue (R,G,B) to tint water pixels toward (optional cosmetic).
 WATER_BLUE = np.array([21, 85, 112], dtype=np.float32)
-WATER_TINT = 0.55            # blend factor toward WATER_BLUE for water pixels
+WATER_TINT = 0.55            # blend water RGB toward WATER_BLUE so it reads as
+                             # water (without it, water is transparent over grass)
+
+# Real water-extent rasters (the forest-style fix for over-wide OSM rivers):
+# rivers get their TRUE width from JRC Global Surface Water; OSM polygons are
+# kept only for lakes/reservoirs/ponds.
+WATER_RASTER = ROOT / ".sandbox" / "water_rasters" / "occurrence_utm34_30m.tif"
+WC_RASTER = ROOT / ".sandbox" / "forest_rasters" / "worldcover_utm34_30m.tif"
+JRC_OCC_MIN = 40             # JRC GSW occurrence % counted as permanent water
+WC_WATER = 80                # ESA WorldCover permanent-water class
+
+# Skopska Crna Gora tiles whose RGB was colour-corrected by fix_textures (their
+# phase-1 backup predates that fix), so re-bake from the installed copy.
+_COLORFIX_TILES = {"t0605", "t0606", "t0607", "t0705", "t0706", "t0707"}
+
+_OCC = _OCC_AFF = _WC = _WC_AFF = None
+
+
+def load_water_rasters():
+    """Load JRC occurrence + WorldCover into module globals (north-up, geographic)."""
+    global _OCC, _OCC_AFF, _WC, _WC_AFF
+    if WATER_RASTER.exists():
+        _OCC, _OCC_AFF = load_forest_raster(WATER_RASTER)
+    if WC_RASTER.exists():
+        _WC, _WC_AFF = load_forest_raster(WC_RASTER)
+    print(f"  water rasters: JRC occ={'ok' if _OCC is not None else 'MISSING'}, "
+          f"WorldCover={'ok' if _WC is not None else 'MISSING'}")
 
 
 # ---------------------------------------------------------------------------
@@ -86,6 +113,11 @@ def load_water_polygons():
         g = f.get("geometry")
         if not g:
             continue
+        # Drop wide riverbank polygons (water=river): they sit offset from the
+        # ortho river and over-thicken it. Rivers come from the centreline buffers
+        # below; keep lakes/reservoirs/ponds (the real smooth lake shapes).
+        if (f.get("properties") or {}).get("water") == "river":
+            continue
         try:
             geom = _to_utm(shape(g))
         except Exception:
@@ -96,9 +128,14 @@ def load_water_polygons():
 
 
 def load_waterways():
-    """Return (rivers, minor) where each item is (utm_geom, intermittent)."""
+    """Return (rivers, minor). rivers items are (utm_geom, intermittent, width_m);
+    width scales with the named river's total length so the Vardar (Вардар, the
+    longest) gets its full width and small tributaries stay thin. Smooth buffers,
+    no raster."""
+    from collections import defaultdict
     data = json.load(open(OSM / "waterways.geojson", encoding="utf-8"))
-    rivers, minor = [], []
+    feats = []
+    name_len = defaultdict(float)
     for f in data.get("features", []):
         g = f.get("geometry")
         p = f.get("properties", {})
@@ -110,9 +147,28 @@ def load_waterways():
             continue
         if geom.is_empty:
             continue
+        nm = str(p.get("name", "") or "")
+        ww = p.get("waterway")
         interm = str(p.get("intermittent", "")).lower() in ("yes", "true", "1")
-        if p.get("waterway") == "river":
-            rivers.append((geom, interm))
+        feats.append((geom, ww, nm, interm))
+        if ww == "river":
+            name_len[nm] += geom.length
+
+    def river_width(nm):
+        low = nm.lower()
+        if "вардар" in low or "vardar" in low:
+            return 38.0                       # the main river — full width
+        L = name_len.get(nm, 0.0)
+        if L >= 45000:                        # Треска / Пчиња / Lepenc tier
+            return 20.0
+        if L >= 15000:
+            return 12.0
+        return 9.0                            # small named rivers
+
+    rivers, minor = [], []
+    for geom, ww, nm, interm in feats:
+        if ww == "river":
+            rivers.append((geom, interm, river_width(nm)))
         else:
             minor.append((geom, interm))
     return rivers, minor
@@ -189,21 +245,22 @@ def build_alpha_mask(col, row, poly_tree, polys, rivers, minor):
                 if len(pts) >= 3:
                     draw.polygon(pts, fill=0)
 
-    # Rivers (wider) and minor waterways (narrower), drawn as thick polylines.
-    # width in source px: river ~30 m (>= ~3 px @2048 -> 6 px @4096), canal/stream 2 px @2048.
-    river_w = max(int(round(30.0 / PATCH_SIZE_M * size)), 3 * SS)
-    minor_w = max(2 * SS, 2)
-    for geom, interm in rivers:
+    # OSM river/stream LINES drawn as SMOOTH buffers at realistic per-river width
+    # (Vardar full width; tributaries thin). Smooth curves, no 30 m raster, so the
+    # shorelines antialias cleanly instead of pixelating.
+    minor_w = max(int(round(5.0 / PATCH_SIZE_M * size)), 2)
+    for geom, interm, width_m in rivers:
         if not geom.intersects(b):
             continue
         try:
             clipped = geom.intersection(b)
         except Exception:
             continue
+        rw_px = max(int(round(width_m / PATCH_SIZE_M * size)), 2 * SS)
         for line in _iter_lines(clipped):
             pts = _line_to_pixels(list(line.coords), e_min, n_max, size)
             if len(pts) >= 2:
-                draw.line(pts, fill=255, width=river_w, joint="curve")
+                draw.line(pts, fill=255, width=rw_px, joint="curve")
     for geom, interm in minor:
         if interm:
             continue  # skip intermittent trickles
@@ -218,8 +275,11 @@ def build_alpha_mask(col, row, poly_tree, polys, rivers, minor):
             if len(pts) >= 2:
                 draw.line(pts, fill=255, width=minor_w, joint="curve")
 
-    # Box-downsample (antialias) 4096 -> 2048: average over SSxSS blocks.
+    # Box-downsample (antialias) 4096 -> 2048: average over SSxSS blocks. OSM
+    # polygons + smooth line buffers give clean antialiased shorelines (the JRC
+    # 30 m raster was removed -- it pixelated the Vardar into jagged stair-steps).
     water = np.asarray(img, dtype=np.float32).reshape(TEX, SS, TEX, SS).mean(axis=(1, 3))
+
     # water in [0,255] where 255=full water. alpha = 255 - water (0=water, 255=land).
     alpha = np.clip(255.0 - water, 0, 255).astype(np.uint8)
     return alpha
@@ -244,8 +304,13 @@ def bake_patch(col, row, poly_tree, polys, rivers, minor, save_preview=False):
     alpha = build_alpha_mask(col, row, poly_tree, polys, rivers, minor)
     water_frac = float((alpha == 0).mean())
 
-    # Decompress installed RGB.
-    rgb = np.array(Image.open(src_dds).convert("RGB"), dtype=np.float32)
+    # Decompress the PRE-WATER RGB (the phase-1 backup) so a re-bake with a
+    # narrower river does not leave blue-tinted ghosts where the old wide water
+    # was. The 6 colour-corrected tiles are read from the installed copy so their
+    # fix is preserved (their backup predates the colour fix).
+    orig_dds = BACKUP / f"{name}.dds"
+    read_dds = src_dds if (name in _COLORFIX_TILES or not orig_dds.exists()) else orig_dds
+    rgb = np.array(Image.open(read_dds).convert("RGB"), dtype=np.float32)
 
     # Tint water pixels toward Slovenia2 blue (cosmetic, helps non-shader views).
     wmask = (alpha < 128)
@@ -294,7 +359,7 @@ def compute_water_patches(poly_tree, polys, rivers):
                 except Exception:
                     pass
             rlen = 0.0
-            for geom, interm in rivers:
+            for geom, interm, _w in rivers:
                 if interm:
                     continue
                 if geom.intersects(b):

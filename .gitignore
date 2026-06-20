@@ -1,0 +1,38 @@
+# Sandbox for transient / debug / garbage files
+.sandbox/
+
+# Python / OS caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# QGIS / GDAL sidecars that can be regenerated
+*.aux.xml
+
+# Large source data (DEMs, GeoTIFFs, rasters) — regenerable from open sources
+sources/
+
+# Generated outputs / staging / logs / validation previews
+output/
+logs/
+validation/
+
+# Third-party Condor Landscape Toolkit binaries (CLT2.7, ObjectEditor, RawToTrn, etc.)
+tools/
+
+# Third-party Condor official docs (copyrighted) — keep our own spec .md, not these
+docs/reference/
+
+# Session / archive junk
+*.zip
+*.7z
+=0.24
+session_*.zip
+
+# RawToTrn UI-automation dumps (transient)
+rawtotrn_*.txt
+rawtotrn_*.png
+
+# Condor landscape binaries live under C:/Condor2/Landscapes, not the repo

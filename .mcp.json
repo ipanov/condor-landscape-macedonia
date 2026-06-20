@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "windows-automation": {
+      "command": "D:/Repos/condor-landscape/.sandbox/mcp/windows-mcp-server/Sbroenne.WindowsMcp.exe",
+      "args": [],
+      "cwd": "D:/Repos/condor-landscape/.sandbox/mcp/windows-mcp-server"
+    },
+    "playwright": {
+      "command": "node",
+      "args": [
+        "D:/Repos/condor-landscape/.sandbox/mcp/playwright/node_modules/@playwright/mcp/cli.js",
+        "--headless"
+      ],
+      "cwd": "D:/Repos/condor-landscape/.sandbox/mcp/playwright"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+2026-06-13 14:25:24,996 [INFO] ============================================================
+2026-06-13 14:25:24,997 [INFO] Condor 2 automation started
+2026-06-13 14:25:24,997 [INFO] ============================================================
+2026-06-13 14:25:29,135 [INFO] Connected to existing Condor main window.
+2026-06-13 14:25:33,124 [INFO] Main window rect: (L1920, T631, R3200, B1527)
+2026-06-13 14:25:37,132 [INFO] Waiting 8s for Condor menu to become interactive...
+2026-06-13 14:25:49,301 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\main_menu_20260613_142545.png
+2026-06-13 14:25:57,189 [INFO] Clicking 'FREE FLIGHT' pane at (L1991, T914, R2191, B959)
+2026-06-13 14:26:01,801 [INFO] Waiting for Flight Planner after click attempt 1...
+2026-06-13 14:26:05,149 [INFO] Flight Planner appeared after attempt 1.
+2026-06-13 14:26:09,150 [INFO] Flight Planner rect: (L1924, T619, R3197, B1540)
+2026-06-13 14:26:13,304 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\flight_planner_open_20260613_142609.png
+2026-06-13 14:26:17,445 [INFO] Landscape already set to: MacedoniaSkopje [1.00]
+2026-06-13 14:26:25,371 [INFO] Clicking 'Load' pane at (L2045, T1499, R2146, B1528)
+2026-06-13 14:26:29,985 [INFO] Waiting for window 'Load flight plan' (timeout 15.0s)...
+2026-06-13 14:26:46,656 [ERROR] Automation failed: Window 'Load flight plan' did not appear within 15s
+Traceback (most recent call last):
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 271, in main
+    if not load_flight_plan(app):
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 132, in load_flight_plan
+    dlg = wait_for_window(app, CONDOR_LOAD_DIALOG_TITLE, timeout=15)
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 79, in wait_for_window
+    raise PyWinAutoTimeoutError(f"Window '{title}' did not appear within {timeout}s")
+pywinauto.timings.TimeoutError: Window 'Load flight plan' did not appear within 15s

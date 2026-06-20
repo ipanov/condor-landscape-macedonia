@@ -1,0 +1,26 @@
+2026-06-13 14:31:48,103 [INFO] ============================================================
+2026-06-13 14:31:48,103 [INFO] Condor 2 automation started
+2026-06-13 14:31:48,103 [INFO] ============================================================
+2026-06-13 14:31:51,341 [INFO] Condor not running; launching C:\Condor2\Condor.exe
+2026-06-13 14:32:03,367 [INFO] Condor main window appeared after launch.
+2026-06-13 14:32:07,365 [INFO] Main window rect: (L1920, T631, R3200, B1527)
+2026-06-13 14:32:11,366 [INFO] Waiting 5s for Condor menu to become interactive...
+2026-06-13 14:32:20,534 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\main_menu_20260613_143216.png
+2026-06-13 14:32:28,418 [INFO] Clicking 'FREE FLIGHT' pane at (L1991, T914, R2191, B959)
+2026-06-13 14:32:33,037 [INFO] Waiting for Flight Planner after click attempt 1...
+2026-06-13 14:32:43,384 [INFO] Flight Planner appeared after attempt 1.
+2026-06-13 14:32:47,394 [INFO] Flight Planner rect: (L1924, T619, R3197, B1540)
+2026-06-13 14:32:51,591 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\flight_planner_open_20260613_143247.png
+2026-06-13 14:32:59,626 [INFO] Clicking Load at (L2045, T1499, R2146, B1528)
+2026-06-13 14:33:03,737 [INFO] Waiting for window 'Load flight plan' (timeout 15.0s)...
+2026-06-13 14:33:07,407 [INFO] Window 'Load flight plan' found.
+2026-06-13 14:33:11,411 [INFO] Load dialog rect: (L2248, T819, R2873, B1340)
+2026-06-13 14:33:19,606 [INFO] Selected User flightplans tab.
+2026-06-13 14:33:23,500 [ERROR] Automation failed: 'ListViewWrapper' object has no attribute 'exists'
+Traceback (most recent call last):
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 263, in main
+    if not load_flight_plan(app, fp):
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 157, in load_flight_plan
+    if list_ctrl is None or not list_ctrl.exists():
+AttributeError: 'ListViewWrapper' object has no attribute 'exists'
+2026-06-13 14:33:31,591 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\error_state_20260613_143327.png

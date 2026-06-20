@@ -1,0 +1,17 @@
+2026-06-13 14:23:15,060 [INFO] ============================================================
+2026-06-13 14:23:15,061 [INFO] Condor 2 automation started
+2026-06-13 14:23:15,061 [INFO] ============================================================
+2026-06-13 14:23:19,038 [INFO] Condor not running; launching C:\Condor2\Condor.exe
+2026-06-13 14:23:31,041 [INFO] Condor main window appeared after launch.
+2026-06-13 14:23:35,041 [INFO] Main window rect: (L1920, T631, R3200, B1527)
+2026-06-13 14:23:39,205 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\main_menu_20260613_142335.png
+2026-06-13 14:23:47,094 [INFO] Clicking 'FREE FLIGHT' pane at (L1991, T914, R2191, B959)
+2026-06-13 14:23:51,711 [INFO] Waiting for window 'FLIGHT PLANNER' (timeout 30.0s)...
+2026-06-13 14:24:23,573 [ERROR] Automation failed: Window 'FLIGHT PLANNER' did not appear within 30s
+Traceback (most recent call last):
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 229, in main
+    fp = wait_for_window(app, CONDOR_FLIGHT_PLANNER_TITLE, timeout=30)
+  File "D:\Repos\condor-landscape\scripts\automate_condor_test.py", line 79, in wait_for_window
+    raise PyWinAutoTimeoutError(f"Window '{title}' did not appear within {timeout}s")
+pywinauto.timings.TimeoutError: Window 'FLIGHT PLANNER' did not appear within 30s
+2026-06-13 14:24:31,218 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\error_state_20260613_142427.png

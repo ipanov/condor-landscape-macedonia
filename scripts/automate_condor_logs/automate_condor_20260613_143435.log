@@ -1,0 +1,31 @@
+2026-06-13 14:34:35,382 [INFO] ============================================================
+2026-06-13 14:34:35,382 [INFO] Condor 2 automation started
+2026-06-13 14:34:35,382 [INFO] ============================================================
+2026-06-13 14:34:39,467 [INFO] Connected to existing Condor main window.
+2026-06-13 14:34:43,467 [INFO] Main window rect: (L1920, T631, R3200, B1527)
+2026-06-13 14:34:47,470 [INFO] Waiting 5s for Condor menu to become interactive...
+2026-06-13 14:34:56,640 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\main_menu_20260613_143452.png
+2026-06-13 14:35:04,519 [INFO] Clicking 'FREE FLIGHT' pane at (L1991, T914, R2191, B959)
+2026-06-13 14:35:09,145 [INFO] Waiting for Flight Planner after click attempt 1...
+2026-06-13 14:35:12,485 [INFO] Flight Planner appeared after attempt 1.
+2026-06-13 14:35:16,482 [INFO] Flight Planner rect: (L1924, T619, R3197, B1540)
+2026-06-13 14:35:20,642 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\flight_planner_open_20260613_143516.png
+2026-06-13 14:35:28,707 [INFO] Clicking Load at (L2045, T1499, R2146, B1528)
+2026-06-13 14:35:32,813 [INFO] Waiting for window 'Load flight plan' (timeout 15.0s)...
+2026-06-13 14:35:36,501 [INFO] Window 'Load flight plan' found.
+2026-06-13 14:35:40,501 [INFO] Load dialog rect: (L2248, T819, R2873, B1340)
+2026-06-13 14:35:48,697 [INFO] Selected User flightplans tab.
+2026-06-13 14:35:52,584 [INFO] Focusing flightplan list at (L2281, T943, R2577, B1269)
+2026-06-13 14:35:52,989 [INFO] Navigating list via keyboard...
+2026-06-13 14:35:57,584 [INFO] List selection attempt 1 details: ''
+2026-06-13 14:35:57,937 [INFO] List selection attempt 2 details: ''
+2026-06-13 14:35:58,290 [INFO] List selection attempt 3 details: ''
+2026-06-13 14:35:58,644 [INFO] List selection attempt 4 details: ''
+2026-06-13 14:35:58,997 [INFO] List selection attempt 5 details: ''
+2026-06-13 14:35:59,350 [INFO] List selection attempt 6 details: ''
+2026-06-13 14:35:59,703 [INFO] List selection attempt 7 details: ''
+2026-06-13 14:36:00,056 [INFO] List selection attempt 8 details: ''
+2026-06-13 14:36:00,409 [INFO] List selection attempt 9 details: ''
+2026-06-13 14:36:00,762 [INFO] List selection attempt 10 details: ''
+2026-06-13 14:36:01,115 [ERROR] Could not select target flight plan after 10 attempts
+2026-06-13 14:36:01,115 [ERROR] Failed to load flight plan.

@@ -1,0 +1,22 @@
+2026-06-13 14:37:08,523 [INFO] ============================================================
+2026-06-13 14:37:08,523 [INFO] Condor 2 automation started
+2026-06-13 14:37:08,523 [INFO] ============================================================
+2026-06-13 14:37:12,572 [INFO] Connected to existing Condor main window.
+2026-06-13 14:37:16,575 [INFO] Main window rect: (L1920, T631, R3200, B1527)
+2026-06-13 14:37:20,570 [INFO] Waiting 3s for Condor menu to become interactive...
+2026-06-13 14:37:27,732 [INFO] Screenshot saved: D:\Repos\condor-landscape\scripts\automate_condor_logs\main_menu_20260613_143723.png
+2026-06-13 14:37:35,616 [INFO] Clicking 'FREE FLIGHT' pane at (L1991, T914, R2191, B959)
+2026-06-13 14:37:40,237 [INFO] Waiting for Flight Planner after click attempt 1...
+2026-06-13 14:37:43,582 [INFO] Flight Planner appeared after attempt 1.
+2026-06-13 14:37:47,584 [INFO] Flight Planner rect: (L1924, T619, R3197, B1540)
+2026-06-13 14:37:55,799 [INFO] Clicking Load at (L2045, T1499, R2146, B1528)
+2026-06-13 14:37:59,920 [INFO] Waiting for window 'Load flight plan' (timeout 15.0s)...
+2026-06-13 14:38:03,597 [INFO] Window 'Load flight plan' found.
+2026-06-13 14:38:07,606 [INFO] Load dialog rect: (L2248, T819, R2873, B1340)
+2026-06-13 14:38:15,788 [INFO] Selected User flightplans tab.
+2026-06-13 14:38:19,681 [INFO] Focusing flightplan list at (L2281, T943, R2577, B1269)
+2026-06-13 14:38:20,089 [INFO] Navigating list via keyboard to MacedoniaSkopje Test.fpl...
+2026-06-13 14:38:21,147 [INFO] List navigation complete.
+2026-06-13 14:38:24,687 [INFO] Clicking OK to load flight plan.
+2026-06-13 14:38:40,922 [WARNING] Load dialog still open after clicking OK
+2026-06-13 14:38:40,922 [ERROR] Failed to load flight plan.

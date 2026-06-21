@@ -53,6 +53,7 @@ doc for details.
 
 from __future__ import annotations
 
+import math
 import struct
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -394,6 +395,62 @@ def make_box(
             px, py, pz = c[k]
             verts.append(Vertex(px, py, pz, nrm[0], nrm[1], nrm[2], uv[ci][0], uv[ci][1]))
         indices += [base, base + 1, base + 2, base, base + 2, base + 3]
+    return C3DObject(name=name, texture=texture, material=tuple(material),
+                     vertices=verts, indices=indices)
+
+
+def make_prism(
+    name: str,
+    footprint: Sequence[Tuple[float, float]],
+    height: float,
+    *,
+    z0: float = 0.0,
+    texture: str = "",
+    material: Tuple[float, ...] = WHITE_MATERIAL,
+) -> C3DObject:
+    """Extrude a real footprint polygon into a vertical building prism.
+
+    ``footprint`` is the exterior ring as local (x=east, y=north) metre pairs,
+    relative to the polygon centroid (so the centroid is the local origin and the
+    mesh needs no placement rotation -- ori=0). Winding is normalised to CCW, so
+    wall outward-normals point away from the interior and the roof faces +Z. Walls
+    span ``z0 .. z0+height``; the roof is a centroid fan (exact for convex/star-
+    shaped footprints, which is the overwhelming majority of cadastre buildings).
+    """
+    pts = [(float(x), float(y)) for (x, y) in footprint]
+    if pts and pts[0] == pts[-1]:
+        pts.pop()
+    n = len(pts)
+    if n < 3:
+        raise ValueError(f"prism {name!r} needs >=3 points, got {n}")
+    area2 = sum(pts[i][0] * pts[(i + 1) % n][1] - pts[(i + 1) % n][0] * pts[i][1]
+                for i in range(n))
+    if area2 < 0.0:                       # ensure CCW
+        pts.reverse()
+    ztop = z0 + float(height)
+    verts: List[Vertex] = []
+    indices: List[int] = []
+    # vertical walls: one quad (two CCW tris) per edge, outward normal (dy,-dx)
+    for i in range(n):
+        x0, y0 = pts[i]
+        x1, y1 = pts[(i + 1) % n]
+        dx, dy = x1 - x0, y1 - y0
+        L = math.hypot(dx, dy) or 1.0
+        nx, ny = dy / L, -dx / L
+        base = len(verts)
+        verts.append(Vertex(x0, y0, z0,   nx, ny, 0.0, 0.0, 0.0))
+        verts.append(Vertex(x1, y1, z0,   nx, ny, 0.0, 1.0, 0.0))
+        verts.append(Vertex(x1, y1, ztop, nx, ny, 0.0, 1.0, 1.0))
+        verts.append(Vertex(x0, y0, ztop, nx, ny, 0.0, 0.0, 1.0))
+        indices += [base, base + 1, base + 2, base, base + 2, base + 3]
+    # flat roof: centroid fan at z=ztop (centroid == local origin)
+    cidx = len(verts)
+    verts.append(Vertex(0.0, 0.0, ztop, 0.0, 0.0, 1.0, 0.5, 0.5))
+    ring0 = len(verts)
+    for (x, y) in pts:
+        verts.append(Vertex(x, y, ztop, 0.0, 0.0, 1.0, 0.0, 0.0))
+    for i in range(n):
+        indices += [cidx, ring0 + i, ring0 + (i + 1) % n]
     return C3DObject(name=name, texture=texture, material=tuple(material),
                      vertices=verts, indices=indices)
 

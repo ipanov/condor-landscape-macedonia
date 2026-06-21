@@ -1,0 +1,102 @@
+# =============================================================================
+# Pinned setup for scripts/detect_buildings_sam.py
+# Local SAM building-footprint detection on the user's box:
+#   RTX 3070 (8 GB VRAM), 64 GB RAM, i9-9900K, Windows 11, Python 3.10.x
+# =============================================================================
+#
+# This is a SEPARATE, heavy environment from the repo's core pipeline (torch +
+# CUDA pull ~3 GB). Install it into its own venv/conda env so it cannot perturb
+# the working terrain/forest/texture toolchain.
+#
+# ---------------------------------------------------------------------------
+# STEP 0 - PyTorch with CUDA 12.1 (MUST be installed FIRST, from the cu121 index)
+# ---------------------------------------------------------------------------
+# The RTX 3070 is Ampere (sm_86); the cu121 wheels cover it. Do NOT `pip install
+# torch` plain (that can grab a CPU-only or mismatched build). Run this exact line
+# BEFORE the rest of this file:
+#
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+#
+# Verify CUDA is live before going further:
+#   python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+#   # expect: 2.4.1+cu121 True NVIDIA GeForce RTX 3070
+#
+# (If you are on a newer driver and want cu124, swap the index URL and bump the
+#  torch pins accordingly; cu121 is the safe, widely-tested choice for Ampere.)
+#
+# ---------------------------------------------------------------------------
+# STEP 1 - then install everything below
+# ---------------------------------------------------------------------------
+#   pip install -r scripts/requirements_sam.txt
+#
+# ---------------------------------------------------------------------------
+# STEP 2 (model-dependent) - GATED WEIGHTS + the CLIP fork. READ THESE.
+# ---------------------------------------------------------------------------
+# GOTCHA 1 - SAM 3 weights are GATED on Hugging Face.
+#   a) Sign in at https://huggingface.co and open  https://huggingface.co/facebook/sam3
+#   b) Click "Request access" / accept the license. Approval is needed before the
+#      weights will download.
+#   c) Authenticate the CLI so samgeo/transformers can pull them:
+#        huggingface-cli login            # paste a token from hf.co/settings/tokens
+#      (token needs only READ scope.)
+#   Without this, --model sam3 fails at weight download. The script prints this
+#   exact remedy on failure.
+#
+# GOTCHA 2 - the Ultralytics TEXT-PROMPT path needs the CLIP fork (NOT pip's `clip`).
+#   The text prompt ('building') for FastSAM (and Ultralytics' SAM text path) is
+#   resolved through CLIP. The PyPI package named `clip` is the WRONG one. Install
+#   Ultralytics' fork:
+#        pip install git+https://github.com/ultralytics/CLIP.git
+#   (Requires git on PATH. This is what makes `--model fastsam` / text prompts work.)
+#
+# =============================================================================
+# CORE (CPU-safe) deps for the geo + geometry half of the pipeline
+# =============================================================================
+numpy>=1.26,<2.3            # repo already on 2.2.6; SAM stack is fine with numpy 2
+rasterio>=1.3,<1.5          # DDS->GeoTIFF write, mask vectorise (rasterio.features)
+shapely>=2.0               # polygon regularise / seam merge
+pillow>=10.1               # DDS DXT1/DXT3 decode (verified: decodes the installed t*.dds)
+imageio>=2.31              # documented fallback DDS reader
+opencv-python-headless>=4.8  # mask resize / morphology (headless = no Qt/GUI pull-in)
+pyproj>=3.5                # via condor_grid; CRS bookkeeping
+
+# =============================================================================
+# SAM 3.1 quality path  (--model sam3)
+# =============================================================================
+# segment-geospatial (samgeo, Qiusheng Wu) wraps SAM with geotiff-aware tiling and
+# the text-prompt API. The SAM3 entry points (SamGeo3 / text_sam.LangSAM) require a
+# recent samgeo; if your pinned version lacks SamGeo3 the script auto-falls back to
+# the LangSAM text path. Pin a recent release:
+segment-geospatial>=0.12.0
+# samgeo pulls these, but pin the ones the text path actually needs:
+transformers>=4.44         # SAM3 model loading from the gated HF repo
+huggingface-hub>=0.24      # provides `huggingface-cli login`
+# groundingdino / segment-anything are pulled transitively by samgeo's text path.
+
+# =============================================================================
+# FastSAM / YOLO fallback + speed sweep  (--model fastsam | --model yolo)
+# =============================================================================
+ultralytics>=8.3.0         # FastSAM, FastSAMPrompt, YOLO11*-seg
+# FastSAM-s.pt / yolo11n-seg.pt auto-download to the ultralytics cache on first use.
+# Remember GOTCHA 2 above: text prompts need the Ultralytics CLIP fork (git install).
+
+# =============================================================================
+# OPTIONAL - higher-fidelity footprint regularisation (--regularizer buildingregulariser)
+# =============================================================================
+# The script's built-in orthogonaliser snaps rectangle-like footprints to their
+# oriented bounding box (no extra deps). For L/T/U-shaped buildings, the
+# buildingregulariser library does a proper edge-orthogonalisation. Optional:
+#   pip install buildingregulariser geopandas
+# buildingregulariser>=0.1
+# geopandas>=0.14
+#
+# =============================================================================
+# conda alternative (if you prefer conda for the geo stack)
+# =============================================================================
+#   conda create -n sambuild python=3.10
+#   conda activate sambuild
+#   conda install -c conda-forge rasterio shapely pyproj pillow imageio opencv numpy
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+#   pip install segment-geospatial ultralytics transformers
+#   pip install git+https://github.com/ultralytics/CLIP.git
+#   huggingface-cli login   # after requesting facebook/sam3 access

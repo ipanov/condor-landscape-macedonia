@@ -14,24 +14,25 @@
           "length_m": 2950,
           "width_m": 45,
           "surface": "asphalt",
-          "true_heading": 167.16,
-          "center_lat": 41.958368,
-          "center_lon": 21.62276,
+          "true_heading": 165.07,
+          "center_lat": 41.959292,
+          "center_lon": 21.622244,
           "ends": [
             {
               "designation": "16",
-              "lat": 41.97666,
-              "lon": 21.616191,
+              "lat": 41.972153,
+              "lon": 21.617783,
               "elevation_m": 237.85
             },
             {
               "designation": "34",
-              "lat": 41.950925,
-              "lon": 21.625153,
+              "lat": 41.946432,
+              "lon": 21.626704,
               "elevation_m": 234.13
             }
           ],
-          "_aligned_from_imagery": true
+          "_aligned_from_imagery": true,
+          "_alignment_note": "LWSK runway centerline + azimuth measured from installed ortho t0402 by Canny+Hough (align_lwsk_runway.py): painted axis 165.07 deg (whole 165), centroid of the asphalt ribbon at UTM (551565.7,4645443.7). Prior .apt heading was 167.16 (from eAIP thresholds), ~2.1 deg off the painted strip; ends rewritten onto the measured axis so the generate_apt.py end-derived heading rounds to 165. Center moved 111 m onto the painted centerline so the aerotow glider spawns on-runway."
         }
       ]
     },

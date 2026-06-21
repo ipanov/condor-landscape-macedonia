@@ -62,7 +62,7 @@ def encode_airport(ap: dict, index: int) -> bytes:
         _az = _m.degrees(_m.atan2(_b[0] - _a[0], _b[1] - _a[1])) % 360.0
     else:
         _az = float(rwy["true_heading"])
-    rwdir = int(round(_az * 1000.0))
+    rwdir = int(round(_az))           # whole degrees (Slovenia2 convention; millidegrees crashed)
     # Condor spawns a ground start ~170 m IN from the .apt runway end (into wind),
     # NOT at the threshold. Extend the declared length by ~340 m (2x170) so the
     # spawn lands on the REAL threshold; the flattened plateau (flatten_runways.py)

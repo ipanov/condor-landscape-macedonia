@@ -267,3 +267,58 @@ rewrite:
 7. **Hash + validate** as in §4 and §6.
 
 The invariants in §1/§2/§3/§5 are **format-level** and do not change with extent.
+
+### 8.1 NM build — as implemented (`CONDOR_LANDSCAPE=nm`)
+
+The full North Macedonia landscape is selected by the env var
+**`CONDOR_LANDSCAPE=nm`** (read by `condor_grid.py`). Grid: **40×32 = 1280
+patches**, NW `447690 / 4694070`, BR `678090 / 4509750`, DEM **7681×6145** @30 m,
+UTM 34N. Name `NorthMacedonia`; install `C:/Condor2/Landscapes/NorthMacedonia/`.
+
+Every pipeline writes to **landscape-scoped paths** so the Skopje pilot is never
+clobbered (and is byte-identical under the default env):
+
+| Asset | Skopje (default) | NM (`CONDOR_LANDSCAPE=nm`) |
+|-------|------------------|----------------------------|
+| Forest rasters | `.sandbox/forest_rasters/` | `.sandbox/forest_rasters_nm/` |
+| OSM cache | `.sandbox/osm/` | `.sandbox/osm_nm/` |
+| Airports JSON | `data/airports.json` | `data/airports_nm.json` |
+| Runway footprints | — | `data/northmacedonia_runway_footprints.geojson` |
+| DEM (flattened) | `…_2305_flat.raw` | `…_7681x6145_flat.raw` |
+| Forest validation | `validation/forest/` | `validation/forest_nm/` |
+
+Run order (forest + water + airports — `nm`):
+```bash
+export CONDOR_LANDSCAPE=nm
+python scripts/download_forest_rasters.py        # DLT/TCD/WorldCover -> forest_rasters_nm (auto bbox/3035-tiling/WC tiles)
+python scripts/download_osm_nm.py --workers 4    # TILED Overpass (10x6 @0.30deg, mirror-rotating, resumable) -> osm_nm
+python scripts/generate_apt.py                   # NorthMacedonia.apt (14 airfields, whole-deg heading, width->tug)
+python scripts/flatten_runways.py --footprints   # runway flatten footprints for the terrain agent (+flattens DEM if present)
+python scripts/generate_forest_maps.py --workers <ncores> --wait-dem 1800   # 1280 .for, parallel, polls for the DEM
+python scripts/bake_water.py                     # DXT3 water bake from osm_nm water.geojson/waterways.geojson
+tools/CLT2.7/LandscapeEditor.exe -hash NorthMacedonia   # .fha (after the .for exist)
+```
+
+Key NM-specific differences from the pilot (do not regress):
+- **`download_osm_nm.py`** replaces the single-bbox Skopje OSM scripts for the big
+  extent: it **tiles** the bbox (a single Overpass query over 250×170 km times
+  out), rotates across Overpass mirrors on 429/timeout, caches each `(layer,tile)`
+  raw response under `.sandbox/osm_nm/_tiles/` (resumable), and emits every layer
+  the forest/water passes need — `forest` (with `leaf_type`), `water`,
+  `waterways`, `roads_lines`, `railways_lines`, `buildings`, `runways`,
+  `settlements`, plus `aerodromes.json` for airport discovery.
+- **Vodno conifer Gaussian is DISABLED for NM** (`USE_VODNO_BIAS=False`): a single
+  Skopje-centred bump would mis-colour the whole country. Species rely on the
+  **HRL DLT** soft prior + elevation model (conifer ≈ data-accurate, not inflated).
+  The Skopje-bbox CORINE hint is likewise off (`USE_CLC=False`) — it doesn't cover
+  the NM extent.
+- **`generate_forest_maps.py` is parallel** (`ProcessPoolExecutor`, one shared-data
+  load per worker, deterministic seeded RNG → byte-identical regardless of worker
+  count). The QA overview is assembled from per-patch thumbnails (NM full-res is
+  too large to hold). Extent algorithm, anti-transpose, exclusions, despeckle and
+  treeline are **unchanged** from §3.
+- **Airports**: `data/airports_nm.json` is the NM superset (14 fields: LWSK, LWOH,
+  LWSN, LW67, LW66/Prilep-Malo-Konjari, LW74/Bitola-Logovardi, LWPR/Dolneni, LW70,
+  LW73/Štip, LWST, LWNE/Negotino, LWDK/Demir-Kapija, LWGR/Gradsko, LW71/Sveti-
+  Nikole), runway geometry from OSM `aeroway=runway` ends cross-checked with
+  OurAirports. The pilot `data/airports.json` (3 fields) is untouched.

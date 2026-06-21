@@ -28,12 +28,20 @@ For Phase 1 we store the primary runway of each airport.
 
 import json
 import struct
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from condor_grid import LANDSCAPE_NAME
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-AIRPORTS_ALIGNED = PROJECT_ROOT / "data" / "airports_aligned.json"
-AIRPORTS_JSON = PROJECT_ROOT / "data" / "airports.json"
-OUT_APT = Path("C:/Condor2/Landscapes/MacedoniaSkopje/MacedoniaSkopje.apt")
+# NM has no imagery-aligned airports file; the Skopje pilot prefers its aligned
+# centres so the .apt midpoint matches the flattened plateau.
+_NM = LANDSCAPE_NAME == "NorthMacedonia"
+AIRPORTS_ALIGNED = PROJECT_ROOT / "data" / ("airports_nm_aligned.json" if _NM
+                                            else "airports_aligned.json")
+AIRPORTS_JSON = PROJECT_ROOT / "data" / ("airports_nm.json" if _NM else "airports.json")
+OUT_APT = Path(f"C:/Condor2/Landscapes/{LANDSCAPE_NAME}/{LANDSCAPE_NAME}.apt")
 
 
 def encode_airport(ap: dict, index: int) -> bytes:

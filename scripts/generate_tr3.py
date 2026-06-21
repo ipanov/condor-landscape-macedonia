@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Condor 2 HeightMaps/hCCRR.tr3 patch files directly from the
-flattened 30 m UTM DEM overview.
+Generate Condor 2 HeightMaps/hCCRR.tr3 patch files from the 30 m UTM DEM.
 
 The patch extraction scheme is verified against Slovenia2:
 - Each .tr3 is 193 x 193 uint16 little-endian meters.
@@ -9,45 +8,61 @@ The patch extraction scheme is verified against Slovenia2:
 - Patch (c, r) global indices: [c*192 .. c*192+192] horizontally and
   [r*192 .. r*192+192] vertically, with c/r counting from the bottom-right
   (south-east) corner.
-- The .tr3 array is stored with the same bottom-right origin as the .trn
-  overview, i.e. it is a 180-degree rotation of the raw GDAL top-left patch.
+- The .tr3 array is stored as the ANTI-TRANSPOSE of the north-up GDAL patch,
+  `patch.T[::-1, ::-1]` (the #1 mesh-tear bug — see below / PIPELINES.md §5).
+
+Grid-driven via condor_grid (CONDOR_LANDSCAPE=nm -> NorthMacedonia 40x32 = 1280
+patches). Parallel across all CPU cores (multiprocessing). Deterministic: same
+DEM -> byte-identical .tr3 set.
+
+Source DEM selection:
+  * NorthMacedonia: the BASE (unflattened) 30 m raw — runway flattening is
+    DEFERRED until the all-NM airports/.apt exist; re-run flatten + this script +
+    -hash afterwards. (--source overrides.)
+  * skopje (default): the runway-FLATTENED raw, so tow/winch starts work. The
+    unflattened raw is available via --source for non-airport experiments.
 """
 
 import os
 import sys
 import argparse
-import struct
 import numpy as np
 from pathlib import Path
+from functools import partial
+from multiprocessing import Pool, cpu_count
 
-# Landscape settings
-WIDTH = 2305
-HEIGHT = 2305
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import condor_grid as g  # noqa: E402
+
+# Landscape settings from the grid.
+WIDTH = g.WIDTH
+HEIGHT = g.HEIGHT
 PATCH_SAMPLES = 193
 INTERVAL = 192
-PATCHES_X = 12  # (WIDTH - 1) / INTERVAL
-PATCHES_Y = 12  # (HEIGHT - 1) / INTERVAL
+PATCHES_X = g.PATCHES_X
+PATCHES_Y = g.PATCHES_Y
 
-# Paths
 ROOT = Path(__file__).resolve().parent.parent
-# DEFAULT = the RUNWAY-FLATTENED exactly-30m raw (NW pixel-center 506880/4700160,
-# produced by flatten_runways.py from macedonia_skopje_dem_30m_2305.raw). The
-# installed heightmaps MUST use the flattened DEM, otherwise the runway plateaus
-# are bumpy and Condor will NOT spawn the aerotow towplane (AERO guide: a tug needs
-# terrain flattened to the .apt altitude). The unflattened raw is still available
-# via --source for non-airport experiments.
-#   NOTE: both rasters are EXACTLY 30 m/px; the old 29.987 m drift file is retired.
-SOURCE_RAW = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
-SOURCE_RAW_UNFLAT = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
-OUT_DIR = Path("C:/Condor2/Landscapes/MacedoniaSkopje/HeightMaps")
+DEM_DIR = ROOT / "sources" / "dem"
+
+if g.LANDSCAPE_NAME == "NorthMacedonia":
+    # BASE mesh (runway flatten deferred until airports exist).
+    SOURCE_RAW = DEM_DIR / f"northmacedonia_dem_30m_{WIDTH}x{HEIGHT}.raw"
+    SOURCE_RAW_UNFLAT = SOURCE_RAW
+else:
+    SOURCE_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305_flat.raw"
+    SOURCE_RAW_UNFLAT = DEM_DIR / "macedonia_skopje_dem_30m_2305.raw"
+
+OUT_DIR = Path(f"C:/Condor2/Landscapes/{g.LANDSCAPE_NAME}/HeightMaps")
 
 
 def read_source(path: Path) -> np.ndarray:
     data = np.fromfile(path, dtype=np.int16)
     if data.size != WIDTH * HEIGHT:
-        raise ValueError(f"Expected {WIDTH*HEIGHT} samples, got {data.size}")
+        raise ValueError(
+            f"Expected {WIDTH*HEIGHT} samples ({WIDTH}x{HEIGHT}), got {data.size}")
     arr = data.reshape(HEIGHT, WIDTH)
-    # int16 raw may contain nodata as negative; clamp to 0 for Condor uint16
+    # int16 raw may contain nodata as negative; clamp to 0 for Condor uint16.
     arr = np.where(arr < 0, 0, arr)
     return arr.astype(np.uint16)
 
@@ -65,39 +80,74 @@ def extract_patch(src: np.ndarray, c: int, r: int) -> np.ndarray:
     # Condor .tr3 storage is an ANTI-TRANSPOSE of north-up GDAL (verified
     # empirically against Slovenia2 via shared-edge continuity: the correct op
     # makes adjacent-patch boundary vertices bit-exact; identity output diverges
-    # by up to ~991 m -> the catastrophic mesh tears/voids we saw in-sim).
-    # In stored .tr3: +row(i) = WEST, +col(j) = NORTH. The DEM slice above is
-    # north-up (row 0 = north, col 0 = west); apply patch.T[::-1, ::-1].
-    # NOTE: the spec's "180 degree rotation" wording is incomplete — it omits the
-    # transpose. rot90(x, 2) alone does NOT match Condor. The extraction position
-    # (j_start/i_start) is already correct; only per-patch orientation was wrong.
+    # by up to ~991 m -> catastrophic mesh tears/voids). In stored .tr3:
+    # +row(i) = WEST, +col(j) = NORTH. The DEM slice is north-up (row 0 = north,
+    # col 0 = west); apply patch.T[::-1, ::-1]. rot90(x,2) alone does NOT match.
     return patch.T[::-1, ::-1]
 
 
-def write_tr3(path: Path, patch: np.ndarray):
-    patch.astype(np.uint16).tofile(path)
+def _write_one(cr, src, out_dir):
+    c, r = cr
+    patch = extract_patch(src, c, r)
+    name = f"h{c:02d}{r:02d}.tr3"
+    patch.astype(np.uint16).tofile(out_dir / name)
+    return name
 
 
-def main(source_raw: Path = SOURCE_RAW, out_dir: Path = OUT_DIR):
+# Worker-global DEM (loaded once per process, not pickled per task).
+_SRC = None
+_OUT = None
+
+
+def _init_worker(source_raw, out_dir):
+    global _SRC, _OUT
+    _SRC = read_source(Path(source_raw))
+    _OUT = Path(out_dir)
+
+
+def _worker(cr):
+    c, r = cr
+    patch = extract_patch(_SRC, c, r)
+    name = f"h{c:02d}{r:02d}.tr3"
+    patch.astype(np.uint16).tofile(_OUT / name)
+    return name
+
+
+def main(source_raw: Path = SOURCE_RAW, out_dir: Path = OUT_DIR, workers: int = 0):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    src = read_source(Path(source_raw))
-
-    for c in range(PATCHES_X):
-        for r in range(PATCHES_Y):
-            patch = extract_patch(src, c, r)
-            name = f"h{c:02d}{r:02d}.tr3"
-            write_tr3(out_dir / name, patch)
-
-    print(f"Generated {PATCHES_X * PATCHES_Y} .tr3 files in {out_dir}")
+    tasks = [(c, r) for c in range(PATCHES_X) for r in range(PATCHES_Y)]
+    n = len(tasks)
+    nproc = workers if workers > 0 else cpu_count()
+    nproc = min(nproc, n)
+    print(f"Generating {n} .tr3 patches ({PATCHES_X}x{PATCHES_Y}) on {nproc} cores")
     print(f"  source: {source_raw}")
+    print(f"  out   : {out_dir}")
+
+    if nproc <= 1:
+        src = read_source(Path(source_raw))
+        for cr in tasks:
+            _write_one(cr, src, out_dir)
+    else:
+        with Pool(processes=nproc,
+                  initializer=_init_worker,
+                  initargs=(str(source_raw), str(out_dir))) as pool:
+            done = 0
+            for _ in pool.imap_unordered(_worker, tasks, chunksize=8):
+                done += 1
+                if done % 128 == 0 or done == n:
+                    print(f"  {done}/{n}")
+    print(f"Done: {n} .tr3 files in {out_dir}")
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Generate 144 .tr3 patches from a 30m raw DEM")
+    ap = argparse.ArgumentParser(
+        description="Generate per-patch .tr3 heightmaps from a 30m raw DEM (parallel)")
     ap.add_argument("--source", default=str(SOURCE_RAW),
-                    help="source int16 2305x2305 raw (default: runway-FLATTENED 30m raw)")
+                    help="source int16 WIDTHxHEIGHT raw")
     ap.add_argument("--out", default=str(OUT_DIR),
                     help="output HeightMaps dir (default: installed Condor HeightMaps)")
+    ap.add_argument("--workers", type=int, default=0,
+                    help="worker processes (0 = all CPU cores)")
     args = ap.parse_args()
-    main(Path(args.source), Path(args.out))
+    main(Path(args.source), Path(args.out), args.workers)

@@ -1,7 +1,11 @@
 """
 Phase 1 Landscape Verification Script
-Verifies all files at C:/Condor2/Landscapes/MacedoniaSkopje/
-against the Condor 2 file format specification.
+Verifies all files at C:/Condor2/Landscapes/<LANDSCAPE_NAME>/ against the Condor 2
+file format specification.
+
+Grid-driven via condor_grid (CONDOR_LANDSCAPE=nm -> NorthMacedonia 40x32 = 1280
+patches, .trn 2560x2048; default -> MacedoniaSkopje 12x12 = 144, .trn 768x768).
+Expansion is a pure reparameterisation; this verifier rescales automatically.
 """
 
 import struct
@@ -9,18 +13,30 @@ import os
 import json
 import sys
 
-LANDSCAPE_DIR = "C:/Condor2/Landscapes/MacedoniaSkopje"
-NAME = "MacedoniaSkopje"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import condor_grid as _g  # honours CONDOR_LANDSCAPE
 
-# Expected grid: 12x12 patches = 144, 3x3 tiles
-PATCH_COLS = 12
-PATCH_ROWS = 12
-NUM_PATCHES = PATCH_COLS * PATCH_ROWS  # 144
+NAME = _g.LANDSCAPE_NAME
+LANDSCAPE_DIR = f"C:/Condor2/Landscapes/{NAME}"
+_NM = NAME == "NorthMacedonia"
 
-# Expected .trn/.bmp/.tdm dimensions: 90 m overview = patches x 64 = 12 x 64 = 768.
-# (2305 is the full 30 m DEM .raw used only for .tr3 extraction, NOT the .trn.)
-TRN_WIDTH = 768
-TRN_HEIGHT = 768
+# Expected grid (patches per side) and 90 m overview dimensions (patches x 64).
+PATCH_COLS = _g.PATCHES_X
+PATCH_ROWS = _g.PATCHES_Y
+NUM_PATCHES = PATCH_COLS * PATCH_ROWS            # skopje 144 ; nm 1280
+
+# .trn/.bmp/.tdm dimensions: 90 m overview = patches x 64.
+# (The full 30 m DEM .raw is patches*192+1 and is used only for .tr3 extraction.)
+TRN_WIDTH = PATCH_COLS * 64                      # skopje 768 ; nm 2560
+TRN_HEIGHT = PATCH_ROWS * 64                     # skopje 768 ; nm 2048
+
+# Landscape-specific reference data for the .apt / .cup cross-checks.
+_AIRPORTS_REF = ("D:/Repos/condor-landscape/data/airports_nm.json" if _NM
+                 else "D:/Repos/condor-landscape/data/airports.json")
+_CUP_ICAOS = (["LWSK", "LWOH", "LWSN", "LW67", "LW66", "LW74"] if _NM
+              else ["LWSK", "LWSN", "LW67"])
+with open(_AIRPORTS_REF, "r", encoding="utf-8") as _f:
+    _EXPECTED_AIRPORTS = len(json.load(_f)["airports"])
 
 results = []
 
@@ -29,6 +45,18 @@ def report(item, status, detail=""):
     results.append((item, tag, detail))
     symbol = "[PASS]" if status else "[FAIL]"
     print(f"  {symbol} {item}")
+    if detail:
+        for line in detail.strip().split("\n"):
+            print(f"         {line}")
+
+
+def skip(item, detail=""):
+    """Report a not-yet-built, out-of-scope artifact as SKIP (not counted
+    as PASS or FAIL). Used for NM artifacts that are intentionally deferred
+    (loading screens, .cup, .tdm, 3D objects) so the PASS/FAIL tally reflects
+    only the terrain+textures+forest+airports build."""
+    results.append((item, "SKIP", detail))
+    print(f"  [SKIP] {item}")
     if detail:
         for line in detail.strip().split("\n"):
             print(f"         {line}")
@@ -170,13 +198,68 @@ else:
 
 
 # ============================================================
+# 2b. Textures/tCCRR.dds - Per-patch textures (DXT1 dry / DXT3 water-baked)
+# ============================================================
+section("2b. Textures/tCCRR.dds - Per-patch textures (2048x2048)")
+
+tex_dir = os.path.join(LANDSCAPE_DIR, "Textures")
+if not os.path.isdir(tex_dir):
+    report("Textures/ directory exists", False)
+else:
+    expected_tex = []
+    for cc in range(PATCH_COLS):
+        for rr in range(PATCH_ROWS):
+            expected_tex.append(f"t{cc:02d}{rr:02d}.dds")
+
+    actual_tex = [f for f in os.listdir(tex_dir)
+                  if f.startswith("t") and f.endswith(".dds")]
+    report("Textures patch DDS count", len(actual_tex) == NUM_PATCHES,
+           f"Expected {NUM_PATCHES} tCCRR.dds, found {len(actual_tex)}")
+
+    missing_tex = set(expected_tex) - set(actual_tex)
+    report("Textures no missing patch DDS", not missing_tex,
+           f"Missing: {sorted(missing_tex)[:10]}" if missing_tex else "")
+
+    # Verify DDS magic, 2048x2048, and DXT1/DXT3 fourcc on every patch DDS.
+    bad_dim, fourccs = [], {}
+    for fn in actual_tex:
+        with open(os.path.join(tex_dir, fn), "rb") as f:
+            hdr = f.read(128)
+        if hdr[:4] != b"DDS ":
+            bad_dim.append((fn, "no DDS magic"))
+            continue
+        h, w = struct.unpack_from("<ii", hdr, 12)  # dwHeight, dwWidth
+        if (w, h) != (2048, 2048):
+            bad_dim.append((fn, f"{w}x{h}"))
+        fcc = hdr[84:88].decode("latin-1", "replace")
+        fourccs[fcc] = fourccs.get(fcc, 0) + 1
+    report("Textures all 2048x2048", not bad_dim,
+           f"{len(bad_dim)} wrong-dim: {bad_dim[:5]}" if bad_dim else
+           "All patch DDS are 2048x2048")
+    valid_fcc = set(fourccs) <= {"DXT1", "DXT3"}
+    report("Textures DXT1/DXT3 only (no 8192/uncompressed)", valid_fcc,
+           f"fourcc histogram: {fourccs}")
+
+    # empty.dds must exist and be 2048x2048 (NEVER 4x4 - causes load issues).
+    empty_fp = os.path.join(tex_dir, "empty.dds")
+    if os.path.exists(empty_fp):
+        with open(empty_fp, "rb") as f:
+            ehdr = f.read(128)
+        eh, ew = struct.unpack_from("<ii", ehdr, 12)
+        report("empty.dds is 2048x2048", (ew, eh) == (2048, 2048),
+               f"empty.dds {ew}x{eh}")
+    else:
+        report("empty.dds exists", False, "Textures/empty.dds not found")
+
+
+# ============================================================
 # 3. MacedoniaSkopje.apt - Airports
 # ============================================================
 section("3. MacedoniaSkopje.apt - Airports (binary)")
 
 apt_path = os.path.join(LANDSCAPE_DIR, f"{NAME}.apt")
 AIRPORT_RECORD_SIZE = 72
-EXPECTED_AIRPORTS = 3
+EXPECTED_AIRPORTS = _EXPECTED_AIRPORTS
 
 if not os.path.exists(apt_path):
     report(".apt exists", False, f"File not found: {apt_path}")
@@ -191,15 +274,15 @@ else:
            f"Expected {EXPECTED_AIRPORTS}, got {num_records}")
 
     # Load reference data
-    ref_path = "D:/Repos/condor-landscape/data/airports.json"
-    with open(ref_path, "r") as f:
+    ref_path = _AIRPORTS_REF
+    with open(ref_path, "r", encoding="utf-8") as f:
         ref_data = json.load(f)
     ref_airports = {a["icao"]: a for a in ref_data["airports"]}
 
     with open(apt_path, "rb") as f:
         apt_data = f.read()
 
-    for i in range(min(num_records, 10)):
+    for i in range(num_records):
         offset = i * AIRPORT_RECORD_SIZE
         record = apt_data[offset:offset + AIRPORT_RECORD_SIZE]
 
@@ -221,12 +304,18 @@ else:
             f"  Frequency: {freq_mhz:.2f} MHz",
         ]
 
-        # Try to match with reference
+        # Match to the NEAREST reference airport (not the first within a loose
+        # radius): with 14 densely-packed NM fields a 0.05deg first-match grabs
+        # the wrong neighbour (e.g. Susevo vs Stip ~5 km apart). Pick min L2.
         matched = None
+        best_d2 = None
         for icao, ref in ref_airports.items():
-            if abs(ref["lat"] - lat) < 0.05 and abs(ref["lon"] - lon) < 0.05:
-                matched = (icao, ref)
-                break
+            d2 = (ref["lat"] - lat) ** 2 + (ref["lon"] - lon) ** 2
+            if best_d2 is None or d2 < best_d2:
+                best_d2, matched = d2, (icao, ref)
+        # Only accept if the nearest is actually close (~5 km guard).
+        if matched and best_d2 ** 0.5 > 0.05:
+            matched = None
 
         if matched:
             icao, ref = matched
@@ -251,7 +340,12 @@ section("4. MacedoniaSkopje.cup - Turnpoints/Waypoints")
 cup_path = os.path.join(LANDSCAPE_DIR, f"{NAME}.cup")
 
 if not os.path.exists(cup_path):
-    report(".cup exists", False, f"File not found: {cup_path}")
+    if _NM:
+        skip(".cup turnpoints", "Not built yet (NM: deferred, out of terrain scope)")
+    else:
+        report(".cup exists", False, f"File not found: {cup_path}")
+elif False:
+    pass
 else:
     with open(cup_path, "r", encoding="latin-1") as f:
         cup_lines = f.readlines()
@@ -276,7 +370,7 @@ else:
 
     # Check for airport ICAO codes
     cup_text = "".join(cup_lines)
-    for icao in ["LWSK", "LWSN", "LW67"]:
+    for icao in _CUP_ICAOS:
         found = icao in cup_text
         report(f".cup contains {icao}", found)
 
@@ -290,7 +384,12 @@ tdm_path = os.path.join(LANDSCAPE_DIR, f"{NAME}.tdm")
 expected_tdm_size = 8 + TRN_WIDTH * TRN_HEIGHT  # 5,313,033
 
 if not os.path.exists(tdm_path):
-    report(".tdm exists", False, f"File not found: {tdm_path}")
+    if _NM:
+        skip(".tdm thermal map", "Not built yet (NM: deferred, out of terrain scope)")
+    else:
+        report(".tdm exists", False, f"File not found: {tdm_path}")
+elif False:
+    pass
 else:
     actual_size = os.path.getsize(tdm_path)
     report(".tdm file size", actual_size == expected_tdm_size,
@@ -455,6 +554,8 @@ for fn in loading_files:
     if os.path.exists(fp):
         sz = os.path.getsize(fp)
         report(f"{fn} exists", True, f"Size: {sz:,} bytes")
+    elif _NM:
+        skip(f"{fn}", "Not built yet (NM: real MK glider photos pending)")
     else:
         report(f"{fn} exists", False, f"Not found at {fp}")
 
@@ -464,6 +565,8 @@ for fn in loading_files:
 # ============================================================
 section("10. Directory structure")
 
+# Core data dirs are mandatory; the rest are created later (objects/loading/work).
+_CORE_DIRS = {"HeightMaps", "Textures", "ForestMaps"}
 required_dirs = [
     "HeightMaps",
     "Textures",
@@ -481,6 +584,8 @@ for d in required_dirs:
     if exists:
         contents = os.listdir(dp)
         report(f"Directory {d}/", True, f"Contains {len(contents)} items")
+    elif _NM and d not in _CORE_DIRS:
+        skip(f"Directory {d}/", "Not created yet (NM: deferred)")
     else:
         report(f"Directory {d}/", False, f"Not found: {dp}")
 
@@ -492,12 +597,23 @@ section("VERIFICATION SUMMARY")
 
 pass_count = sum(1 for _, s, _ in results if s == "PASS")
 fail_count = sum(1 for _, s, _ in results if s == "FAIL")
+skip_count = sum(1 for _, s, _ in results if s == "SKIP")
 total = len(results)
 
-print(f"\n  Total checks: {total}")
+print(f"\n  Landscape:    {NAME}  ({PATCH_COLS}x{PATCH_ROWS} = {NUM_PATCHES} patches, "
+      f".trn {TRN_WIDTH}x{TRN_HEIGHT})")
+print(f"  Total checks: {total}")
 print(f"  Passed: {pass_count}")
 print(f"  Failed: {fail_count}")
+print(f"  Skipped (deferred/out-of-scope): {skip_count}")
 print()
+
+if skip_count > 0:
+    print("  SKIPPED (deferred, not part of the terrain+textures+forest+airports build):")
+    for item, status, detail in results:
+        if status == "SKIP":
+            print(f"    [SKIP] {item}")
+    print()
 
 if fail_count > 0:
     print("  FAILED CHECKS:")
@@ -513,3 +629,5 @@ if fail_count == 0:
     print("  ALL CHECKS PASSED - Phase 1 landscape is correctly structured.")
 else:
     print(f"  {fail_count} issue(s) found - review the failures above.")
+
+sys.exit(1 if fail_count else 0)

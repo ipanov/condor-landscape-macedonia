@@ -32,10 +32,21 @@ Outputs a human-readable summary to tools/flatten_runways_summary.txt.
 
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
 import pyproj
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from condor_grid import (
+    LANDSCAPE_NAME,
+    ULXMAP as G_ULXMAP,
+    ULYMAP as G_ULYMAP,
+    XDIM as G_XDIM,
+    WIDTH as G_WIDTH,
+    HEIGHT as G_HEIGHT,
+)
 
 # ---------------------------------------------------------------------------
 # Project layout
@@ -45,21 +56,32 @@ DATA_DIR = PROJECT_ROOT / "data"
 TOOLS_DIR = PROJECT_ROOT / "tools"
 DEM_DIR = PROJECT_ROOT / "sources" / "dem"
 
-AIRPORTS_ALIGNED = DATA_DIR / "airports_aligned.json"
-AIRPORTS_JSON = DATA_DIR / "airports.json"
-INPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305.raw"
-OUTPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305_flat.raw"
-SUMMARY_TXT = TOOLS_DIR / "flatten_runways_summary.txt"
+# Landscape-scoped inputs/outputs.  The NM DEM (7681x6145) is produced by the
+# terrain agent; flattening writes the *_flat.raw the forest/tr3 steps consume.
+_NM = LANDSCAPE_NAME == "NorthMacedonia"
+if _NM:
+    AIRPORTS_ALIGNED = DATA_DIR / "airports_nm_aligned.json"
+    AIRPORTS_JSON = DATA_DIR / "airports_nm.json"
+    INPUT_RAW = DEM_DIR / "northmacedonia_dem_30m_7681x6145.raw"
+    OUTPUT_RAW = DEM_DIR / "northmacedonia_dem_30m_7681x6145_flat.raw"
+    SUMMARY_TXT = TOOLS_DIR / "flatten_runways_nm_summary.txt"
+else:
+    AIRPORTS_ALIGNED = DATA_DIR / "airports_aligned.json"
+    AIRPORTS_JSON = DATA_DIR / "airports.json"
+    INPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305.raw"
+    OUTPUT_RAW = DEM_DIR / "macedonia_skopje_dem_30m_2305_flat.raw"
+    SUMMARY_TXT = TOOLS_DIR / "flatten_runways_summary.txt"
 
 # ---------------------------------------------------------------------------
-# Heightmap geometry -- canonical exactly-30m raw.
+# Heightmap geometry -- canonical exactly-30m raw, derived from condor_grid so
+# expansion is a pure reparameterisation.
 # ---------------------------------------------------------------------------
-NROWS = 2305
-NCOLS = 2305
-XDIM = 30.0              # metres per pixel, easting (EXACT)
-YDIM = 30.0              # metres per pixel, northing (EXACT)
-ULXMAP = 506880.0        # easting of the CENTRE of the top-left pixel
-ULYMAP = 4700160.0       # northing of the CENTRE of the top-left pixel
+NROWS = G_HEIGHT          # skopje 2305 ; nm 6145
+NCOLS = G_WIDTH           # skopje 2305 ; nm 7681
+XDIM = G_XDIM             # metres per pixel, easting (EXACT 30 m)
+YDIM = G_XDIM             # metres per pixel, northing (EXACT 30 m)
+ULXMAP = G_ULXMAP         # easting of the CENTRE of the top-left pixel
+ULYMAP = G_ULYMAP         # northing of the CENTRE of the top-left pixel
 
 # Flatten rectangle padding and skirt.
 # Condor renders terrain as a SPLINE through the .tr3 grid points, so a plateau
@@ -238,7 +260,88 @@ def write_summary(s: dict) -> None:
     SUMMARY_TXT.write_text("\n".join(L), encoding="utf-8")
 
 
+def _oriented_rect(e_c, n_c, length_m, width_m, hdg_deg, pad_len=0.0, pad_wid=0.0):
+    """Return the 4 UTM corners of an oriented runway rectangle (E,N tuples)."""
+    hl = (length_m + pad_len) / 2.0
+    hw = (width_m + pad_wid) / 2.0
+    th = math.radians(hdg_deg)
+    a_e, a_n = math.sin(th), math.cos(th)     # along centreline
+    p_e, p_n = math.cos(th), -math.sin(th)    # perpendicular
+    corners = []
+    for sl, sw in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+        e = e_c + sl * hl * a_e + sw * hw * p_e
+        n = n_c + sl * hl * a_n + sw * hw * p_n
+        corners.append((e, n))
+    corners.append(corners[0])
+    return corners
+
+
+def export_footprints() -> dict:
+    """Emit runway flatten footprints (no DEM needed) for the terrain agent.
+
+    Writes:
+      data/<landscape>_runway_footprints.geojson  -- oriented flatten rectangles
+        (the L+PAD_LEN x W+PAD_WID plateau) in UTM 34N (EPSG:32634), each tagged
+        with icao / designation / target_elev_m / heading, plus a SKIRT_M field.
+      tools/flatten_runways_<...>_footprints.json  -- machine-readable manifest.
+
+    The terrain agent flattens each polygon to ``target_elev_m`` (with the same
+    graded skirt this script applies) and re-hashes.
+    """
+    data, src_json = load_airports()
+    feats = []
+    manifest = {"landscape": LANDSCAPE_NAME, "crs": "EPSG:32634",
+                "pad_len_m": PAD_LEN_M, "pad_wid_m": PAD_WID_M, "skirt_m": SKIRT_M,
+                "airports_source": src_json, "runways": []}
+    for ap in data.get("airports", []):
+        elev_i16 = int(round(ap["elevation_m"]))
+        for rwy in ap.get("runways", []):
+            e_c, n_c = wgs84_to_utm(rwy["center_lon"], rwy["center_lat"])
+            ring = _oriented_rect(e_c, n_c, rwy["length_m"], rwy["width_m"],
+                                  rwy["true_heading"], PAD_LEN_M, PAD_WID_M)
+            props = {
+                "icao": ap["icao"], "name": ap.get("name", ""),
+                "designation": rwy["designation"],
+                "target_elev_m": elev_i16,
+                "true_heading": rwy["true_heading"],
+                "length_m": rwy["length_m"], "width_m": rwy["width_m"],
+                "pad_len_m": PAD_LEN_M, "pad_wid_m": PAD_WID_M, "skirt_m": SKIRT_M,
+                "center_utm_e": round(e_c, 1), "center_utm_n": round(n_c, 1),
+            }
+            feats.append({"type": "Feature", "properties": props,
+                          "geometry": {"type": "Polygon",
+                                       "coordinates": [[list(c) for c in ring]]}})
+            manifest["runways"].append(props)
+    gj = {"type": "FeatureCollection",
+          "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::32634"}},
+          "features": feats}
+    out_gj = DATA_DIR / f"{LANDSCAPE_NAME.lower()}_runway_footprints.geojson"
+    out_mf = TOOLS_DIR / f"flatten_runways_{LANDSCAPE_NAME.lower()}_footprints.json"
+    out_gj.write_text(json.dumps(gj, indent=2), encoding="utf-8")
+    out_mf.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    print(f"Wrote {len(feats)} runway footprints:\n  {out_gj}\n  {out_mf}")
+    for r in manifest["runways"]:
+        print(f"  {r['icao']:6s} {r['designation']:6s} elev {r['target_elev_m']:>4} m  "
+              f"hdg {r['true_heading']:.1f}  ({r['length_m']}x{r['width_m']} m)")
+    return manifest
+
+
 def main() -> None:
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--footprints", action="store_true",
+                    help="only export runway flatten footprints (no DEM needed); "
+                         "for the terrain agent to flatten + re-hash")
+    args = ap.parse_args()
+
+    if args.footprints or not INPUT_RAW.exists():
+        if not INPUT_RAW.exists() and not args.footprints:
+            print(f"[flatten] input DEM {INPUT_RAW.name} not present yet -- "
+                  "exporting footprints only (terrain agent will flatten).")
+        export_footprints()
+        if not INPUT_RAW.exists():
+            return
+
     s = flatten_runways()
     write_summary(s)
     print(f"Input : {s['input_file']}")

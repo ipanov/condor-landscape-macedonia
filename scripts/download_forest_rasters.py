@@ -35,15 +35,32 @@ exists (use ``--force`` to refetch).
 """
 
 import argparse
+import math
 import os
 import subprocess
 import sys
 from pathlib import Path
 
+import pyproj
 import requests
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from condor_grid import (
+    LANDSCAPE_NAME,
+    ULXMAP,
+    ULYMAP,
+    XDIM,
+    PATCHES_X,
+    PATCHES_Y,
+    PATCH_SIZE_M,
+    UTM_CRS,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RASTER_DIR = PROJECT_ROOT / ".sandbox" / "forest_rasters"
+# Output to a landscape-specific sandbox so the Skopje rasters are never
+# clobbered when the NM grid is selected (CONDOR_LANDSCAPE=nm).
+_RASTER_SUBDIR = "forest_rasters_nm" if LANDSCAPE_NAME == "NorthMacedonia" else "forest_rasters"
+RASTER_DIR = PROJECT_ROOT / ".sandbox" / _RASTER_SUBDIR
 RAW_DIR = RASTER_DIR / "raw"
 
 GDAL_BIN = Path("C:/Program Files/QGIS 4.0.0/bin")
@@ -52,27 +69,83 @@ GDAL_TRANSLATE = str(GDAL_BIN / "gdal_translate.exe")
 GDALBUILDVRT = str(GDAL_BIN / "gdalbuildvrt.exe")
 GDALINFO = str(GDAL_BIN / "gdalinfo.exe")
 
-# Landscape grid (UTM 34N, EPSG:32634).  Full 12x12-patch extent.
-#   NW pixel-centre 506880 / 4700160, exact 30 m, 12*512=... but grid here is
-#   the patch extent in metres: 12 patches * 5760 m = 69120 m square.
+# ---------------------------------------------------------------------------
+# Landscape grid, fully derived from condor_grid (UTM 34N, EPSG:32634, exact
+# 30 m).  Expansion to the full NM grid is a pure reparameterisation -- the
+# target extent / EPSG:3035 export bbox / WorldCover tile list all follow the
+# bbox, so no constants need hand-editing.
+# ---------------------------------------------------------------------------
 TARGET_SRS = "EPSG:32634"
-TE = ["506880", "4631040", "576000", "4700160"]  # xmin ymin xmax ymax
-TR = ["30", "30"]
+# UTM target extent (pixel-EDGE aligned to the patch grid, matching the mesh).
+# The Skopje pilot historically used the NW pixel-centre as xmin (506880) with a
+# 69120 m span; the patch-metres span (PATCHES * PATCH_SIZE_M) is identical, so
+# this stays byte-compatible for Skopje while scaling for NM.
+_E0 = ULXMAP
+_E1 = ULXMAP + PATCHES_X * PATCH_SIZE_M
+_N1 = ULYMAP
+_N0 = ULYMAP - PATCHES_Y * PATCH_SIZE_M
+TE = [f"{_E0:.0f}", f"{_N0:.0f}", f"{_E1:.0f}", f"{_N1:.0f}"]  # xmin ymin xmax ymax
+TR = [f"{XDIM:.0f}", f"{XDIM:.0f}"]
 
 # EEA DiscoMap ImageServer endpoints (native EPSG:3035).
 DISCOMAP = "https://image.discomap.eea.europa.eu/arcgis/rest/services"
 DLT_SERVICE = f"{DISCOMAP}/GioLandPublic/HRL_DominantLeafType2018/ImageServer/exportImage"
 TCD_SERVICE = f"{DISCOMAP}/GioLandPublic/HRL_TreeCoverDensity_2018/ImageServer/exportImage"
 
-# Bounding box of the landscape in EPSG:3035 (LAEA), padded slightly so the
-# warp has full coverage at the edges.  Provided by the task brief.
-BBOX_3035 = (5232004.0, 2148649.0, 5309895.0, 2227181.0)  # xmin ymin xmax ymax
-# 30 m native pixels => ~2597x2618.  Round up for safety.
-EXPORT_W = 2600
-EXPORT_H = 2620
+
+def _bbox_3035():
+    """EPSG:3035 (LAEA) bounding box of the landscape grid, padded 1 px.
+
+    The DiscoMap ImageServers are native EPSG:3035; exporting in the native CRS
+    keeps the HRL pixels crisp before the final warp to UTM 34N.
+    """
+    t = pyproj.Transformer.from_crs(UTM_CRS, pyproj.CRS.from_epsg(3035), always_xy=True)
+    xs, ys = [], []
+    for e in (_E0, _E1):
+        for n in (_N0, _N1):
+            x, y = t.transform(e, n)
+            xs.append(x)
+            ys.append(y)
+    pad = 60.0  # ~2 px LAEA padding for full edge coverage
+    return (min(xs) - pad, min(ys) - pad, max(xs) + pad, max(ys) + pad)
+
+
+BBOX_3035 = _bbox_3035()  # xmin ymin xmax ymax
+# Native HRL pixels are 100 m in 3035 but we request at ~30 m so the warp has
+# enough source resolution; round up for safety.
+EXPORT_W = int(math.ceil((BBOX_3035[2] - BBOX_3035[0]) / 30.0)) + 4
+EXPORT_H = int(math.ceil((BBOX_3035[3] - BBOX_3035[1]) / 30.0)) + 4
+# DiscoMap exportImage caps a single request at 4100 px/side, so tile when large.
+EXPORT_MAX = 4000
+
+
+def _worldcover_tiles():
+    """ESA WorldCover v200 3x3-degree tile names covering the landscape bbox.
+
+    Tiles are named S/N{lat}E/W{lon} on a 3-degree grid (floor to multiple of 3).
+    """
+    t = pyproj.Transformer.from_crs(UTM_CRS, pyproj.CRS.from_epsg(4326), always_xy=True)
+    lons, lats = [], []
+    for e in (_E0, _E1):
+        for n in (_N0, _N1):
+            lo, la = t.transform(e, n)
+            lons.append(lo)
+            lats.append(la)
+    lat_lo = int(math.floor(min(lats) / 3.0) * 3)
+    lat_hi = int(math.floor(max(lats) / 3.0) * 3)
+    lon_lo = int(math.floor(min(lons) / 3.0) * 3)
+    lon_hi = int(math.floor(max(lons) / 3.0) * 3)
+    tiles = []
+    for la in range(lat_lo, lat_hi + 1, 3):
+        for lo in range(lon_lo, lon_hi + 1, 3):
+            ns = "N" if la >= 0 else "S"
+            ew = "E" if lo >= 0 else "W"
+            tiles.append(f"{ns}{abs(la):02d}{ew}{abs(lo):03d}")
+    return tiles
+
 
 # ESA WorldCover 2021 v200 public S3.
-WORLDCOVER_TILES = ["N39E021", "N42E021"]
+WORLDCOVER_TILES = _worldcover_tiles()
 WORLDCOVER_URL = (
     "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/"
     "ESA_WorldCover_10m_2021_v200_{tile}_Map.tif"
@@ -157,11 +230,14 @@ def _warp_to_grid(src, dst, resample, src_srs=None):
 # DiscoMap HRL exports (DLT / TCD)
 # -----------------------------------------------------------------------------
 
-def _export_discomap(service: str, out_raw: Path, tag: str) -> Path:
-    """Export an HRL layer from DiscoMap, tiling 2x2 if a single export fails.
+def _export_discomap(service: str, out_raw: Path, tag: str, force=False) -> Path:
+    """Export an HRL layer from DiscoMap as a tiled EPSG:3035 GeoTIFF mosaic.
 
-    Returns the path to a single GeoTIFF (or VRT) in EPSG:3035 covering the
-    landscape bbox.
+    The DiscoMap exportImage endpoint caps a single request at ~4100 px/side, and
+    the full North Macedonia bbox is ~8443x7205 px at 30 m, so the export is
+    split into an Nx M grid of <=EXPORT_MAX-px tiles georeferenced via an ESRI
+    world-file and mosaicked with gdalbuildvrt.  Each tile is cached, so a
+    re-run resumes rather than re-downloading.
     """
     xmin, ymin, xmax, ymax = BBOX_3035
     common = {
@@ -172,45 +248,57 @@ def _export_discomap(service: str, out_raw: Path, tag: str) -> Path:
         "f": "image",
     }
 
-    # 1) Try a single full-extent export first.
-    single = out_raw.with_name(f"{tag}_3035_full.tif")
-    params = dict(common)
-    params["bbox"] = f"{xmin},{ymin},{xmax},{ymax}"
-    params["size"] = f"{EXPORT_W},{EXPORT_H}"
-    try:
-        _download(service, single, params=params)
-        # Sanity: ensure it carries georeferencing and is not a tiny stub.
-        info = subprocess.run([GDALINFO, str(single)], capture_output=True, text=True)
-        if "Coordinate System is" in info.stdout or "PROJCRS" in info.stdout or "3035" in info.stdout:
-            print(f"  {tag}: single export OK")
-            return single
-        print(f"  {tag}: single export missing CRS, falling back to tiling")
-    except Exception as exc:
-        print(f"  {tag}: single export failed ({exc}); tiling 2x2")
+    ncols = max(1, math.ceil(EXPORT_W / EXPORT_MAX))
+    nrows = max(1, math.ceil(EXPORT_H / EXPORT_MAX))
+    dx = (xmax - xmin) / ncols
+    dy = (ymax - ymin) / nrows
+    sub_w = math.ceil(EXPORT_W / ncols) + 2
+    sub_h = math.ceil(EXPORT_H / nrows) + 2
+    print(f"  {tag}: 3035 export grid {ncols}x{nrows} ({sub_w}x{sub_h}px tiles)")
 
-    # 2) Tile into a 2x2 grid and mosaic with gdalbuildvrt.
     tiles = []
-    mx = (xmin + xmax) / 2.0
-    my = (ymin + ymax) / 2.0
-    sub_w = EXPORT_W // 2 + 2
-    sub_h = EXPORT_H // 2 + 2
-    cells = [
-        ("ll", xmin, ymin, mx, my),
-        ("lr", mx, ymin, xmax, my),
-        ("ul", xmin, my, mx, ymax),
-        ("ur", mx, my, xmax, ymax),
-    ]
-    for name, bx0, by0, bx1, by1 in cells:
-        tpath = out_raw.with_name(f"{tag}_3035_{name}.tif")
-        p = dict(common)
-        p["bbox"] = f"{bx0},{by0},{bx1},{by1}"
-        p["size"] = f"{sub_w},{sub_h}"
-        _download(service, tpath, params=p)
-        tiles.append(tpath)
+    for r in range(nrows):
+        for c in range(ncols):
+            bx0 = xmin + c * dx
+            bx1 = xmin + (c + 1) * dx
+            by1 = ymax - r * dy
+            by0 = ymax - (r + 1) * dy
+            tpath = out_raw.with_name(f"{tag}_3035_r{r}c{c}.tif")
+            if tpath.exists() and _is_geotiff(tpath) and not force:
+                print(f"    cached {tpath.name}")
+                tiles.append(tpath)
+                continue
+            p = dict(common)
+            p["bbox"] = f"{bx0},{by0},{bx1},{by1}"
+            p["size"] = f"{sub_w},{sub_h}"
+            # ArcGIS returns the TIFF without embedded georef in some configs;
+            # write a sidecar world-file so gdalbuildvrt can place the tile.
+            _download(service, tpath, params=p)
+            if not _has_crs(tpath):
+                px = (bx1 - bx0) / sub_w
+                py = (by1 - by0) / sub_h
+                tfw = tpath.with_suffix(".tfw")
+                tfw.write_text(
+                    f"{px:.10f}\n0.0\n0.0\n{-py:.10f}\n"
+                    f"{bx0 + px / 2:.6f}\n{by1 - py / 2:.6f}\n"
+                )
+                # Stamp the CRS via a .prj so gdal reads EPSG:3035.
+                _run([GDAL_TRANSLATE, "-a_srs", "EPSG:3035", "-of", "GTiff",
+                      str(tpath), str(tpath.with_name(tpath.stem + "_geo.tif"))])
+                tpath = tpath.with_name(tpath.stem + "_geo.tif")
+            tiles.append(tpath)
 
+    if len(tiles) == 1:
+        return tiles[0]
     vrt = out_raw.with_name(f"{tag}_3035.vrt")
     _run([GDALBUILDVRT, "-overwrite", str(vrt)] + [str(t) for t in tiles])
     return vrt
+
+
+def _has_crs(path: Path) -> bool:
+    info = subprocess.run([GDALINFO, str(path)], capture_output=True, text=True)
+    out = info.stdout
+    return ("PROJCRS" in out or "Coordinate System is" in out) and "3035" in out
 
 
 def fetch_dlt(force=False) -> Path:
@@ -219,7 +307,7 @@ def fetch_dlt(force=False) -> Path:
         print(f"[DLT] cached {out}")
         return out
     print("[DLT] Dominant Leaf Type 2018")
-    src = _export_discomap(DLT_SERVICE, RAW_DIR / "dlt.tif", "dlt")
+    src = _export_discomap(DLT_SERVICE, RAW_DIR / "dlt.tif", "dlt", force=force)
     _warp_to_grid(src, out, resample="near", src_srs="EPSG:3035")
     return out
 
@@ -230,7 +318,7 @@ def fetch_tcd(force=False) -> Path:
         print(f"[TCD] cached {out}")
         return out
     print("[TCD] Tree Cover Density 2018")
-    src = _export_discomap(TCD_SERVICE, RAW_DIR / "tcd.tif", "tcd")
+    src = _export_discomap(TCD_SERVICE, RAW_DIR / "tcd.tif", "tcd", force=force)
     # TCD is a continuous percent surface -> bilinear gives smoother thinning.
     _warp_to_grid(src, out, resample="bilinear", src_srs="EPSG:3035")
     return out
@@ -274,6 +362,13 @@ def main():
 
     RASTER_DIR.mkdir(parents=True, exist_ok=True)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
+
+    print(f"Landscape: {LANDSCAPE_NAME}  ({PATCHES_X}x{PATCHES_Y} patches)")
+    print(f"  UTM target extent (TE): {TE}")
+    print(f"  EPSG:3035 export bbox:  {tuple(round(v) for v in BBOX_3035)}  "
+          f"({EXPORT_W}x{EXPORT_H}px)")
+    print(f"  WorldCover tiles:       {WORLDCOVER_TILES}")
+    print(f"  Output dir:             {RASTER_DIR}")
 
     if not Path(GDALWARP).exists():
         sys.exit(f"gdalwarp not found at {GDALWARP}")

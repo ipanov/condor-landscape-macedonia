@@ -46,15 +46,21 @@ from shapely.strtree import STRtree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from condor_grid import (
+    LANDSCAPE_NAME,
     patch_bounds_utm, PATCHES_X, PATCHES_Y, UTM_CRS, WGS84_CRS, PATCH_SIZE_M,
 )
 from forest_utils import load_forest_raster, patch_raster
 
 ROOT = Path(__file__).resolve().parent.parent
-OSM = ROOT / ".sandbox" / "osm"
-WORK = ROOT / ".sandbox" / "water_bake"
-VALID = ROOT / "validation" / "textures"
-CONDOR_TEX = Path("C:/Condor2/Landscapes/MacedoniaSkopje/Textures")
+# Landscape-scoped inputs/outputs (NM reads osm_nm + bakes the NorthMacedonia
+# install).  The water "masks" the texture agent needs are the OSM water.geojson
+# + waterways.geojson; this script rasterises them per patch to a DXT3 alpha and
+# bakes them in place.  Keep Skopje on its original paths.
+_NM = LANDSCAPE_NAME == "NorthMacedonia"
+OSM = ROOT / ".sandbox" / ("osm_nm" if _NM else "osm")
+WORK = ROOT / ".sandbox" / ("water_bake_nm" if _NM else "water_bake")
+VALID = ROOT / "validation" / ("textures_nm" if _NM else "textures")
+CONDOR_TEX = Path(f"C:/Condor2/Landscapes/{LANDSCAPE_NAME}/Textures")
 BACKUP = CONDOR_TEX.parent / "Textures_bak_phase1"
 NVCOMPRESS = "C:/Program Files/NVIDIA Corporation/NVIDIA Texture Tools/nvcompress.exe"
 
@@ -72,15 +78,19 @@ WATER_TINT = 0.55            # blend water RGB toward WATER_BLUE so it reads as
 
 # Real water-extent rasters (the forest-style fix for over-wide OSM rivers):
 # rivers get their TRUE width from JRC Global Surface Water; OSM polygons are
-# kept only for lakes/reservoirs/ponds.
-WATER_RASTER = ROOT / ".sandbox" / "water_rasters" / "occurrence_utm34_30m.tif"
-WC_RASTER = ROOT / ".sandbox" / "forest_rasters" / "worldcover_utm34_30m.tif"
+# kept only for lakes/reservoirs/ponds.  ESA WorldCover (already fetched for the
+# forest pass) carries a permanent-water class, used as a fallback when the JRC
+# raster is absent.
+WATER_RASTER = ROOT / ".sandbox" / ("water_rasters_nm" if _NM else "water_rasters") / "occurrence_utm34_30m.tif"
+WC_RASTER = ROOT / ".sandbox" / ("forest_rasters_nm" if _NM else "forest_rasters") / "worldcover_utm34_30m.tif"
 JRC_OCC_MIN = 40             # JRC GSW occurrence % counted as permanent water
 WC_WATER = 80                # ESA WorldCover permanent-water class
 
 # Skopska Crna Gora tiles whose RGB was colour-corrected by fix_textures (their
 # phase-1 backup predates that fix), so re-bake from the installed copy.
-_COLORFIX_TILES = {"t0605", "t0606", "t0607", "t0705", "t0706", "t0707"}
+# Skopje-only: tiles whose RGB was colour-corrected after the phase-1 backup.
+# Empty for NM (those tile names do not exist in the NM grid).
+_COLORFIX_TILES = set() if _NM else {"t0605", "t0606", "t0607", "t0705", "t0706", "t0707"}
 
 _OCC = _OCC_AFF = _WC = _WC_AFF = None
 

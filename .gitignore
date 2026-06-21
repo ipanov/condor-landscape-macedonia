@@ -36,3 +36,6 @@ rawtotrn_*.txt
 rawtotrn_*.png
 
 # Condor landscape binaries live under C:/Condor2/Landscapes, not the repo
+
+# Playwright MCP debug dumps
+.playwright-mcp/

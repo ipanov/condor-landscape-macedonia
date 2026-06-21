@@ -1,0 +1,927 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - menubar [ref=e6]:
+        - listitem [ref=e7]:
+          - menuitem "Login" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: 
+            - text: Login
+          - text: 
+        - listitem [ref=e10]:
+          - menuitem "Register" [ref=e11] [cursor=pointer]:
+            - generic [ref=e12]: 
+            - text: Register
+        - text: 
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "Condor" [ref=e16] [cursor=pointer]:
+          - /url: https://www.condorsoaring.com
+        - paragraph [ref=e18]:
+          - link "Skip to content" [ref=e19] [cursor=pointer]:
+            - /url: "#start_here"
+    - navigation [ref=e20]:
+      - generic [ref=e21]:
+        - menubar [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Quick links" [ref=e24] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e25]: Quick links
+            - text:  
+        - menubar [ref=e26]:
+          - listitem [ref=e27]:
+            - link " Condor" [ref=e29] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com
+              - generic [ref=e30]: 
+              - text: Condor
+            - generic [ref=e31]:
+              - text: »
+              - link " Board index" [ref=e32] [cursor=pointer]:
+                - /url: ./index.php
+                - generic [ref=e33]: 
+                - text: Board index
+            - generic [ref=e34]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e35]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e36]:
+              - text: »
+              - link:
+                - /url: ""
+  - main [ref=e37]:
+    - heading "Czech Republic scenery" [level=2] [ref=e38]:
+      - link "Czech Republic scenery" [ref=e39] [cursor=pointer]:
+        - /url: ./viewtopic.php?f=3&t=6242
+    - paragraph [ref=e40]:
+      - strong [ref=e41]: "Moderators:"
+      - link "Uros" [ref=e42] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=3
+      - text: ","
+      - link "OXO" [ref=e43] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1470
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - link "Post Reply" [ref=e46] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=3&t=6242
+          - text: Post Reply
+          - generic [ref=e47]: 
+        - generic [ref=e48]:
+          - text: 50 posts
+          - list [ref=e49]:
+            - listitem [ref=e50]:
+              - generic [ref=e51]: "1"
+            - listitem [ref=e52]:
+              - button "2" [ref=e53] [cursor=pointer]
+            - listitem [ref=e54]:
+              - button "3" [ref=e55] [cursor=pointer]
+            - listitem [ref=e56]:
+              - button "4" [ref=e57] [cursor=pointer]
+            - listitem [ref=e58]:
+              - button "Next" [ref=e59] [cursor=pointer]:
+                - generic [ref=e60]: 
+                - generic [ref=e61]: Next
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - term [ref=e65]:
+            - link "User avatar" [ref=e67] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e68]
+            - link "JBr" [ref=e69] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e70]
+          - definition [ref=e71]:
+            - strong [ref=e72]: "Posts:"
+            - text: "498"
+          - definition [ref=e73]:
+            - strong [ref=e74]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e76]:
+          - heading "Czech Republic scenery" [level=3] [ref=e77]:
+            - link "Czech Republic scenery" [ref=e78] [cursor=pointer]:
+              - /url: "#p58184"
+          - list [ref=e79]:
+            - listitem [ref=e80]:
+              - link "Quote" [ref=e81] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58184
+                - generic [ref=e82]: 
+                - generic [ref=e83]: Quote
+            - text: 
+          - paragraph [ref=e84]:
+            - link "Post" [ref=e85] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58184#p58184
+              - generic [ref=e86]: 
+              - generic [ref=e87]: Post
+            - generic [ref=e88]:
+              - text: by
+              - strong [ref=e89]:
+                - link "JBr" [ref=e90] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Sat Mar 17, 2007 7:30 pm
+          - generic [ref=e91]:
+            - text: I've been planning to create the Czech Republic scenery for a long time and I'm even working on a small area of it as a test bed for testing texturing and modelling techniques. Finally, some time ago, Cadfael and I have decided to join our forces and bring you another high quality scenery
+            - img ";)" [ref=e92]
+            - text: Today, the first step was taken towards delivering it to you... Terrain is ready and calibrated to the highest precision I'm able to achieve - length of the task from the west most airport to the east most airport is the same in Condor task planner as in See You, the same applies to the task from the north most to the south most airport. Polygon task around all borderline airports only differs by 100 meters (737,2 km in Condor vs 737,3 km in See You), which I think is also very good.
+            - text: Looking at the map below many of you may wonder why does the scenery overlap with the Slovakia so much.
+            - text: "We've been discussing this a lot and the area in the map is the best compromise we could think of. We wanted to ensure two basic things:"
+            - text: 1) we wanted to keep the whole northern mountainous region intact, which means we had to include parts of the area that are covered by Slovakia. The reason for this is the fact that many long distance flights are achieved there and with the discovery of the wave active area in Jeseniky (although much weaker in Condor than in real life) we believe the same can be done for Krkonose and thus could allow us to fly longer tasks in mountains.
+            - text: 2) we wanted to strech the scenery to the west as much as possible.
+            - text: Due to the size limits of Condor scenery we couldn't cover the whole area of the Czech Republic, but we believe that the scenery covers the most attractive soaring regions of it.
+            - text: We'll begin "fulltime" work on the scenery by the time Cadfael releases his Slovakia 2.5.
+            - text: "The map of the area (click on the picture to get bigger version with more airport and turn point names):"
+            - link "Image" [ref=e93] [cursor=pointer]:
+              - /url: http://condor.brozek.org/temp/czech_mapa_big.jpg
+              - img "Image" [ref=e94]
+          - link "Image" [ref=e96] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e97]
+        - link "Top" [ref=e98] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e99]: 
+          - generic [ref=e100]: Top
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - term [ref=e104]:
+            - link "User avatar" [ref=e106] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - img "User avatar" [ref=e107]
+            - link "Colin" [ref=e108] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+            - generic "Offline" [ref=e109]
+          - definition [ref=e110]:
+            - strong [ref=e111]: "Posts:"
+            - text: "393"
+          - definition [ref=e112]:
+            - strong [ref=e113]: "Joined:"
+            - text: Sat Sep 23, 2006 9:14 pm
+        - generic [ref=e115]:
+          - heading [level=3] [ref=e116]:
+            - link:
+              - /url: "#p58207"
+          - list [ref=e117]:
+            - listitem [ref=e118]:
+              - link "Quote" [ref=e119] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58207
+                - generic [ref=e120]: 
+                - generic [ref=e121]: Quote
+            - text: 
+          - paragraph [ref=e122]:
+            - link "Post" [ref=e123] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58207#p58207
+              - generic [ref=e124]: 
+              - generic [ref=e125]: Post
+            - generic [ref=e126]:
+              - text: by
+              - strong [ref=e127]:
+                - link "Colin" [ref=e128] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - text: »
+            - text: Sat Mar 17, 2007 11:14 pm
+          - generic [ref=e129]: Cool- really great work. Got any screenshots yet?
+          - generic [ref=e130]:
+            - text: Don't Disregard Dangling the Dunlop!
+            - text: Colin Field G-CJWF 'CJF'
+            - link "Image":
+              - /url: http://www.sloganizer.net/en/
+              - img "Image"
+        - link "Top" [ref=e131] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e132]: 
+          - generic [ref=e133]: Top
+      - generic [ref=e135]:
+        - generic [ref=e136]:
+          - term [ref=e137]:
+            - link "User avatar" [ref=e139] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+              - img "User avatar" [ref=e140]
+            - link "Cadfael" [ref=e141] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+            - generic "Offline" [ref=e142]
+          - definition [ref=e143]:
+            - strong [ref=e144]: "Posts:"
+            - text: "3707"
+          - definition [ref=e145]:
+            - strong [ref=e146]: "Joined:"
+            - text: Fri May 27, 2005 8:07 pm
+          - definition [ref=e147]:
+            - strong [ref=e148]: "Location:"
+            - text: Czech republic
+          - definition [ref=e149]:
+            - strong [ref=e150]: "Contact:"
+            - link "Contact Cadfael" [ref=e152] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e153]: 
+              - generic [ref=e154]: Contact Cadfael
+        - generic [ref=e156]:
+          - heading [level=3] [ref=e157]:
+            - link:
+              - /url: "#p58232"
+          - list [ref=e158]:
+            - listitem [ref=e159]:
+              - link "Quote" [ref=e160] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58232
+                - generic [ref=e161]: 
+                - generic [ref=e162]: Quote
+            - text: 
+          - paragraph [ref=e163]:
+            - link "Post" [ref=e164] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58232#p58232
+              - generic [ref=e165]: 
+              - generic [ref=e166]: Post
+            - generic [ref=e167]:
+              - text: by
+              - strong [ref=e168]:
+                - link "Cadfael" [ref=e169] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=363
+              - text: »
+            - text: Sun Mar 18, 2007 8:50 am
+          - generic [ref=e170]:
+            - text: We start this scenery now, so release date is expected about Christmas, probably this year
+            - img "8)" [ref=e171]
+            - text: First pictures during some months.
+          - generic [ref=e172]:
+            - link "Image" [ref=e173] [cursor=pointer]:
+              - /url: http://www.condorworld.eu
+              - img "Image" [ref=e174]
+            - link "Image" [ref=e175] [cursor=pointer]:
+              - /url: https://virtualsoaring.eu/beskydy2021/
+              - img "Image" [ref=e176]
+        - link "Top" [ref=e177] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e178]: 
+          - generic [ref=e179]: Top
+      - generic [ref=e181]:
+        - generic [ref=e182]:
+          - term [ref=e183]:
+            - link "User avatar" [ref=e185] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - img "User avatar" [ref=e186]
+            - link "Colin" [ref=e187] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+            - generic "Offline" [ref=e188]
+          - definition [ref=e189]:
+            - strong [ref=e190]: "Posts:"
+            - text: "393"
+          - definition [ref=e191]:
+            - strong [ref=e192]: "Joined:"
+            - text: Sat Sep 23, 2006 9:14 pm
+        - generic [ref=e194]:
+          - heading [level=3] [ref=e195]:
+            - link:
+              - /url: "#p58236"
+          - list [ref=e196]:
+            - listitem [ref=e197]:
+              - link "Quote" [ref=e198] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58236
+                - generic [ref=e199]: 
+                - generic [ref=e200]: Quote
+            - text: 
+          - paragraph [ref=e201]:
+            - link "Post" [ref=e202] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58236#p58236
+              - generic [ref=e203]: 
+              - generic [ref=e204]: Post
+            - generic [ref=e205]:
+              - text: by
+              - strong [ref=e206]:
+                - link "Colin" [ref=e207] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - text: »
+            - text: Sun Mar 18, 2007 9:32 am
+          - generic [ref=e208]: kk
+          - generic [ref=e209]:
+            - text: Don't Disregard Dangling the Dunlop!
+            - text: Colin Field G-CJWF 'CJF'
+            - link "Image":
+              - /url: http://www.sloganizer.net/en/
+              - img "Image"
+        - link "Top" [ref=e210] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e211]: 
+          - generic [ref=e212]: Top
+      - generic [ref=e214]:
+        - generic [ref=e215]:
+          - term [ref=e216]:
+            - link "User avatar" [ref=e218] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e219]
+            - link "JBr" [ref=e220] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e221]
+          - definition [ref=e222]:
+            - strong [ref=e223]: "Posts:"
+            - text: "498"
+          - definition [ref=e224]:
+            - strong [ref=e225]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e227]:
+          - heading [level=3] [ref=e228]:
+            - link:
+              - /url: "#p58238"
+          - list [ref=e229]:
+            - listitem [ref=e230]:
+              - link "Quote" [ref=e231] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58238
+                - generic [ref=e232]: 
+                - generic [ref=e233]: Quote
+            - text: 
+          - paragraph [ref=e234]:
+            - link "Post" [ref=e235] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58238#p58238
+              - generic [ref=e236]: 
+              - generic [ref=e237]: Post
+            - generic [ref=e238]:
+              - text: by
+              - strong [ref=e239]:
+                - link "JBr" [ref=e240] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Sun Mar 18, 2007 10:07 am
+          - generic [ref=e241]:
+            - text: As Cadfael said, it's too early for pics. I can however post few screens from my test scenery. Airports in the pictures will be included in the final C.R. scenery (those and many many more).
+            - text: LKCT - Chotebor, my home airport
+            - img "Image" [ref=e242]
+            - img "Image" [ref=e243]
+            - text: and one RL photo for comparison...
+            - img "Image" [ref=e244]
+            - text: LKPN - Podhorany, home of the two-seater nationals in 1998, 2004
+            - img "Image" [ref=e245]
+          - link "Image" [ref=e247] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e248]
+        - link "Top" [ref=e249] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e250]: 
+          - generic [ref=e251]: Top
+      - generic [ref=e253]:
+        - generic [ref=e254]:
+          - term [ref=e255]:
+            - link "Pierre.v.d.Elshout" [ref=e256] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=971
+            - generic "Offline" [ref=e257]
+          - definition [ref=e258]:
+            - strong [ref=e259]: "Posts:"
+            - text: "288"
+          - definition [ref=e260]:
+            - strong [ref=e261]: "Joined:"
+            - text: Mon Nov 28, 2005 9:02 am
+        - generic [ref=e263]:
+          - heading [level=3] [ref=e264]:
+            - link:
+              - /url: "#p58239"
+          - list [ref=e265]:
+            - listitem [ref=e266]:
+              - link "Quote" [ref=e267] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58239
+                - generic [ref=e268]: 
+                - generic [ref=e269]: Quote
+            - text: 
+          - paragraph [ref=e270]:
+            - link "Post" [ref=e271] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58239#p58239
+              - generic [ref=e272]: 
+              - generic [ref=e273]: Post
+            - generic [ref=e274]:
+              - text: by
+              - strong [ref=e275]:
+                - link "Pierre.v.d.Elshout" [ref=e276] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=971
+              - text: »
+            - text: Sun Mar 18, 2007 10:23 am
+          - generic [ref=e277]: Can you include Zbraslavice? Thanks
+          - generic [ref=e278]: Glider-Equipment.nl
+        - link "Top" [ref=e279] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e280]: 
+          - generic [ref=e281]: Top
+      - generic [ref=e283]:
+        - generic [ref=e284]:
+          - term [ref=e285]:
+            - link "User avatar" [ref=e287] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e288]
+            - link "JBr" [ref=e289] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e290]
+          - definition [ref=e291]:
+            - strong [ref=e292]: "Posts:"
+            - text: "498"
+          - definition [ref=e293]:
+            - strong [ref=e294]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e296]:
+          - heading [level=3] [ref=e297]:
+            - link:
+              - /url: "#p58241"
+          - list [ref=e298]:
+            - listitem [ref=e299]:
+              - link "Quote" [ref=e300] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58241
+                - generic [ref=e301]: 
+                - generic [ref=e302]: Quote
+            - text: 
+          - paragraph [ref=e303]:
+            - link "Post" [ref=e304] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58241#p58241
+              - generic [ref=e305]: 
+              - generic [ref=e306]: Post
+            - generic [ref=e307]:
+              - text: by
+              - strong [ref=e308]:
+                - link "JBr" [ref=e309] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Sun Mar 18, 2007 10:55 am
+          - generic [ref=e310]: Zbraslavice are part of the planned scenery.
+          - link "Image" [ref=e312] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e313]
+        - link "Top" [ref=e314] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e315]: 
+          - generic [ref=e316]: Top
+      - generic [ref=e318]:
+        - generic [ref=e319]:
+          - term [ref=e320]:
+            - link "User avatar" [ref=e322] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - img "User avatar" [ref=e323]
+            - link "Colin" [ref=e324] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2685
+            - generic "Offline" [ref=e325]
+          - definition [ref=e326]:
+            - strong [ref=e327]: "Posts:"
+            - text: "393"
+          - definition [ref=e328]:
+            - strong [ref=e329]: "Joined:"
+            - text: Sat Sep 23, 2006 9:14 pm
+        - generic [ref=e331]:
+          - heading [level=3] [ref=e332]:
+            - link:
+              - /url: "#p58242"
+          - list [ref=e333]:
+            - listitem [ref=e334]:
+              - link "Quote" [ref=e335] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=58242
+                - generic [ref=e336]: 
+                - generic [ref=e337]: Quote
+            - text: 
+          - paragraph [ref=e338]:
+            - link "Post" [ref=e339] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=58242#p58242
+              - generic [ref=e340]: 
+              - generic [ref=e341]: Post
+            - generic [ref=e342]:
+              - text: by
+              - strong [ref=e343]:
+                - link "Colin" [ref=e344] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2685
+              - text: »
+            - text: Sun Mar 18, 2007 10:58 am
+          - generic [ref=e345]: That comparison photo is great, but it really does show off the problem with the oversized trees.
+          - generic [ref=e346]:
+            - text: Don't Disregard Dangling the Dunlop!
+            - text: Colin Field G-CJWF 'CJF'
+            - link "Image":
+              - /url: http://www.sloganizer.net/en/
+              - img "Image"
+        - link "Top" [ref=e347] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e348]: 
+          - generic [ref=e349]: Top
+      - generic [ref=e351]:
+        - generic [ref=e352]:
+          - term [ref=e353]:
+            - link "User avatar" [ref=e355] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e356]
+            - link "JBr" [ref=e357] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e358]
+          - definition [ref=e359]:
+            - strong [ref=e360]: "Posts:"
+            - text: "498"
+          - definition [ref=e361]:
+            - strong [ref=e362]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e364]:
+          - heading [level=3] [ref=e365]:
+            - link:
+              - /url: "#p59760"
+          - list [ref=e366]:
+            - listitem [ref=e367]:
+              - link "Quote" [ref=e368] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=59760
+                - generic [ref=e369]: 
+                - generic [ref=e370]: Quote
+            - text: 
+          - paragraph [ref=e371]:
+            - link "Post" [ref=e372] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=59760#p59760
+              - generic [ref=e373]: 
+              - generic [ref=e374]: Post
+            - generic [ref=e375]:
+              - text: by
+              - strong [ref=e376]:
+                - link "JBr" [ref=e377] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Sat Apr 07, 2007 10:03 pm
+          - generic [ref=e378]:
+            - text: Well, Milos started creating textures for our demo scenery (covering almost 100x100 km of the Czech Republic area) which will be released quite soon (at least we hope
+            - img ":)" [ref=e379]
+            - text: ). We are using it for testing few new things (including brand new approach to terrain texturing) that will be used in the final CR scenery.
+            - text: Little sneak peek
+            - img ";)" [ref=e380]
+            - img "Image" [ref=e381]
+          - link "Image" [ref=e383] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e384]
+        - link "Top" [ref=e385] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e386]: 
+          - generic [ref=e387]: Top
+      - generic [ref=e389]:
+        - generic [ref=e390]:
+          - term [ref=e391]:
+            - link "User avatar" [ref=e393] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2331
+              - img "User avatar" [ref=e394]
+            - link "Freebird" [ref=e395] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2331
+            - generic "Offline" [ref=e396]
+          - definition [ref=e397]:
+            - strong [ref=e398]: "Posts:"
+            - text: "2472"
+          - definition [ref=e399]:
+            - strong [ref=e400]: "Joined:"
+            - text: Thu Jul 13, 2006 9:40 pm
+          - definition [ref=e401]:
+            - strong [ref=e402]: "Location:"
+            - text: North Wales UK
+        - generic [ref=e404]:
+          - heading [level=3] [ref=e405]:
+            - link:
+              - /url: "#p59867"
+          - list [ref=e406]:
+            - listitem [ref=e407]:
+              - link "Quote" [ref=e408] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=59867
+                - generic [ref=e409]: 
+                - generic [ref=e410]: Quote
+            - text: 
+          - paragraph [ref=e411]:
+            - link "Post" [ref=e412] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=59867#p59867
+              - generic [ref=e413]: 
+              - generic [ref=e414]: Post
+            - generic [ref=e415]:
+              - text: by
+              - strong [ref=e416]:
+                - link "Freebird" [ref=e417] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2331
+              - text: »
+            - text: Mon Apr 09, 2007 4:55 pm
+          - generic [ref=e418]:
+            - text: Wow! It makes a big difference when you have fields with different colours, shapes & textures, one of the things that makes Provence such a beautiful scenery. I think Cadfael deserves an award for his services to the Condor community
+            - img ":)" [ref=e419]
+        - link "Top" [ref=e420] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e421]: 
+          - generic [ref=e422]: Top
+      - generic [ref=e424]:
+        - generic [ref=e425]:
+          - term [ref=e426]:
+            - link "User avatar" [ref=e428] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e429]
+            - link "JBr" [ref=e430] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e431]
+          - definition [ref=e432]:
+            - strong [ref=e433]: "Posts:"
+            - text: "498"
+          - definition [ref=e434]:
+            - strong [ref=e435]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e437]:
+          - heading [level=3] [ref=e438]:
+            - link:
+              - /url: "#p61037"
+          - list [ref=e439]:
+            - listitem [ref=e440]:
+              - link "Quote" [ref=e441] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=61037
+                - generic [ref=e442]: 
+                - generic [ref=e443]: Quote
+            - text: 
+          - paragraph [ref=e444]:
+            - link "Post" [ref=e445] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=61037#p61037
+              - generic [ref=e446]: 
+              - generic [ref=e447]: Post
+            - generic [ref=e448]:
+              - text: by
+              - strong [ref=e449]:
+                - link "JBr" [ref=e450] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Mon Apr 30, 2007 2:28 pm
+          - generic [ref=e451]:
+            - text: First two pics from our demo scenery
+            - img ";)" [ref=e452]
+            - img "Image" [ref=e453]
+            - img "Image" [ref=e454]
+          - link "Image" [ref=e456] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e457]
+        - link "Top" [ref=e458] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e459]: 
+          - generic [ref=e460]: Top
+      - generic [ref=e462]:
+        - generic [ref=e463]:
+          - term [ref=e464]:
+            - link "User avatar" [ref=e466] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2817
+              - img "User avatar" [ref=e467]
+            - link "ybuqc" [ref=e468] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2817
+            - generic "Offline" [ref=e469]
+          - definition [ref=e470]:
+            - strong [ref=e471]: "Posts:"
+            - text: "609"
+          - definition [ref=e472]:
+            - strong [ref=e473]: "Joined:"
+            - text: Sat Oct 14, 2006 11:41 pm
+          - definition [ref=e474]:
+            - strong [ref=e475]: "Location:"
+            - text: France
+        - generic [ref=e477]:
+          - heading [level=3] [ref=e478]:
+            - link:
+              - /url: "#p61286"
+          - list [ref=e479]:
+            - listitem [ref=e480]:
+              - link "Quote" [ref=e481] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=61286
+                - generic [ref=e482]: 
+                - generic [ref=e483]: Quote
+            - text: 
+          - paragraph [ref=e484]:
+            - link "Post" [ref=e485] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=61286#p61286
+              - generic [ref=e486]: 
+              - generic [ref=e487]: Post
+            - generic [ref=e488]:
+              - text: by
+              - strong [ref=e489]:
+                - link "ybuqc" [ref=e490] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2817
+              - text: »
+            - text: Thu May 03, 2007 10:48 pm
+          - generic [ref=e491]:
+            - text: Looks REALLY nice!
+            - text: "Remark: the textures (white corner) to define the limit of the airfield seem to be left/right inverted."
+          - link "Image" [ref=e493] [cursor=pointer]:
+            - /url: http://www.condor-club.eu/graduate/0/?id=165
+            - img "Image" [ref=e494]
+        - link "Top" [ref=e495] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e496]: 
+          - generic [ref=e497]: Top
+      - generic [ref=e499]:
+        - generic [ref=e500]:
+          - term [ref=e501]:
+            - link "User avatar" [ref=e503] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - img "User avatar" [ref=e504]
+            - link "JBr" [ref=e505] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1566
+            - generic "Offline" [ref=e506]
+          - definition [ref=e507]:
+            - strong [ref=e508]: "Posts:"
+            - text: "498"
+          - definition [ref=e509]:
+            - strong [ref=e510]: "Joined:"
+            - text: Tue Feb 28, 2006 11:33 am
+        - generic [ref=e512]:
+          - heading [level=3] [ref=e513]:
+            - link:
+              - /url: "#p61289"
+          - list [ref=e514]:
+            - listitem [ref=e515]:
+              - link "Quote" [ref=e516] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=61289
+                - generic [ref=e517]: 
+                - generic [ref=e518]: Quote
+            - text: 
+          - paragraph [ref=e519]:
+            - link "Post" [ref=e520] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=61289#p61289
+              - generic [ref=e521]: 
+              - generic [ref=e522]: Post
+            - generic [ref=e523]:
+              - text: by
+              - strong [ref=e524]:
+                - link "JBr" [ref=e525] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1566
+              - text: »
+            - text: Thu May 03, 2007 11:26 pm
+          - generic [ref=e526]:
+            - blockquote [ref=e527]:
+              - generic [ref=e528]:
+                - generic [ref=e529]: "ybuqc wrote:"
+                - text: Looks REALLY nice!
+                - text: "Remark: the textures (white corner) to define the limit of the airfield seem to be left/right inverted."
+            - text: Nope, they are correct and in compliance with Czech air traffic regulations.
+            - text: You can check them yourself, just click
+            - link "here" [ref=e530] [cursor=pointer]:
+              - /url: http://www.mapy.cz/?query=LKCT&portWidth=930&portHeight=717&zoom=5&mapType=base&centerX=135549861&centerY=134989697#centerX=135965136@centerY=134507248@typ=ophoto@zoom=16@vizType=none@vizIds=none
+            - text: .
+          - link "Image" [ref=e532] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=10041
+            - img "Image" [ref=e533]
+        - link "Top" [ref=e534] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e535]: 
+          - generic [ref=e536]: Top
+      - generic [ref=e538]:
+        - generic [ref=e539]:
+          - term [ref=e540]:
+            - link "User avatar" [ref=e542] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2817
+              - img "User avatar" [ref=e543]
+            - link "ybuqc" [ref=e544] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=2817
+            - generic "Offline" [ref=e545]
+          - definition [ref=e546]:
+            - strong [ref=e547]: "Posts:"
+            - text: "609"
+          - definition [ref=e548]:
+            - strong [ref=e549]: "Joined:"
+            - text: Sat Oct 14, 2006 11:41 pm
+          - definition [ref=e550]:
+            - strong [ref=e551]: "Location:"
+            - text: France
+        - generic [ref=e553]:
+          - heading [level=3] [ref=e554]:
+            - link:
+              - /url: "#p61292"
+          - list [ref=e555]:
+            - listitem [ref=e556]:
+              - link "Quote" [ref=e557] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=61292
+                - generic [ref=e558]: 
+                - generic [ref=e559]: Quote
+            - text: 
+          - paragraph [ref=e560]:
+            - link "Post" [ref=e561] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=61292#p61292
+              - generic [ref=e562]: 
+              - generic [ref=e563]: Post
+            - generic [ref=e564]:
+              - text: by
+              - strong [ref=e565]:
+                - link "ybuqc" [ref=e566] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=2817
+              - text: »
+            - text: Fri May 04, 2007 2:30 am
+          - generic [ref=e567]:
+            - text: Who said it was on the wrong side??? Certainly not me
+            - img ":D" [ref=e568]
+            - img ":lol:" [ref=e569]
+          - link "Image" [ref=e571] [cursor=pointer]:
+            - /url: http://www.condor-club.eu/graduate/0/?id=165
+            - img "Image" [ref=e572]
+        - link "Top" [ref=e573] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e574]: 
+          - generic [ref=e575]: Top
+      - generic [ref=e577]:
+        - generic [ref=e578]:
+          - term [ref=e579]:
+            - link "SAN-Soarer" [ref=e580] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1751
+            - generic "Offline" [ref=e581]
+          - definition [ref=e582]:
+            - strong [ref=e583]: "Posts:"
+            - text: "527"
+          - definition [ref=e584]:
+            - strong [ref=e585]: "Joined:"
+            - text: Thu Mar 23, 2006 11:20 pm
+        - generic [ref=e587]:
+          - heading [level=3] [ref=e588]:
+            - link:
+              - /url: "#p64943"
+          - list [ref=e589]:
+            - listitem [ref=e590]:
+              - link "Quote" [ref=e591] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=3&p=64943
+                - generic [ref=e592]: 
+                - generic [ref=e593]: Quote
+            - text: 
+          - paragraph [ref=e594]:
+            - link "Post" [ref=e595] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=64943#p64943
+              - generic [ref=e596]: 
+              - generic [ref=e597]: Post
+            - generic [ref=e598]:
+              - text: by
+              - strong [ref=e599]:
+                - link "SAN-Soarer" [ref=e600] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1751
+              - text: »
+            - text: Wed Jun 20, 2007 5:01 pm
+          - generic [ref=e601]:
+            - text: As far as I can see on Colin's thread about the map with all sceneries, the czech republic scenery will cover small parts of germany is that right???
+            - text: "And another question: If so could you extend your scenery 30 km more to west??? I ask that cause I fly in NE-Bavaria and the czech border isn't so far away from here. Would be cool to have my home airfield in the scenery though"
+            - img ":P" [ref=e602]
+            - text: if It's not possible,... well... it's ok then
+            - img ":(" [ref=e603]
+            - img ":wink:" [ref=e604]
+        - link "Top" [ref=e605] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e606]: 
+          - generic [ref=e607]: Top
+      - generic [ref=e608]:
+        - link "Post Reply" [ref=e609] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=3&t=6242
+          - text: Post Reply
+          - generic [ref=e610]: 
+        - generic "Display and sorting options" [ref=e612] [cursor=pointer]:
+          - generic [ref=e613]: 
+          - generic [ref=e615]: 
+        - generic [ref=e616]:
+          - text: 50 posts
+          - list [ref=e617]:
+            - listitem [ref=e618]:
+              - generic [ref=e619]: "1"
+            - listitem [ref=e620]:
+              - button "2" [ref=e621] [cursor=pointer]
+            - listitem [ref=e622]:
+              - button "3" [ref=e623] [cursor=pointer]
+            - listitem [ref=e624]:
+              - button "4" [ref=e625] [cursor=pointer]
+            - listitem [ref=e626]:
+              - button "Next" [ref=e627] [cursor=pointer]:
+                - generic [ref=e628]: 
+                - generic [ref=e629]: Next
+      - generic [ref=e630]:
+        - paragraph:
+          - link "Return to “Scenery”" [ref=e631] [cursor=pointer]:
+            - /url: ./viewforum.php?f=3
+            - generic [ref=e632]: 
+            - text: Return to “Scenery”
+    - generic [ref=e633]:
+      - heading "Who is online" [level=3] [ref=e634]:
+        - link "Who is online" [ref=e635] [cursor=pointer]:
+          - /url: ./viewonline.php
+      - paragraph [ref=e636]: "Users browsing this forum: No registered users"
+  - contentinfo [ref=e637]:
+    - navigation [ref=e638]:
+      - menubar [ref=e640]:
+        - listitem [ref=e641]:
+          - link "Condor" [ref=e643] [cursor=pointer]:
+            - /url: https://www.condorsoaring.com
+            - generic [ref=e644]: 
+            - text: Condor
+          - generic [ref=e645]:
+            - text: »
+            - link "Board index" [ref=e646] [cursor=pointer]:
+              - /url: ./index.php
+        - text: 
+        - listitem [ref=e647]: All times are UTC+02:00
+        - listitem [ref=e648]:
+          - menuitem "Delete cookies" [ref=e649] [cursor=pointer]:
+            - generic [ref=e650]: 
+            - text: Delete cookies
+        - listitem [ref=e651]:
+          - menuitem "Members" [ref=e652] [cursor=pointer]:
+            - generic [ref=e653]: 
+            - text: Members
+        - listitem [ref=e654]:
+          - menuitem "FAQ" [ref=e655] [cursor=pointer]:
+            - generic [ref=e656]: 
+            - text: FAQ
+        - listitem [ref=e657]:
+          - menuitem "The team" [ref=e658] [cursor=pointer]:
+            - generic [ref=e659]: 
+            - text: The team
+        - listitem [ref=e660]:
+          - menuitem "Contact us" [ref=e661] [cursor=pointer]:
+            - generic [ref=e662]: 
+            - text: Contact us
+    - paragraph [ref=e663]: It is currently Sun Jun 21, 2026 12:17 am
+    - generic [ref=e664]:
+      - text: Powered by
+      - link "phpBB" [ref=e665] [cursor=pointer]:
+        - /url: https://www.phpbb.com/
+      - text: ® Forum Software © phpBB Limited
+      - generic [ref=e666]:
+        - text: phpBB Metro Theme by
+        - link "PixelGoose Studio" [ref=e667] [cursor=pointer]:
+          - /url: http://pixelgoose.com/

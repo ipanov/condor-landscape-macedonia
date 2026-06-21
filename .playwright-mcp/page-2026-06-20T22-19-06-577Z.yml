@@ -1,0 +1,1066 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - menubar [ref=e6]:
+        - listitem [ref=e7]:
+          - menuitem "Login" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: 
+            - text: Login
+          - text: 
+        - listitem [ref=e10]:
+          - menuitem "Register" [ref=e11] [cursor=pointer]:
+            - generic [ref=e12]: 
+            - text: Register
+        - text: 
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "Condor" [ref=e16] [cursor=pointer]:
+          - /url: https://www.condorsoaring.com
+        - paragraph [ref=e18]:
+          - link "Skip to content" [ref=e19] [cursor=pointer]:
+            - /url: "#start_here"
+    - navigation [ref=e20]:
+      - generic [ref=e21]:
+        - menubar [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Quick links" [ref=e24] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e25]: Quick links
+            - text:  
+        - menubar [ref=e26]:
+          - listitem [ref=e27]:
+            - link " Condor" [ref=e29] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com
+              - generic [ref=e30]: 
+              - text: Condor
+            - generic [ref=e31]:
+              - text: »
+              - link " Board index" [ref=e32] [cursor=pointer]:
+                - /url: ./index.php
+                - generic [ref=e33]: 
+                - text: Board index
+            - generic [ref=e34]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e35]:
+              - text: »
+              - link:
+                - /url: ""
+  - main [ref=e36]:
+    - heading "OSM first try" [level=2] [ref=e37]:
+      - link "OSM first try" [ref=e38] [cursor=pointer]:
+        - /url: ./viewtopic.php?f=37&t=22869
+    - paragraph [ref=e39]:
+      - strong [ref=e40]: "Moderators:"
+      - link "Uros" [ref=e41] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=3
+      - text: ","
+      - link "OXO" [ref=e42] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1470
+      - text: ","
+      - link "JBr" [ref=e43] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1566
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - link "Post Reply" [ref=e46] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=37&t=22869
+          - text: Post Reply
+          - generic [ref=e47]: 
+        - generic [ref=e48]:
+          - generic "Topic tools" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: 
+            - generic [ref=e52]: 
+          - text: 
+        - generic [ref=e53]:
+          - text: 27 posts
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - generic [ref=e56]: "1"
+            - listitem [ref=e57]:
+              - button "2" [ref=e58] [cursor=pointer]
+            - listitem [ref=e59]:
+              - button "Next" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: 
+                - generic [ref=e62]: Next
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - term [ref=e66]:
+            - link "6266" [ref=e67] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e68]
+          - definition [ref=e69]:
+            - strong [ref=e70]: "Posts:"
+            - text: "1836"
+          - definition [ref=e71]:
+            - strong [ref=e72]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e74]:
+          - heading "OSM first try" [level=3] [ref=e75]:
+            - link "OSM first try" [ref=e76] [cursor=pointer]:
+              - /url: "#p193198"
+          - list [ref=e77]:
+            - listitem [ref=e78]:
+              - link "Quote" [ref=e79] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193198
+                - generic [ref=e80]: 
+                - generic [ref=e81]: Quote
+            - text: 
+          - paragraph [ref=e82]:
+            - link "Post" [ref=e83] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193198#p193198
+              - generic [ref=e84]: 
+              - generic [ref=e85]: Post
+            - generic [ref=e86]:
+              - text: by
+              - strong [ref=e87]:
+                - link "6266" [ref=e88] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Tue Jan 21, 2025 12:15 am
+          - generic [ref=e89]:
+            - text: Decided to give the OSM-Exporter a try today.
+            - text: Looks very nice, thanks to the devs and especially to Wiek. Here the result at my home airport after 2 hours reading and doing
+            - term [ref=e92]:
+              - link "OSM1.jpg" [ref=e93] [cursor=pointer]:
+                - /url: ./download/file.php?id=23791&mode=view
+                - img "OSM1.jpg" [ref=e94]
+          - generic [ref=e95]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e96] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e97]: 
+          - generic [ref=e98]: Top
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - term [ref=e102]:
+            - link "drombach" [ref=e103] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=9322
+            - generic "Offline" [ref=e104]
+          - definition [ref=e105]:
+            - strong [ref=e106]: "Posts:"
+            - text: "78"
+          - definition [ref=e107]:
+            - strong [ref=e108]: "Joined:"
+            - text: Tue Jan 03, 2012 6:10 am
+        - generic [ref=e110]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e111]':
+            - 'link "Re: OSM first try" [ref=e112] [cursor=pointer]':
+              - /url: "#p193215"
+          - list [ref=e113]:
+            - listitem [ref=e114]:
+              - link "Quote" [ref=e115] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193215
+                - generic [ref=e116]: 
+                - generic [ref=e117]: Quote
+            - text: 
+          - paragraph [ref=e118]:
+            - link "Post" [ref=e119] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193215#p193215
+              - generic [ref=e120]: 
+              - generic [ref=e121]: Post
+            - generic [ref=e122]:
+              - text: by
+              - strong [ref=e123]:
+                - link "drombach" [ref=e124] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=9322
+              - text: »
+            - text: Wed Jan 22, 2025 1:49 am
+          - generic [ref=e125]: Very nice
+          - link "Image" [ref=e127] [cursor=pointer]:
+            - /url: http://www.condor-club.eu/graduate/0/?id=15988
+            - img "Image" [ref=e128]
+        - link "Top" [ref=e129] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e130]: 
+          - generic [ref=e131]: Top
+      - generic [ref=e133]:
+        - generic [ref=e134]:
+          - term [ref=e135]:
+            - link "6266" [ref=e136] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e137]
+          - definition [ref=e138]:
+            - strong [ref=e139]: "Posts:"
+            - text: "1836"
+          - definition [ref=e140]:
+            - strong [ref=e141]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e143]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e144]':
+            - 'link "Re: OSM first try" [ref=e145] [cursor=pointer]':
+              - /url: "#p193278"
+          - list [ref=e146]:
+            - listitem [ref=e147]:
+              - link "Quote" [ref=e148] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193278
+                - generic [ref=e149]: 
+                - generic [ref=e150]: Quote
+            - text: 
+          - paragraph [ref=e151]:
+            - link "Post" [ref=e152] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193278#p193278
+              - generic [ref=e153]: 
+              - generic [ref=e154]: Post
+            - generic [ref=e155]:
+              - text: by
+              - strong [ref=e156]:
+                - link "6266" [ref=e157] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Thu Jan 23, 2025 6:07 pm
+          - generic [ref=e158]:
+            - text: "My landscape is finished as far as I come for now. I thought first, it will be nice to add buildings automatically to the landscapes, but I was wrong: It is amazing!"
+            - strong [ref=e159]: The tool
+            - text: The description is good, I followed it word by word and got it to run with the first try, I don't see a point in it worth to make it better.
+            - strong [ref=e160]: The import from OSM
+            - text: For my landscape (25 x 18 tiles) I need 7200 c3d files, one for each patch. At the first step for each patch is a mtl and an obj file to import from OSM. Runtime netto are round about 1 -2 days, but there were some errors (see below). So I didn't got the files for 12 patches. That is a good quota, nevertheless will these patches look not good, but first you have to find them while flying (0,16 % of the area). If there are only a few buildings, you will not see it, but in one patch were more than 25000 buildings, if this patch is a part of a bigger town it will be good visible.
+            - strong [ref=e161]: The import to Condor
+            - text: "If you import a lot of files into Condor via LE, it will crash. If that happens, it says, that it can't import a filename. If you click OK it continues until the next file were it crashes. My solution for that is:"
+            - text: When the first message appears, kill LE via taskmanager, copy then all c3d files from working\autogen to autogen and delete (or backup) the mtl and obj files for the created c3d files. Start then LE and continue importing. If you don't delete the mtl and obj files from working\autogen, the import will create the c3d files again. The crash happens due to less memory. It happens after creating 500 - 1000 c3d files
+            - strong [ref=e162]: Ressources
+            - text: My landscape has a size of 6 - 7 GB, the autogen files are nearly 20 GB, that is a very big difference. It would be nice, if missing autogen files will not be calculated as cheating, then everybody can decide, if 7 GB is enough or if he/she will use 27 GB for the same landscape in a nicer version
+            - strong [ref=e163]: OSM errors
+            - text: I found three different errors. Is there an update for the python file, or has someone made a workaround? I guess that bad data is the main reason for the errors, so maybe it's possible to ignore the bad buildings and install the good ones. In my example with 25000 buildings you will not see if 1000 are missing, but missing all will be a big hole.
+            - text: If someone is interested, I can send the h999999.obj and h999999.txt files from working\heightmaps to the patches where the errors occurred.
+            - text: Error 1, the main error with 10 patches
+            - generic [ref=e164]:
+              - paragraph [ref=e165]:
+                - text: "Code:"
+                - link "Select all" [ref=e166] [cursor=pointer]:
+                  - /url: "#"
+              - code [ref=e168]: "Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped.py\", line 70, in render ok = self.generateRoof(footprint, roofItem, firstVertIndex) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped.py\", line 225, in generateRoof polygonize( File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 1048, in polygonize embedding = graph.circular_embedding(verts,'CCW') File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\poly2FacesGraph.py\", line 60, in circular_embedding ordering = sorted(neighbors, key = cmp_to_key( lambda a,b: compare_angles(vList,a,b,vertex)) ) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\poly2FacesGraph.py\", line 60, in <lambda> ordering = sorted(neighbors, key = cmp_to_key( lambda a,b: compare_angles(vList,a,b,vertex)) ) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\poly2FacesGraph.py\", line 18, in compare_angles a1 = pseudoangle(vList[p1] - vList[center]) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\poly2FacesGraph.py\", line 11, in pseudoangle p = d[0]/(abs(d[0])+abs(d[1])) # -1 .. 1 increasing with x ZeroDivisionError: float division by zero Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109"
+            - text: Error 2, only one patch. A memory error, occurred after a reboot too
+            - generic [ref=e169]:
+              - paragraph [ref=e170]:
+                - text: "Code:"
+                - link "Select all" [ref=e171] [cursor=pointer]:
+                  - /url: "#"
+              - code [ref=e173]: "Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 65, in do self.volumeGeneratorMultiHipped.do(footprint) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat_multi.py\", line 14, in do self.render(footprint, roofItem) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 49, in render ok = self.generateRoof(footprint, roofItem, firstVertIndex) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 130, in generateRoof polygonize( File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 999, in polygonize skeleton = skeletonize(edgeContours) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 855, in skeletonize (arc, events) = slav.handle_edge_event(i) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 344, in handle_edge_event for vertex in list(lav): MemoryError Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109"
+            - text: Error 3, only one patch
+            - generic [ref=e174]:
+              - paragraph [ref=e175]:
+                - text: "Code:"
+                - link "Select all" [ref=e176] [cursor=pointer]:
+                  - /url: "#"
+              - code [ref=e178]: "Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_profile.py\", line 680, in render slotR.trackUp(roofItem, 0) File \"C:\\Users\\pklett\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_profile.py\", line 465, in trackUp index += 1 if reflection is False else 2 TypeError: unsupported operand type(s) for +=: 'NoneType' and 'int' Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109"
+            - text: I made this landscape primary for myself, but if someone is interested, I can share it. It's the first landscape I made 3 years ago, NorthGermany, from the Netherlands to Poland, and from Denmark to Göttingen. Tonight I will fly on it the first time.
+            - text: Thanks again for this very great tool
+          - generic [ref=e179]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e180] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e181]: 
+          - generic [ref=e182]: Top
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - term [ref=e186]:
+            - link "User avatar" [ref=e188] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e189]
+            - link "wickid" [ref=e190] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e191]
+          - definition [ref=e192]:
+            - strong [ref=e193]: "Posts:"
+            - text: "3889"
+          - definition [ref=e194]:
+            - strong [ref=e195]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e196]:
+            - strong [ref=e197]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e198]:
+            - strong [ref=e199]: "Contact:"
+            - link "Contact wickid" [ref=e201] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e202]: 
+              - generic [ref=e203]: Contact wickid
+        - generic [ref=e205]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e206]':
+            - 'link "Re: OSM first try" [ref=e207] [cursor=pointer]':
+              - /url: "#p193280"
+          - list [ref=e208]:
+            - listitem [ref=e209]:
+              - link "Quote" [ref=e210] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193280
+                - generic [ref=e211]: 
+                - generic [ref=e212]: Quote
+            - text: 
+          - paragraph [ref=e213]:
+            - link "Post" [ref=e214] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193280#p193280
+              - generic [ref=e215]: 
+              - generic [ref=e216]: Post
+            - generic [ref=e217]:
+              - text: by
+              - strong [ref=e218]:
+                - link "wickid" [ref=e219] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Thu Jan 23, 2025 7:16 pm
+          - generic [ref=e220]:
+            - text: The issue is that we use a 3th party addon in Blender called BLOSM to create the building meshes. It is indeed bad data in the OSM database. Unfortunately I don't have the Phyton skills to fix this very complicated bit of code. I only wrote the Blender plugin that populates the BLOSM plugin with all the data from Condor and saves the files to the correct location. There is no easy fix unfortunately
+            - img ":(" [ref=e221]
+            - text: Glad you like the tools and the documentation.
+            - text: The autogen cannot be removed as it will give an unfair advantage to players that have it removed. You can cross ridges lower, and fly the final glide flatter when there are no buildings in the way. Same reason the tree density setting was changed to a tree visibility distance.
+          - generic [ref=e222]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e223] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e224]: 
+          - generic [ref=e225]: Top
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - term [ref=e229]:
+            - link "6266" [ref=e230] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e231]
+          - definition [ref=e232]:
+            - strong [ref=e233]: "Posts:"
+            - text: "1836"
+          - definition [ref=e234]:
+            - strong [ref=e235]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e237]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e238]':
+            - 'link "Re: OSM first try" [ref=e239] [cursor=pointer]':
+              - /url: "#p193282"
+          - list [ref=e240]:
+            - listitem [ref=e241]:
+              - link "Quote" [ref=e242] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193282
+                - generic [ref=e243]: 
+                - generic [ref=e244]: Quote
+            - text: 
+          - paragraph [ref=e245]:
+            - link "Post" [ref=e246] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193282#p193282
+              - generic [ref=e247]: 
+              - generic [ref=e248]: Post
+            - generic [ref=e249]:
+              - text: by
+              - strong [ref=e250]:
+                - link "6266" [ref=e251] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Thu Jan 23, 2025 8:37 pm
+          - generic [ref=e252]:
+            - text: Thanks for your fast answer. Even if nothing can/will be changed, it's a very nice piece of software. Here some quick finds to show what it produces. It will need years to look at all the millions of buildings
+            - term [ref=e255]:
+              - link "osm1.png" [ref=e256] [cursor=pointer]:
+                - /url: ./download/file.php?id=23802&mode=view
+                - img "osm1.png" [ref=e257]
+            - text: industry
+            - term [ref=e260]:
+              - link "osm2.png" [ref=e261] [cursor=pointer]:
+                - /url: ./download/file.php?id=23803&mode=view
+                - img "osm2.png" [ref=e262]
+            - text: a church in Helmstedt, didn't expected that
+            - term [ref=e265]:
+              - link "osm3.png" [ref=e266] [cursor=pointer]:
+                - /url: ./download/file.php?id=23804&mode=view
+                - img "osm3.png" [ref=e267]
+            - text: Hamburg (in bad picture quality because of the size restrictions here)
+            - text: You see me enthusiastic ...
+            - img ";-)" [ref=e268]
+          - generic [ref=e269]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e270] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e271]: 
+          - generic [ref=e272]: Top
+      - generic [ref=e274]:
+        - generic [ref=e275]:
+          - term [ref=e276]:
+            - link "6266" [ref=e277] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e278]
+          - definition [ref=e279]:
+            - strong [ref=e280]: "Posts:"
+            - text: "1836"
+          - definition [ref=e281]:
+            - strong [ref=e282]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e284]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e285]':
+            - 'link "Re: OSM first try" [ref=e286] [cursor=pointer]':
+              - /url: "#p193296"
+          - list [ref=e287]:
+            - listitem [ref=e288]:
+              - link "Quote" [ref=e289] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193296
+                - generic [ref=e290]: 
+                - generic [ref=e291]: Quote
+            - text: 
+          - paragraph [ref=e292]:
+            - link "Post" [ref=e293] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193296#p193296
+              - generic [ref=e294]: 
+              - generic [ref=e295]: Post
+            - generic [ref=e296]:
+              - text: by
+              - strong [ref=e297]:
+                - link "6266" [ref=e298] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Fri Jan 24, 2025 1:10 am
+          - generic [ref=e299]:
+            - text: Now the difficulties begin, I have to edit an obj file. I'm working without any success 3 hours on that, googled a lot, but I'm stucking.
+            - text: First I imported the obj file. To navigate in the object is strange, to say it in a kind way. But ok, I see the wrong thing I only want to delete (the long "building" red marked).
+            - text: I choose box select, make a small box on top and a lot of other points of that object are selected too. To select only that line seems to be impossible. But ok, I delete all marked objects, the line is gone and some of the little points (would like to take a better look on it, but if I zoom in, the object dissappears, moving the whole screen seems not possible, oh I hate such software, what did they smoke when they build it ...).
+            - text: After deleting that line and the other points, I exported the object, got a new obj and mtl file. Renamed them to the name, Condor needs and tried export autogen c3d from obj in LE. LE says it can't export it.
+            - text: I don't understand that, but it can't be so difficult ... Even if I deleted too much, importing the obj, modifying it and exporting again, Condor doesn't like it. Is there a special way to export for Condor?
+            - text: Thanks for any help. I know I'm not stupid, but such "solutions" make me feeling stupid
+            - img ":-(" [ref=e300]
+            - term [ref=e303]:
+              - link "blender.png" [ref=e304] [cursor=pointer]:
+                - /url: ./download/file.php?id=23807&mode=view
+                - img "blender.png" [ref=e305]
+          - generic [ref=e306]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e307] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e308]: 
+          - generic [ref=e309]: Top
+      - generic [ref=e311]:
+        - generic [ref=e312]:
+          - term [ref=e313]:
+            - link "arneh" [ref=e314] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=7122
+            - generic "Offline" [ref=e315]
+          - definition [ref=e316]:
+            - strong [ref=e317]: "Posts:"
+            - text: "799"
+          - definition [ref=e318]:
+            - strong [ref=e319]: "Joined:"
+            - text: Mon Nov 16, 2009 10:34 am
+        - generic [ref=e321]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e322]':
+            - 'link "Re: OSM first try" [ref=e323] [cursor=pointer]':
+              - /url: "#p193297"
+          - list [ref=e324]:
+            - listitem [ref=e325]:
+              - link "Quote" [ref=e326] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193297
+                - generic [ref=e327]: 
+                - generic [ref=e328]: Quote
+            - text: 
+          - paragraph [ref=e329]:
+            - link "Post" [ref=e330] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193297#p193297
+              - generic [ref=e331]: 
+              - generic [ref=e332]: Post
+            - generic [ref=e333]:
+              - text: by
+              - strong [ref=e334]:
+                - link "arneh" [ref=e335] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=7122
+              - text: »
+            - text: Fri Jan 24, 2025 1:26 am
+          - generic [ref=e336]:
+            - text: First of all, looks like your object is sideways, make sure you select the right axis for up and forward when importing the object file (it's among the options in the import dialog).
+            - blockquote [ref=e337]:
+              - generic [ref=e338]:
+                - generic [ref=e339]:
+                  - link "6266" [ref=e340] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=17988
+                  - text: "wrote:"
+                  - link "↑" [ref=e341] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=193296#p193296
+                  - generic [ref=e342]: Fri Jan 24, 2025 1:10 am
+                - text: I choose box select, make a small box on top and a lot of other points of that object are selected too. To select only that line seems to be impossible.
+            - text: You have 3 modes which chooses what you select. Keypress 1 is points, Keypress 2 is lines, and Keypress 3 is faces. Try another one and see if it's easier to select what you want. Also try from another angle. Often it can be useful to see an object straight from the top (7 key on numpad, assuming you've imported it with the right axis as up).
+            - blockquote [ref=e343]:
+              - generic [ref=e344]: (would like to take a better look on it, but if I zoom in, the object dissappears, moving the whole screen seems not possible)
+            - text: Try pressing . (dot) on the numpad, that will zoom into whatever is selected. Panning in default setup I believe is pressing middle mouse button and moving mouse.
+            - blockquote [ref=e345]:
+              - generic [ref=e346]: After deleting that line and the other points, I exported the object, got a new obj and mtl file. Renamed them to the name, Condor needs and tried export autogen c3d from obj in LE. LE says it can't export it.
+            - text: Yeah, I've been having trouble converting exported autogen objects if I edit them too. So I've been using the Object Editor (included with landscape toolkit), to manually convert to c3d if I've edited an autogen file.
+          - link "My real life soaring videos" [ref=e348] [cursor=pointer]:
+            - /url: https://www.youtube.com/user/realpokski
+        - link "Top" [ref=e349] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e350]: 
+          - generic [ref=e351]: Top
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - term [ref=e355]:
+            - link "6266" [ref=e356] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e357]
+          - definition [ref=e358]:
+            - strong [ref=e359]: "Posts:"
+            - text: "1836"
+          - definition [ref=e360]:
+            - strong [ref=e361]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e363]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e364]':
+            - 'link "Re: OSM first try" [ref=e365] [cursor=pointer]':
+              - /url: "#p193298"
+          - list [ref=e366]:
+            - listitem [ref=e367]:
+              - link "Quote" [ref=e368] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193298
+                - generic [ref=e369]: 
+                - generic [ref=e370]: Quote
+            - text: 
+          - paragraph [ref=e371]:
+            - link "Post" [ref=e372] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193298#p193298
+              - generic [ref=e373]: 
+              - generic [ref=e374]: Post
+            - generic [ref=e375]:
+              - text: by
+              - strong [ref=e376]:
+                - link "6266" [ref=e377] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Fri Jan 24, 2025 2:12 am
+          - generic [ref=e378]:
+            - text: Thanks a lot for your hints. The object was sideways because I used a lot of buttons to get it visible
+            - img ";-)" [ref=e379]
+            - text: I tried Object editor before too, did it again but get this message (same like at the first try)
+            - generic [ref=e381]:
+              - term [ref=e382]:
+                - img "oe.png" [ref=e383]
+              - definition [ref=e384]: oe.png (9.35 KiB) Viewed 3037 times
+            - text: The only line with this characters in the obj file is
+            - text: usemtl Material
+            - text: f 1/1/1 5/2/1 7/3/1 3/4/1
+            - text: When I looked into the obj file, I saw this head line, the name of the mtl file was wrong. But no changes after correcting that
+            - text: "# Blender 4.0.2"
+            - text: "#"
+            - link "www.blender.org" [ref=e385] [cursor=pointer]:
+              - /url: http://www.blender.org
+            - text: mtllib o066008.mtl
+          - generic [ref=e386]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e387] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e388]: 
+          - generic [ref=e389]: Top
+      - generic [ref=e391]:
+        - generic [ref=e392]:
+          - term [ref=e393]:
+            - link "6266" [ref=e394] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e395]
+          - definition [ref=e396]:
+            - strong [ref=e397]: "Posts:"
+            - text: "1836"
+          - definition [ref=e398]:
+            - strong [ref=e399]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e401]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e402]':
+            - 'link "Re: OSM first try" [ref=e403] [cursor=pointer]':
+              - /url: "#p193299"
+          - list [ref=e404]:
+            - listitem [ref=e405]:
+              - link "Quote" [ref=e406] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193299
+                - generic [ref=e407]: 
+                - generic [ref=e408]: Quote
+            - text: 
+          - paragraph [ref=e409]:
+            - link "Post" [ref=e410] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193299#p193299
+              - generic [ref=e411]: 
+              - generic [ref=e412]: Post
+            - generic [ref=e413]:
+              - text: by
+              - strong [ref=e414]:
+                - link "6266" [ref=e415] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Fri Jan 24, 2025 2:15 am
+          - generic [ref=e416]:
+            - text: oh, I see in the original file is a very different format
+            - text: Original
+            - text: usemtl Material
+            - text: v 1.36156964 -0.88511240 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.62500000 0.50000000
+            - text: v 1.36157680 1.11488760 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.87500000 0.50000000
+            - text: v -0.63842314 1.11489487 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.87500000 0.75000000
+            - text: f 1/1/1 2/2/2 3/3/3
+            - text: v 1.36156964 -0.88511240 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.62500000 0.50000000
+            - text: v -0.63842314 1.11489487 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.87500000 0.75000000
+            - text: v -0.63843042 -0.88510519 1.00000000
+            - text: vn 0.00000000 0.00000000 1.00000000
+            - text: vt 0.62500000 0.75000000
+            - text: f 4/4/4 5/5/5 6/6/6
+            - text: New file
+            - text: usemtl Material
+            - text: f 1/1/1 5/2/1 7/3/1 3/4/1
+            - text: f 4/5/2 3/4/2 7/6/2 8/7/2
+            - text: f 8/8/3 7/9/3 5/10/3 6/11/3
+            - text: f 6/12/4 2/13/4 4/5/4 8/14/4
+            - text: f 2/13/5 1/1/5 3/4/5 4/5/5
+            - text: f 6/11/6 5/10/6 1/1/6 2/13/6
+            - text: o o066008
+            - text: v 1.361570 -0.885112 1.000000
+            - text: v 1.361577 1.114888 1.000000
+            - text: v -0.638423 1.114895 1.000000
+            - text: v 1.361570 -0.885112 1.000000
+            - text: v -0.638423 1.114895 1.000000
+            - text: v -0.638430 -0.885105 1.000000
+            - text: v -0.638430 -0.885105 -1.000000
+            - text: v -0.638430 -0.885105 1.000000
+            - text: v -0.638423 1.114895 1.000000
+            - text: v -0.638430 -0.885105 -1.000000
+            - text: v -0.638423 1.114895 1.000000
+            - text: v -0.638423 1.114895 -1.000000
+            - text: v -0.638423 1.114895 -1.000000
+            - text: v -0.638423 1.114895 1.000000
+            - text: v 1.361577 1.114888 1.000000
+            - text: v -0.638423 1.114895 -1.000000
+          - generic [ref=e417]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e418] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e419]: 
+          - generic [ref=e420]: Top
+      - generic [ref=e422]:
+        - generic [ref=e423]:
+          - term [ref=e424]:
+            - link "arneh" [ref=e425] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=7122
+            - generic "Offline" [ref=e426]
+          - definition [ref=e427]:
+            - strong [ref=e428]: "Posts:"
+            - text: "799"
+          - definition [ref=e429]:
+            - strong [ref=e430]: "Joined:"
+            - text: Mon Nov 16, 2009 10:34 am
+        - generic [ref=e432]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e433]':
+            - 'link "Re: OSM first try" [ref=e434] [cursor=pointer]':
+              - /url: "#p193300"
+          - list [ref=e435]:
+            - listitem [ref=e436]:
+              - link "Quote" [ref=e437] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193300
+                - generic [ref=e438]: 
+                - generic [ref=e439]: Quote
+            - text: 
+          - paragraph [ref=e440]:
+            - link "Post" [ref=e441] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193300#p193300
+              - generic [ref=e442]: 
+              - generic [ref=e443]: Post
+            - generic [ref=e444]:
+              - text: by
+              - strong [ref=e445]:
+                - link "arneh" [ref=e446] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=7122
+              - text: »
+            - text: Fri Jan 24, 2025 7:21 am
+          - generic [ref=e447]:
+            - text: "When you export from Blender make sure you use the correct options, this works for me:"
+            - text: "Select: \"Apply modifiers\", \"UV Coordinates\", \"Normals\", \"Triangulated Mesh\", \"Materials Export\"."
+            - text: Just guessing, as I don't know the obj format, but my guess is "f 1/1/1 5/2/1 7/3/1 3/4/1" is a line for a face with 4 vertices. If you check the lines starting with f in the original file it has 3 sets of numbers, not 4 like yours. Which means yours has not been triangulated. Condor expects all faces to have 3 vertices. So make sure "Triangulated Mesh" is turned on in the obj export options.
+          - link "My real life soaring videos" [ref=e449] [cursor=pointer]:
+            - /url: https://www.youtube.com/user/realpokski
+        - link "Top" [ref=e450] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e451]: 
+          - generic [ref=e452]: Top
+      - generic [ref=e454]:
+        - generic [ref=e455]:
+          - term [ref=e456]:
+            - link "User avatar" [ref=e458] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e459]
+            - link "wickid" [ref=e460] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e461]
+          - definition [ref=e462]:
+            - strong [ref=e463]: "Posts:"
+            - text: "3889"
+          - definition [ref=e464]:
+            - strong [ref=e465]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e466]:
+            - strong [ref=e467]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e468]:
+            - strong [ref=e469]: "Contact:"
+            - link "Contact wickid" [ref=e471] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e472]: 
+              - generic [ref=e473]: Contact wickid
+        - generic [ref=e475]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e476]':
+            - 'link "Re: OSM first try" [ref=e477] [cursor=pointer]':
+              - /url: "#p193302"
+          - list [ref=e478]:
+            - listitem [ref=e479]:
+              - link "Quote" [ref=e480] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193302
+                - generic [ref=e481]: 
+                - generic [ref=e482]: Quote
+            - text: 
+          - paragraph [ref=e483]:
+            - link "Post" [ref=e484] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193302#p193302
+              - generic [ref=e485]: 
+              - generic [ref=e486]: Post
+            - generic [ref=e487]:
+              - text: by
+              - strong [ref=e488]:
+                - link "wickid" [ref=e489] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Fri Jan 24, 2025 8:12 am
+          - generic [ref=e490]: There is a patch viewer option in the toolkit to edit autogen files. It is also described in the manual. It imports and exports in the correct format.
+          - generic [ref=e491]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e492] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e493]: 
+          - generic [ref=e494]: Top
+      - generic [ref=e496]:
+        - generic [ref=e497]:
+          - term [ref=e498]:
+            - link "6266" [ref=e499] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e500]
+          - definition [ref=e501]:
+            - strong [ref=e502]: "Posts:"
+            - text: "1836"
+          - definition [ref=e503]:
+            - strong [ref=e504]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e506]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e507]':
+            - 'link "Re: OSM first try" [ref=e508] [cursor=pointer]':
+              - /url: "#p193304"
+          - list [ref=e509]:
+            - listitem [ref=e510]:
+              - link "Quote" [ref=e511] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193304
+                - generic [ref=e512]: 
+                - generic [ref=e513]: Quote
+            - text: 
+          - paragraph [ref=e514]:
+            - link "Post" [ref=e515] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193304#p193304
+              - generic [ref=e516]: 
+              - generic [ref=e517]: Post
+            - generic [ref=e518]:
+              - text: by
+              - strong [ref=e519]:
+                - link "6266" [ref=e520] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Fri Jan 24, 2025 10:05 am
+          - generic [ref=e521]:
+            - blockquote [ref=e522]:
+              - generic [ref=e523]:
+                - generic [ref=e524]:
+                  - link "arneh" [ref=e525] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=7122
+                  - text: "wrote:"
+                  - link "↑" [ref=e526] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=193300#p193300
+                  - generic [ref=e527]: Fri Jan 24, 2025 7:21 am
+                - text: "When you export from Blender make sure you use the correct options, this works for me:"
+                - text: "Select: \"Apply modifiers\", \"UV Coordinates\", \"Normals\", \"Triangulated Mesh\", \"Materials Export\"."
+                - text: Just guessing, as I don't know the obj format, but my guess is "f 1/1/1 5/2/1 7/3/1 3/4/1" is a line for a face with 4 vertices. If you check the lines starting with f in the original file it has 3 sets of numbers, not 4 like yours. Which means yours has not been triangulated. Condor expects all faces to have 3 vertices. So make sure "Triangulated Mesh" is turned on in the obj export options.
+            - text: Thank you very much for your explanations, I will keep it in mind if I need it
+            - blockquote [ref=e528]:
+              - generic [ref=e529]:
+                - generic [ref=e530]:
+                  - link "wickid" [ref=e531] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=3242
+                  - text: "wrote:"
+                  - link "↑" [ref=e532] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=193302#p193302
+                  - generic [ref=e533]: Fri Jan 24, 2025 8:12 am
+                - text: There is a patch viewer option in the toolkit to edit autogen files. It is also described in the manual. It imports and exports in the correct format.
+            - text: Of course I read it when I went through the manual the first time after C3 release, but forgot about it now when I needed it. Without the 3 hours of unsuccessful poking in Blender yesterday I wouldn't be able to understand what to do, but today it only took me 5 minutes to delete the wrong building (and some others, but you won't see them missing) and to generate the c3d file via LE.
+            - text: Thank you both so much, you made my day!
+            - generic [ref=e535]:
+              - term [ref=e536]:
+                - img "done.png" [ref=e537]
+              - definition [ref=e538]: done.png (186.07 KiB) Viewed 2948 times
+            - text: The tower is gone ...
+          - generic [ref=e539]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e540] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e541]: 
+          - generic [ref=e542]: Top
+      - generic [ref=e544]:
+        - generic [ref=e545]:
+          - term [ref=e546]:
+            - link "6266" [ref=e547] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e548]
+          - definition [ref=e549]:
+            - strong [ref=e550]: "Posts:"
+            - text: "1836"
+          - definition [ref=e551]:
+            - strong [ref=e552]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e554]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e555]':
+            - 'link "Re: OSM first try" [ref=e556] [cursor=pointer]':
+              - /url: "#p193373"
+          - list [ref=e557]:
+            - listitem [ref=e558]:
+              - link "Quote" [ref=e559] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193373
+                - generic [ref=e560]: 
+                - generic [ref=e561]: Quote
+            - text: 
+          - paragraph [ref=e562]:
+            - link "Post" [ref=e563] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193373#p193373
+              - generic [ref=e564]: 
+              - generic [ref=e565]: Post
+            - generic [ref=e566]:
+              - text: by
+              - strong [ref=e567]:
+                - link "6266" [ref=e568] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Sat Jan 25, 2025 4:54 pm
+          - generic [ref=e569]:
+            - text: After the successful test with NorthGermany I started now to make C3 versions with buildings from all my landscapes (40 until now), have to create ca. 400.000 c3d files, that will take the whole year or more, but it seems to be worth it. If a 3D-idiot like me can create with a few clicks such impressive landscapes, then it has to be done
+            - img ";-)" [ref=e570]
+            - text: (the picture again in bad quality to reduce the size)
+            - term [ref=e573]:
+              - link "ny.png" [ref=e574] [cursor=pointer]:
+                - /url: ./download/file.php?id=23824&mode=view
+                - img "ny.png" [ref=e575]
+            - text: There occurred one problem. I wanted to start from JFK airport, but got a not working elevator. I guess it's from the cheating protection. Start from La Gardua was no problem. I created the OHA file again without success. What else can I do if I get such a problem?
+            - text: Maybe it was the same problem Claraflies1 got with the AS32 ->
+            - link "https://www.condorsoaring.com/forums/vi ... 29&t=22872" [ref=e576] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com/forums/viewtopic.php?f=29&t=22872
+            - text: I wanted to start with the SF28 and didn't got speed enough. By random I saw the stick jumping
+            - text: BTW, had to learn that you can't see the buildings before you created the OHA file
+          - generic [ref=e577]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e578] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e579]: 
+          - generic [ref=e580]: Top
+      - generic [ref=e582]:
+        - generic [ref=e583]:
+          - term [ref=e584]:
+            - link "User avatar" [ref=e586] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e587]
+            - link "wickid" [ref=e588] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e589]
+          - definition [ref=e590]:
+            - strong [ref=e591]: "Posts:"
+            - text: "3889"
+          - definition [ref=e592]:
+            - strong [ref=e593]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e594]:
+            - strong [ref=e595]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e596]:
+            - strong [ref=e597]: "Contact:"
+            - link "Contact wickid" [ref=e599] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e600]: 
+              - generic [ref=e601]: Contact wickid
+        - generic [ref=e603]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e604]':
+            - 'link "Re: OSM first try" [ref=e605] [cursor=pointer]':
+              - /url: "#p193379"
+          - list [ref=e606]:
+            - listitem [ref=e607]:
+              - link "Quote" [ref=e608] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193379
+                - generic [ref=e609]: 
+                - generic [ref=e610]: Quote
+            - text: 
+          - paragraph [ref=e611]:
+            - link "Post" [ref=e612] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193379#p193379
+              - generic [ref=e613]: 
+              - generic [ref=e614]: Post
+            - generic [ref=e615]:
+              - text: by
+              - strong [ref=e616]:
+                - link "wickid" [ref=e617] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Sat Jan 25, 2025 6:51 pm
+          - generic [ref=e618]: There is a check function in the landscape toolkit that flags any corrupt C3D files.
+          - generic [ref=e619]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e620] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e621]: 
+          - generic [ref=e622]: Top
+      - generic [ref=e624]:
+        - generic [ref=e625]:
+          - term [ref=e626]:
+            - link "6266" [ref=e627] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=17988
+            - generic "Offline" [ref=e628]
+          - definition [ref=e629]:
+            - strong [ref=e630]: "Posts:"
+            - text: "1836"
+          - definition [ref=e631]:
+            - strong [ref=e632]: "Joined:"
+            - text: Tue Aug 25, 2020 7:07 am
+        - generic [ref=e634]:
+          - 'heading "Re: OSM first try" [level=3] [ref=e635]':
+            - 'link "Re: OSM first try" [ref=e636] [cursor=pointer]':
+              - /url: "#p193381"
+          - list [ref=e637]:
+            - listitem [ref=e638]:
+              - link "Quote" [ref=e639] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=193381
+                - generic [ref=e640]: 
+                - generic [ref=e641]: Quote
+            - text: 
+          - paragraph [ref=e642]:
+            - link "Post" [ref=e643] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=193381#p193381
+              - generic [ref=e644]: 
+              - generic [ref=e645]: Post
+            - generic [ref=e646]:
+              - text: by
+              - strong [ref=e647]:
+                - link "6266" [ref=e648] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=17988
+              - text: »
+            - text: Sat Jan 25, 2025 8:07 pm
+          - generic [ref=e649]:
+            - blockquote [ref=e650]:
+              - generic [ref=e651]:
+                - generic [ref=e652]:
+                  - link "wickid" [ref=e653] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=3242
+                  - text: "wrote:"
+                  - link "↑" [ref=e654] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=193379#p193379
+                  - generic [ref=e655]: Sat Jan 25, 2025 6:51 pm
+                - text: There is a check function in the landscape toolkit that flags any corrupt C3D files.
+            - text: Hm, found a "check for missing c3d files" in LE, and a "scenery check" in the folder where LE is stored. Both are not what you mean and both without any error message
+          - generic [ref=e656]:
+            - text: Visit https://www.baleit.no
+            - text: "Events: Vintage Series 24, Vintage Competitions, The Journey"
+            - text: Landscapes, tools, panels, discussion forum ...
+        - link "Top" [ref=e657] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e658]: 
+          - generic [ref=e659]: Top
+      - generic [ref=e660]:
+        - link "Post Reply" [ref=e661] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=37&t=22869
+          - text: Post Reply
+          - generic [ref=e662]: 
+        - generic [ref=e663]:
+          - generic "Topic tools" [ref=e664] [cursor=pointer]:
+            - generic [ref=e665]: 
+            - generic [ref=e667]: 
+          - text: 
+        - generic "Display and sorting options" [ref=e669] [cursor=pointer]:
+          - generic [ref=e670]: 
+          - generic [ref=e672]: 
+        - generic [ref=e673]:
+          - text: 27 posts
+          - list [ref=e674]:
+            - listitem [ref=e675]:
+              - generic [ref=e676]: "1"
+            - listitem [ref=e677]:
+              - button "2" [ref=e678] [cursor=pointer]
+            - listitem [ref=e679]:
+              - button "Next" [ref=e680] [cursor=pointer]:
+                - generic [ref=e681]: 
+                - generic [ref=e682]: Next
+      - generic [ref=e683]:
+        - paragraph:
+          - link "Return to “Landscapes”" [ref=e684] [cursor=pointer]:
+            - /url: ./viewforum.php?f=37
+            - generic [ref=e685]: 
+            - text: Return to “Landscapes”
+    - generic [ref=e686]:
+      - heading "Who is online" [level=3] [ref=e687]:
+        - link "Who is online" [ref=e688] [cursor=pointer]:
+          - /url: ./viewonline.php
+      - paragraph [ref=e689]: "Users browsing this forum: No registered users"
+  - contentinfo [ref=e690]:
+    - navigation [ref=e691]:
+      - menubar [ref=e693]:
+        - listitem [ref=e694]:
+          - link "Condor" [ref=e696] [cursor=pointer]:
+            - /url: https://www.condorsoaring.com
+            - generic [ref=e697]: 
+            - text: Condor
+          - generic [ref=e698]:
+            - text: »
+            - link "Board index" [ref=e699] [cursor=pointer]:
+              - /url: ./index.php
+        - text: 
+        - listitem [ref=e700]: All times are UTC+02:00
+        - listitem [ref=e701]:
+          - menuitem "Delete cookies" [ref=e702] [cursor=pointer]:
+            - generic [ref=e703]: 
+            - text: Delete cookies
+        - listitem [ref=e704]:
+          - menuitem "Members" [ref=e705] [cursor=pointer]:
+            - generic [ref=e706]: 
+            - text: Members
+        - listitem [ref=e707]:
+          - menuitem "FAQ" [ref=e708] [cursor=pointer]:
+            - generic [ref=e709]: 
+            - text: FAQ
+        - listitem [ref=e710]:
+          - menuitem "The team" [ref=e711] [cursor=pointer]:
+            - generic [ref=e712]: 
+            - text: The team
+        - listitem [ref=e713]:
+          - menuitem "Contact us" [ref=e714] [cursor=pointer]:
+            - generic [ref=e715]: 
+            - text: Contact us
+    - paragraph [ref=e716]: It is currently Sun Jun 21, 2026 12:19 am
+    - generic [ref=e717]:
+      - text: Powered by
+      - link "phpBB" [ref=e718] [cursor=pointer]:
+        - /url: https://www.phpbb.com/
+      - text: ® Forum Software © phpBB Limited
+      - generic [ref=e719]:
+        - text: phpBB Metro Theme by
+        - link "PixelGoose Studio" [ref=e720] [cursor=pointer]:
+          - /url: http://pixelgoose.com/

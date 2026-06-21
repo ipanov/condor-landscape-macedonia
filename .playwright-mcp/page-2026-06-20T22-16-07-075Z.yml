@@ -1,0 +1,531 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - menubar [ref=e6]:
+        - listitem [ref=e7]:
+          - menuitem "Login" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: 
+            - text: Login
+          - text: 
+        - listitem [ref=e10]:
+          - menuitem "Register" [ref=e11] [cursor=pointer]:
+            - generic [ref=e12]: 
+            - text: Register
+        - text: 
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "Condor" [ref=e16] [cursor=pointer]:
+          - /url: https://www.condorsoaring.com
+        - paragraph [ref=e18]:
+          - link "Skip to content" [ref=e19] [cursor=pointer]:
+            - /url: "#start_here"
+    - navigation [ref=e20]:
+      - generic [ref=e21]:
+        - menubar [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Quick links" [ref=e24] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e25]: Quick links
+            - text:  
+        - menubar [ref=e26]:
+          - listitem [ref=e27]:
+            - link " Condor" [ref=e29] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com
+              - generic [ref=e30]: 
+              - text: Condor
+            - generic [ref=e31]:
+              - text: »
+              - link " Board index" [ref=e32] [cursor=pointer]:
+                - /url: ./index.php
+                - generic [ref=e33]: 
+                - text: Board index
+            - generic [ref=e34]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e35]:
+              - text: »
+              - link:
+                - /url: ""
+  - main [ref=e36]:
+    - heading "We really need to figure out towns" [level=2] [ref=e37]:
+      - link "We really need to figure out towns" [ref=e38] [cursor=pointer]:
+        - /url: ./viewtopic.php?f=38&t=19247
+    - paragraph [ref=e39]:
+      - strong [ref=e40]: "Moderators:"
+      - link "Uros" [ref=e41] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=3
+      - text: ","
+      - link "OXO" [ref=e42] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1470
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - link "Post Reply" [ref=e45] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=38&t=19247
+          - text: Post Reply
+          - generic [ref=e46]: 
+        - generic [ref=e47]:
+          - generic "Topic tools" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e51]: 
+          - text: 
+        - generic [ref=e52]:
+          - text: 7 posts • Page
+          - strong [ref=e53]: "1"
+          - text: of
+          - strong [ref=e54]: "1"
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - term [ref=e58]:
+            - link "KipperUK" [ref=e59] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=16377
+            - generic "Offline" [ref=e60]
+          - definition [ref=e61]:
+            - strong [ref=e62]: "Posts:"
+            - text: "184"
+          - definition [ref=e63]:
+            - strong [ref=e64]: "Joined:"
+            - text: Fri Sep 21, 2018 9:30 pm
+        - generic [ref=e66]:
+          - heading "We really need to figure out towns" [level=3] [ref=e67]:
+            - link "We really need to figure out towns" [ref=e68] [cursor=pointer]:
+              - /url: "#p165864"
+          - list [ref=e69]:
+            - listitem [ref=e70]:
+              - link "Quote" [ref=e71] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=165864
+                - generic [ref=e72]: 
+                - generic [ref=e73]: Quote
+            - text: 
+          - paragraph [ref=e74]:
+            - link "Post" [ref=e75] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=165864#p165864
+              - generic [ref=e76]: 
+              - generic [ref=e77]: Post
+            - generic [ref=e78]:
+              - text: by
+              - strong [ref=e79]:
+                - link "KipperUK" [ref=e80] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=16377
+              - text: »
+            - text: Mon Oct 21, 2019 11:16 pm
+          - generic [ref=e81]:
+            - text: Had a quick experiement at making a small village; and it's not easy. Given that North UK map also contains some actual cities - some thought really has to go into the quickest and easiest way to generate a realistic looking town that isn't a bunch of oversized randomly placed buildings.
+            - text: My current suggestion is create a bunch of stock buildings that have their own UV maps and merge them all into a single blender mesh; I'm not sure if that will preserve the textures/UVs correctly however; and even trying to do a small village with repetitions of the exact same model took considerable time.
+            - text: Any better ideas below please - or are we destined to have pancake-flat towns and villages in our landscapes?
+            - text: Someone should go and steal the tech used for the new Microsoft Flight Simulator....
+        - link "Top" [ref=e82] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e83]: 
+          - generic [ref=e84]: Top
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - term [ref=e88]:
+            - link "User avatar" [ref=e90] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3198
+              - img "User avatar" [ref=e91]
+            - link "Andy1248" [ref=e92] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3198
+            - generic "Offline" [ref=e93]
+          - definition [ref=e94]:
+            - strong [ref=e95]: "Posts:"
+            - text: "1483"
+          - definition [ref=e96]:
+            - strong [ref=e97]: "Joined:"
+            - text: Wed Nov 29, 2006 3:06 pm
+          - definition [ref=e98]:
+            - strong [ref=e99]: "Location:"
+            - text: Biggleswade, Bedfordshire
+        - generic [ref=e101]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e102]':
+            - 'link "Re: We really need to figure out towns" [ref=e103] [cursor=pointer]':
+              - /url: "#p165901"
+          - list [ref=e104]:
+            - listitem [ref=e105]:
+              - link "Quote" [ref=e106] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=165901
+                - generic [ref=e107]: 
+                - generic [ref=e108]: Quote
+            - text: 
+          - paragraph [ref=e109]:
+            - link "Post" [ref=e110] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=165901#p165901
+              - generic [ref=e111]: 
+              - generic [ref=e112]: Post
+            - generic [ref=e113]:
+              - text: by
+              - strong [ref=e114]:
+                - link "Andy1248" [ref=e115] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3198
+              - text: »
+            - text: Thu Oct 24, 2019 4:27 pm
+          - generic [ref=e116]:
+            - text: "There is a sort of way by using OSM2World:"
+            - link "http://osm2world.org/" [ref=e117] [cursor=pointer]:
+              - /url: http://osm2world.org/
+            - text: Select your area of interest on 'Open Street Map', save the map.osm, run OSM2World via command line, export as a wavefront .obj, import into your 3D application, then convert to a c3d file.
+            - text: The pic is an example of all the buildings on the North site of RAF Henlow (not the hangers, they are nicely modelled by me). OSM2World allocates colours to walls and roofs etc. but cannot be used in a condor c3d because of the single texture rule. So in the pic all the buildings are a single colour.
+            - text: However each object can be UV mapped and all the objects grouped into a single object file. I did this for the Henlow site and I am also experimenting for larger airports i.e. Gatwick and Stansted. Also Xavier has recently posted about how to use UV mapped textures in multiple objects.
+            - text: There is also another problem. I made an object for all the buildings in Biggleswade, did not UV map them all, but just tried the object in Condor. Unfortunately the Condor landscape editor was unable to correctly rotate the object such that all the buildings were in the correct place. the same problem as aligning a runway. I understand that an updated version of Landscape editor is in the pipeline and may have improved object alignment.
+            - text: I have not yet worked out how to get the roof shape from OSM2World so all the buildings have flat roofs.
+            - text: "Some YouTube guides:"
+            - link "https://www.youtube.com/watch?v=xo9BS3dpD5o" [ref=e118] [cursor=pointer]:
+              - /url: https://www.youtube.com/watch?v=xo9BS3dpD5o
+            - link "https://www.youtube.com/watch?v=R1ROxTn ... dG60aeiGFW" [ref=e119] [cursor=pointer]:
+              - /url: https://www.youtube.com/watch?v=R1ROxTnD3E0&list=PLpQEkf7-ygeaM-kKQlZBD-NdG60aeiGFW
+            - link "https://www.youtube.com/watch?v=9J5Q1RUGZCU" [ref=e120] [cursor=pointer]:
+              - /url: https://www.youtube.com/watch?v=9J5Q1RUGZCU
+            - text: Note - you can buy an OSM plugin for Blender.
+          - generic [ref=e121]:
+            - term [ref=e122]: Attachments
+            - definition [ref=e123]:
+              - generic [ref=e124]:
+                - term [ref=e125]:
+                  - img "Biggleswade-OSM.jpg" [ref=e126]
+                - definition [ref=e127]: Biggleswade-OSM.jpg (169.32 KiB) Viewed 2930 times
+            - definition [ref=e128]:
+              - generic [ref=e129]:
+                - term [ref=e130]:
+                  - img "BiggleswadeBuildings.jpg" [ref=e131]
+                - definition [ref=e132]: BiggleswadeBuildings.jpg (125.69 KiB) Viewed 2935 times
+            - definition [ref=e133]:
+              - generic [ref=e134]:
+                - term [ref=e135]:
+                  - img "HenlowNorth.jpg" [ref=e136]
+                - definition [ref=e137]: HenlowNorth.jpg (179.48 KiB) Viewed 2937 times
+          - generic [ref=e138]:
+            - text: Condor CN = E20
+            - text: Condor beta team.
+        - link "Top" [ref=e139] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e140]: 
+          - generic [ref=e141]: Top
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - term [ref=e145]:
+            - link "KipperUK" [ref=e146] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=16377
+            - generic "Offline" [ref=e147]
+          - definition [ref=e148]:
+            - strong [ref=e149]: "Posts:"
+            - text: "184"
+          - definition [ref=e150]:
+            - strong [ref=e151]: "Joined:"
+            - text: Fri Sep 21, 2018 9:30 pm
+        - generic [ref=e153]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e154]':
+            - 'link "Re: We really need to figure out towns" [ref=e155] [cursor=pointer]':
+              - /url: "#p165970"
+          - list [ref=e156]:
+            - listitem [ref=e157]:
+              - link "Quote" [ref=e158] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=165970
+                - generic [ref=e159]: 
+                - generic [ref=e160]: Quote
+            - text: 
+          - paragraph [ref=e161]:
+            - link "Post" [ref=e162] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=165970#p165970
+              - generic [ref=e163]: 
+              - generic [ref=e164]: Post
+            - generic [ref=e165]:
+              - text: by
+              - strong [ref=e166]:
+                - link "KipperUK" [ref=e167] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=16377
+              - text: »
+            - text: Mon Oct 28, 2019 2:38 pm
+          - generic [ref=e168]:
+            - text: What is the actual performance impact from using more than one texture in an object?
+            - text: This looks like promising software and while same coloured building roofs isn’t accurate, it may work well enough just to make towns that jump out, especially if separate objects are used for special buildings like churches or industrial areas to add the variety.
+            - text: If there’s little impact from using a couple of textures then having two different “roof” colours would work..
+        - link "Top" [ref=e169] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e170]: 
+          - generic [ref=e171]: Top
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - term [ref=e175]:
+            - link "User avatar" [ref=e177] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+              - img "User avatar" [ref=e178]
+            - link "Cadfael" [ref=e179] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+            - generic "Offline" [ref=e180]
+          - definition [ref=e181]:
+            - strong [ref=e182]: "Posts:"
+            - text: "3707"
+          - definition [ref=e183]:
+            - strong [ref=e184]: "Joined:"
+            - text: Fri May 27, 2005 8:07 pm
+          - definition [ref=e185]:
+            - strong [ref=e186]: "Location:"
+            - text: Czech republic
+          - definition [ref=e187]:
+            - strong [ref=e188]: "Contact:"
+            - link "Contact Cadfael" [ref=e190] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e191]: 
+              - generic [ref=e192]: Contact Cadfael
+        - generic [ref=e194]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e195]':
+            - 'link "Re: We really need to figure out towns" [ref=e196] [cursor=pointer]':
+              - /url: "#p166064"
+          - list [ref=e197]:
+            - listitem [ref=e198]:
+              - link "Quote" [ref=e199] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=166064
+                - generic [ref=e200]: 
+                - generic [ref=e201]: Quote
+            - text: 
+          - paragraph [ref=e202]:
+            - link "Post" [ref=e203] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=166064#p166064
+              - generic [ref=e204]: 
+              - generic [ref=e205]: Post
+            - generic [ref=e206]:
+              - text: by
+              - strong [ref=e207]:
+                - link "Cadfael" [ref=e208] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=363
+              - text: »
+            - text: Thu Oct 31, 2019 2:51 pm
+          - generic [ref=e209]:
+            - text: "There is another issue: too many objects destroy FPS, so placing individual objects for cities can make the scenery flightless for people with weaker computers. I am afraid only manual placement of larger objects (with many houses inside as a parts of one object) give flyable result now. You also need flatten terrain under objects manually. Maybe at the future we will have better object possibilies at the Condor but now it is not easy."
+            - text: At V2 you cannot use more textures for one object. But for example if you have four houses as one objects, you can use four textures for houses inside.
+          - generic [ref=e210]:
+            - link "Image" [ref=e211] [cursor=pointer]:
+              - /url: http://www.condorworld.eu
+              - img "Image" [ref=e212]
+            - link "Image" [ref=e213] [cursor=pointer]:
+              - /url: https://virtualsoaring.eu/beskydy2021/
+              - img "Image" [ref=e214]
+        - link "Top" [ref=e215] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e216]: 
+          - generic [ref=e217]: Top
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - term [ref=e221]:
+            - link "KipperUK" [ref=e222] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=16377
+            - generic "Offline" [ref=e223]
+          - definition [ref=e224]:
+            - strong [ref=e225]: "Posts:"
+            - text: "184"
+          - definition [ref=e226]:
+            - strong [ref=e227]: "Joined:"
+            - text: Fri Sep 21, 2018 9:30 pm
+        - generic [ref=e229]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e230]':
+            - 'link "Re: We really need to figure out towns" [ref=e231] [cursor=pointer]':
+              - /url: "#p166223"
+          - list [ref=e232]:
+            - listitem [ref=e233]:
+              - link "Quote" [ref=e234] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=166223
+                - generic [ref=e235]: 
+                - generic [ref=e236]: Quote
+            - text: 
+          - paragraph [ref=e237]:
+            - link "Post" [ref=e238] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=166223#p166223
+              - generic [ref=e239]: 
+              - generic [ref=e240]: Post
+            - generic [ref=e241]:
+              - text: by
+              - strong [ref=e242]:
+                - link "KipperUK" [ref=e243] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=16377
+              - text: »
+            - text: Thu Nov 07, 2019 10:17 pm
+          - generic [ref=e244]:
+            - blockquote [ref=e245]:
+              - generic [ref=e246]:
+                - generic [ref=e247]:
+                  - link "Cadfael" [ref=e248] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=363
+                  - text: "wrote:"
+                  - link "↑" [ref=e249] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=166064#p166064
+                  - generic [ref=e250]: Thu Oct 31, 2019 2:51 pm
+                - text: At V2 you cannot use more textures for one object. But for example if you have four houses as one objects, you can use four textures for houses inside.
+            - text: You can, but how does that affect performance? I'm aware it's happening on Slovenia 2 ... I've not run into issues with my PC but I wouldn't expect to as it's much higher spec than needed.
+        - link "Top" [ref=e251] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e252]: 
+          - generic [ref=e253]: Top
+      - generic [ref=e255]:
+        - generic [ref=e256]:
+          - term [ref=e257]:
+            - link "User avatar" [ref=e259] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+              - img "User avatar" [ref=e260]
+            - link "Cadfael" [ref=e261] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=363
+            - generic "Offline" [ref=e262]
+          - definition [ref=e263]:
+            - strong [ref=e264]: "Posts:"
+            - text: "3707"
+          - definition [ref=e265]:
+            - strong [ref=e266]: "Joined:"
+            - text: Fri May 27, 2005 8:07 pm
+          - definition [ref=e267]:
+            - strong [ref=e268]: "Location:"
+            - text: Czech republic
+          - definition [ref=e269]:
+            - strong [ref=e270]: "Contact:"
+            - link "Contact Cadfael" [ref=e272] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e273]: 
+              - generic [ref=e274]: Contact Cadfael
+        - generic [ref=e276]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e277]':
+            - 'link "Re: We really need to figure out towns" [ref=e278] [cursor=pointer]':
+              - /url: "#p166262"
+          - list [ref=e279]:
+            - listitem [ref=e280]:
+              - link "Quote" [ref=e281] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=166262
+                - generic [ref=e282]: 
+                - generic [ref=e283]: Quote
+            - text: 
+          - paragraph [ref=e284]:
+            - link "Post" [ref=e285] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=166262#p166262
+              - generic [ref=e286]: 
+              - generic [ref=e287]: Post
+            - generic [ref=e288]:
+              - text: by
+              - strong [ref=e289]:
+                - link "Cadfael" [ref=e290] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=363
+              - text: »
+            - text: Sat Nov 09, 2019 5:15 pm
+          - generic [ref=e291]: One objects with many polygons (objects) inside, has much more better performance, like the same objects seperatelly. I got no any info about troubles with performace at my landscapes, include Slovenia2
+          - generic [ref=e292]:
+            - link "Image" [ref=e293] [cursor=pointer]:
+              - /url: http://www.condorworld.eu
+              - img "Image" [ref=e294]
+            - link "Image" [ref=e295] [cursor=pointer]:
+              - /url: https://virtualsoaring.eu/beskydy2021/
+              - img "Image" [ref=e296]
+        - link "Top" [ref=e297] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e298]: 
+          - generic [ref=e299]: Top
+      - generic [ref=e301]:
+        - generic [ref=e302]:
+          - term [ref=e303]:
+            - link "KipperUK" [ref=e304] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=16377
+            - generic "Offline" [ref=e305]
+          - definition [ref=e306]:
+            - strong [ref=e307]: "Posts:"
+            - text: "184"
+          - definition [ref=e308]:
+            - strong [ref=e309]: "Joined:"
+            - text: Fri Sep 21, 2018 9:30 pm
+        - generic [ref=e311]:
+          - 'heading "Re: We really need to figure out towns" [level=3] [ref=e312]':
+            - 'link "Re: We really need to figure out towns" [ref=e313] [cursor=pointer]':
+              - /url: "#p166268"
+          - list [ref=e314]:
+            - listitem [ref=e315]:
+              - link "Quote" [ref=e316] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=166268
+                - generic [ref=e317]: 
+                - generic [ref=e318]: Quote
+            - text: 
+          - paragraph [ref=e319]:
+            - link "Post" [ref=e320] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=166268#p166268
+              - generic [ref=e321]: 
+              - generic [ref=e322]: Post
+            - generic [ref=e323]:
+              - text: by
+              - strong [ref=e324]:
+                - link "KipperUK" [ref=e325] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=16377
+              - text: »
+            - text: Sat Nov 09, 2019 8:56 pm
+          - generic [ref=e326]:
+            - text: What about the difference between one file with a single mesh vs containing many meshes?
+            - text: And potentially a different texture on each mesh?
+        - link "Top" [ref=e327] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e328]: 
+          - generic [ref=e329]: Top
+      - generic [ref=e330]:
+        - link "Post Reply" [ref=e331] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=38&t=19247
+          - text: Post Reply
+          - generic [ref=e332]: 
+        - generic [ref=e333]:
+          - generic "Topic tools" [ref=e334] [cursor=pointer]:
+            - generic [ref=e335]: 
+            - generic [ref=e337]: 
+          - text: 
+        - generic "Display and sorting options" [ref=e339] [cursor=pointer]:
+          - generic [ref=e340]: 
+          - generic [ref=e342]: 
+        - generic [ref=e343]:
+          - text: 7 posts • Page
+          - strong [ref=e344]: "1"
+          - text: of
+          - strong [ref=e345]: "1"
+      - generic [ref=e346]:
+        - paragraph:
+          - link "Return to “Airports and landscape objects”" [ref=e347] [cursor=pointer]:
+            - /url: ./viewforum.php?f=38
+            - generic [ref=e348]: 
+            - text: Return to “Airports and landscape objects”
+    - generic [ref=e349]:
+      - heading "Who is online" [level=3] [ref=e350]:
+        - link "Who is online" [ref=e351] [cursor=pointer]:
+          - /url: ./viewonline.php
+      - paragraph [ref=e352]: "Users browsing this forum: No registered users"
+  - contentinfo [ref=e353]:
+    - navigation [ref=e354]:
+      - menubar [ref=e356]:
+        - listitem [ref=e357]:
+          - link "Condor" [ref=e359] [cursor=pointer]:
+            - /url: https://www.condorsoaring.com
+            - generic [ref=e360]: 
+            - text: Condor
+          - generic [ref=e361]:
+            - text: »
+            - link "Board index" [ref=e362] [cursor=pointer]:
+              - /url: ./index.php
+        - text: 
+        - listitem [ref=e363]: All times are UTC+02:00
+        - listitem [ref=e364]:
+          - menuitem "Delete cookies" [ref=e365] [cursor=pointer]:
+            - generic [ref=e366]: 
+            - text: Delete cookies
+        - listitem [ref=e367]:
+          - menuitem "Members" [ref=e368] [cursor=pointer]:
+            - generic [ref=e369]: 
+            - text: Members
+        - listitem [ref=e370]:
+          - menuitem "FAQ" [ref=e371] [cursor=pointer]:
+            - generic [ref=e372]: 
+            - text: FAQ
+        - listitem [ref=e373]:
+          - menuitem "The team" [ref=e374] [cursor=pointer]:
+            - generic [ref=e375]: 
+            - text: The team
+        - listitem [ref=e376]:
+          - menuitem "Contact us" [ref=e377] [cursor=pointer]:
+            - generic [ref=e378]: 
+            - text: Contact us
+    - paragraph [ref=e379]: It is currently Sun Jun 21, 2026 12:16 am
+    - generic [ref=e380]:
+      - text: Powered by
+      - link "phpBB" [ref=e381] [cursor=pointer]:
+        - /url: https://www.phpbb.com/
+      - text: ® Forum Software © phpBB Limited
+      - generic [ref=e382]:
+        - text: phpBB Metro Theme by
+        - link "PixelGoose Studio" [ref=e383] [cursor=pointer]:
+          - /url: http://pixelgoose.com/

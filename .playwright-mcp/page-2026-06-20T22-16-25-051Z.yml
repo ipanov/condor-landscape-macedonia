@@ -1,0 +1,993 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - menubar [ref=e6]:
+        - listitem [ref=e7]:
+          - menuitem "Login" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: 
+            - text: Login
+          - text: 
+        - listitem [ref=e10]:
+          - menuitem "Register" [ref=e11] [cursor=pointer]:
+            - generic [ref=e12]: 
+            - text: Register
+        - text: 
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "Condor" [ref=e16] [cursor=pointer]:
+          - /url: https://www.condorsoaring.com
+        - paragraph [ref=e18]:
+          - link "Skip to content" [ref=e19] [cursor=pointer]:
+            - /url: "#start_here"
+    - navigation [ref=e20]:
+      - generic [ref=e21]:
+        - menubar [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Quick links" [ref=e24] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e25]: Quick links
+            - text:  
+        - menubar [ref=e26]:
+          - listitem [ref=e27]:
+            - link " Condor" [ref=e29] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com
+              - generic [ref=e30]: 
+              - text: Condor
+            - generic [ref=e31]:
+              - text: »
+              - link " Board index" [ref=e32] [cursor=pointer]:
+                - /url: ./index.php
+                - generic [ref=e33]: 
+                - text: Board index
+            - generic [ref=e34]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e35]:
+              - text: »
+              - link:
+                - /url: ""
+  - main [ref=e36]:
+    - heading "Condor_OSM_Exporter" [level=2] [ref=e37]:
+      - link "Condor_OSM_Exporter" [ref=e38] [cursor=pointer]:
+        - /url: ./viewtopic.php?f=37&t=22543
+    - paragraph [ref=e39]:
+      - strong [ref=e40]: "Moderators:"
+      - link "Uros" [ref=e41] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=3
+      - text: ","
+      - link "OXO" [ref=e42] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1470
+      - text: ","
+      - link "JBr" [ref=e43] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1566
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - link "Post Reply" [ref=e46] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=37&t=22543
+          - text: Post Reply
+          - generic [ref=e47]: 
+        - generic [ref=e48]:
+          - generic "Topic tools" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: 
+            - generic [ref=e52]: 
+          - text: 
+        - generic [ref=e53]:
+          - text: 20 posts
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - generic [ref=e56]: "1"
+            - listitem [ref=e57]:
+              - button "2" [ref=e58] [cursor=pointer]
+            - listitem [ref=e59]:
+              - button "Next" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: 
+                - generic [ref=e62]: Next
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - term [ref=e66]:
+            - link "n98Bk9-NT3" [ref=e67] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14468
+            - generic "Offline" [ref=e68]
+          - definition [ref=e69]:
+            - strong [ref=e70]: "Posts:"
+            - text: "236"
+          - definition [ref=e71]:
+            - strong [ref=e72]: "Joined:"
+            - text: Sat Jun 17, 2017 6:27 am
+          - definition [ref=e73]:
+            - strong [ref=e74]: "Location:"
+            - text: Tokyo, Japan
+        - generic [ref=e76]:
+          - heading "Condor_OSM_Exporter" [level=3] [ref=e77]:
+            - link "Condor_OSM_Exporter" [ref=e78] [cursor=pointer]:
+              - /url: "#p190157"
+          - list [ref=e79]:
+            - listitem [ref=e80]:
+              - link "Quote" [ref=e81] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190157
+                - generic [ref=e82]: 
+                - generic [ref=e83]: Quote
+            - text: 
+          - paragraph [ref=e84]:
+            - link "Post" [ref=e85] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190157#p190157
+              - generic [ref=e86]: 
+              - generic [ref=e87]: Post
+            - generic [ref=e88]:
+              - text: by
+              - strong [ref=e89]:
+                - link "n98Bk9-NT3" [ref=e90] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14468
+              - text: »
+            - text: Sun Nov 24, 2024 2:53 am
+          - generic [ref=e91]:
+            - text: Regarding Condor_OSM_Exporter, I have a question.
+            - text: On the manual, page 7, there is a screenshot how to set the OSM tab.
+            - text: Should I check "Import for Export" as the screenshot shows? I am asking because this item is not checked when I open the Blender every time.
+            - text: So far, I am following the manual to check it on. But if I don't need it, I will forget about it.
+            - img ":D" [ref=e92]
+            - text: Naoki
+          - generic [ref=e93]:
+            - term [ref=e94]: Attachments
+            - definition [ref=e95]:
+              - term [ref=e97]:
+                - link "screenshot_256.jpg" [ref=e98] [cursor=pointer]:
+                  - /url: ./download/file.php?id=23273&mode=view
+                  - img "screenshot_256.jpg" [ref=e99]
+          - link "Image" [ref=e101] [cursor=pointer]:
+            - /url: https://www.condor.club/graduate/0/?id=16467
+            - img "Image" [ref=e102]
+        - link "Top" [ref=e103] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e104]: 
+          - generic [ref=e105]: Top
+      - generic [ref=e107]:
+        - generic [ref=e108]:
+          - term [ref=e109]:
+            - link "User avatar" [ref=e111] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e112]
+            - link "wickid" [ref=e113] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e114]
+          - definition [ref=e115]:
+            - strong [ref=e116]: "Posts:"
+            - text: "3889"
+          - definition [ref=e117]:
+            - strong [ref=e118]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e119]:
+            - strong [ref=e120]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e121]:
+            - strong [ref=e122]: "Contact:"
+            - link "Contact wickid" [ref=e124] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e125]: 
+              - generic [ref=e126]: Contact wickid
+        - generic [ref=e128]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e129]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e130] [cursor=pointer]':
+              - /url: "#p190164"
+          - list [ref=e131]:
+            - listitem [ref=e132]:
+              - link "Quote" [ref=e133] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190164
+                - generic [ref=e134]: 
+                - generic [ref=e135]: Quote
+            - text: 
+          - paragraph [ref=e136]:
+            - link "Post" [ref=e137] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190164#p190164
+              - generic [ref=e138]: 
+              - generic [ref=e139]: Post
+            - generic [ref=e140]:
+              - text: by
+              - strong [ref=e141]:
+                - link "wickid" [ref=e142] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Sun Nov 24, 2024 8:18 am
+          - generic [ref=e143]: When clicking import it should set all options in BLOSM correctly.
+          - generic [ref=e144]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e145] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e146]: 
+          - generic [ref=e147]: Top
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - term [ref=e151]:
+            - link "n98Bk9-NT3" [ref=e152] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14468
+            - generic "Offline" [ref=e153]
+          - definition [ref=e154]:
+            - strong [ref=e155]: "Posts:"
+            - text: "236"
+          - definition [ref=e156]:
+            - strong [ref=e157]: "Joined:"
+            - text: Sat Jun 17, 2017 6:27 am
+          - definition [ref=e158]:
+            - strong [ref=e159]: "Location:"
+            - text: Tokyo, Japan
+        - generic [ref=e161]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e162]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e163] [cursor=pointer]':
+              - /url: "#p190206"
+          - list [ref=e164]:
+            - listitem [ref=e165]:
+              - link "Quote" [ref=e166] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190206
+                - generic [ref=e167]: 
+                - generic [ref=e168]: Quote
+            - text: 
+          - paragraph [ref=e169]:
+            - link "Post" [ref=e170] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190206#p190206
+              - generic [ref=e171]: 
+              - generic [ref=e172]: Post
+            - generic [ref=e173]:
+              - text: by
+              - strong [ref=e174]:
+                - link "n98Bk9-NT3" [ref=e175] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14468
+              - text: »
+            - text: Sun Nov 24, 2024 1:44 pm
+          - generic [ref=e176]:
+            - text: Alright, I will forget about it.
+            - text: Thanks.
+          - link "Image" [ref=e178] [cursor=pointer]:
+            - /url: https://www.condor.club/graduate/0/?id=16467
+            - img "Image" [ref=e179]
+        - link "Top" [ref=e180] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e181]: 
+          - generic [ref=e182]: Top
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - term [ref=e186]:
+            - link "n98Bk9-NT3" [ref=e187] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14468
+            - generic "Offline" [ref=e188]
+          - definition [ref=e189]:
+            - strong [ref=e190]: "Posts:"
+            - text: "236"
+          - definition [ref=e191]:
+            - strong [ref=e192]: "Joined:"
+            - text: Sat Jun 17, 2017 6:27 am
+          - definition [ref=e193]:
+            - strong [ref=e194]: "Location:"
+            - text: Tokyo, Japan
+        - generic [ref=e196]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e197]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e198] [cursor=pointer]':
+              - /url: "#p190339"
+          - list [ref=e199]:
+            - listitem [ref=e200]:
+              - link "Quote" [ref=e201] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190339
+                - generic [ref=e202]: 
+                - generic [ref=e203]: Quote
+            - text: 
+          - paragraph [ref=e204]:
+            - link "Post" [ref=e205] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190339#p190339
+              - generic [ref=e206]: 
+              - generic [ref=e207]: Post
+            - generic [ref=e208]:
+              - text: by
+              - strong [ref=e209]:
+                - link "n98Bk9-NT3" [ref=e210] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14468
+              - text: »
+            - text: Tue Nov 26, 2024 2:38 am
+          - generic [ref=e211]:
+            - text: Now, I have a problem downloading one patch data.
+            - text: Following is a message from the System Console and attached is an error message from the Blender.
+            - text: When I checked the Windows Task Manager, I found that memory usage was almost full.
+            - text: Do I need more memory on my PC or are there other problems?
+            - text: Naoki
+            - generic [ref=e212]:
+              - paragraph [ref=e213]:
+                - text: "Code:"
+                - link "Select all" [ref=e214] [cursor=pointer]:
+                  - /url: "#"
+              - code [ref=e216]: "Read prefs: \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\config\\userpref.blend\" Importing OSM data Processing patch: 014006 Info: Deleted 1 data-block(s) OBJ import of 'h014006.obj' took 15.1 ms Imported name: TR3014006 Downloading the file from http://overpass-api.de/api/map?bbox=139.43667602539062,35.315433502197266,139.5010223388672,35.36815643310547... Saving the file to C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\osm\\map.osm... Parsing OSM file C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\osm\\map.osm... Time for parsing OSM file: 0:00:05.685648 Processing the parsed OSM data... The number of buildings: 72405 Time for processing of the parsed OSM data: 0:00:02.434117 Creating meshes in Blender... Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dddddd_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_eeeeee_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bbbbbb_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ffffff_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_eeeeee_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_cccccc_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_aaaaaa_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_aaaaaa_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_eeeeee_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dddddd_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bbbbbb_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dddddd_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ffffff_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_cccccc_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_aaaaaa_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_cccccc_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bbbbbb_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ffffff_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_cccccc_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ffffff_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_aaaaaa_metal0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_aaaaaa_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dddddd_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bbbbbb_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_eeeeee_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ffffff_metal0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bbbbbb_metal0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_e6cdb0_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_f1e5ce_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_fef2c7_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_846866_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_cf9691_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bcb9b5_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dad2c8_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dcd7c8_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_d3c7c3_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_f7f1e1_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_798180_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_ded2c7_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_81796c_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_dae1e4_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_9d9e99_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_e0caac_plaster0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_b0b1b3_concrete0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_bcbcb2_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_38b48b_metal0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_705b67_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_f7b977_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_b4ada9_roof_tiles0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_8d93c8_metal0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_7e837f_brick0001.png Saved: C:\\CLT3\\Condor_OSM_Exporter 1.0\\Blender_Download\\texture\\1732583230\\baked_68a4d9_metal0001.png Traceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 65, in do self.volumeGeneratorMultiHipped.do(footprint) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat_multi.py\", line 14, in do self.render(footprint, roofItem) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 49, in render ok = self.generateRoof(footprint, roofItem, firstVertIndex) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 130, in generateRoof polygonize( File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 999, in polygonize skeleton = skeletonize(edgeContours) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 873, in skeletonize removeGhosts(output) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 529, in removeGhosts arc.sinks.remove(nearSink) ValueError: list.remove(x): x not in list Error: Python: Traceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\bTraceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 65, in do self.volumeGeneratorMultiHipped.do(footprint) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat_multi.py\", line 14, in do self.render(footprint, roofItem) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 49, in render ok = self.generateRoof(footprint, roofItem, firstVertIndex) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 130, in generateRoof polygonize( File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 999, in polygonize skeleton = skeletonize(edgeContours) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 873, in skeletonize removeGhosts(output) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 529, in removeGhosts arc.sinks.remove(nearSink) ValueError: list.remove(x): x not in list Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109 Error: Python: Traceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 65, in do self.volumeGeneratorMultiHipped.do(footprint) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat_multi.py\", line 14, in do self.render(footprint, roofItem) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 49, in render ok = self.generateRoof(footprint, roofItem, firstVertIndex) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_hipped_multi.py\", line 130, in generateRoof polygonize( File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 999, in polygonize skeleton = skeletonize(edgeContours) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 873, in skeletonize removeGhosts(output) File \"C:\\Users\\Naoki Takechi\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\lib\\bpypolyskel\\bpypolyskel.py\", line 529, in removeGhosts arc.sinks.remove(nearSink) ValueError: list.remove(x): x not in list Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109"
+          - generic [ref=e217]:
+            - term [ref=e218]: Attachments
+            - definition [ref=e219]:
+              - generic [ref=e220]:
+                - term [ref=e221]:
+                  - img "screenshot_257 2.jpg" [ref=e222]
+                - definition [ref=e223]: screenshot_257 2.jpg (115.56 KiB) Viewed 1910 times
+          - link "Image" [ref=e225] [cursor=pointer]:
+            - /url: https://www.condor.club/graduate/0/?id=16467
+            - img "Image" [ref=e226]
+        - link "Top" [ref=e227] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e228]: 
+          - generic [ref=e229]: Top
+      - generic [ref=e231]:
+        - generic [ref=e232]:
+          - term [ref=e233]:
+            - link "User avatar" [ref=e235] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e236]
+            - link "wickid" [ref=e237] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e238]
+          - definition [ref=e239]:
+            - strong [ref=e240]: "Posts:"
+            - text: "3889"
+          - definition [ref=e241]:
+            - strong [ref=e242]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e243]:
+            - strong [ref=e244]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e245]:
+            - strong [ref=e246]: "Contact:"
+            - link "Contact wickid" [ref=e248] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e249]: 
+              - generic [ref=e250]: Contact wickid
+        - generic [ref=e252]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e253]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e254] [cursor=pointer]':
+              - /url: "#p190341"
+          - list [ref=e255]:
+            - listitem [ref=e256]:
+              - link "Quote" [ref=e257] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190341
+                - generic [ref=e258]: 
+                - generic [ref=e259]: Quote
+            - text: 
+          - paragraph [ref=e260]:
+            - link "Post" [ref=e261] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190341#p190341
+              - generic [ref=e262]: 
+              - generic [ref=e263]: Post
+            - generic [ref=e264]:
+              - text: by
+              - strong [ref=e265]:
+                - link "wickid" [ref=e266] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Tue Nov 26, 2024 3:50 am
+          - generic [ref=e267]: Some patches fail due to an error in the OSM data. Using the Overpass API instead of VKMaps may help for this patch. If not the error in the OSM data needs to be corrected. But it can be very hard to find.
+          - generic [ref=e268]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e269] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e270]: 
+          - generic [ref=e271]: Top
+      - generic [ref=e273]:
+        - generic [ref=e274]:
+          - term [ref=e275]:
+            - link "n98Bk9-NT3" [ref=e276] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14468
+            - generic "Offline" [ref=e277]
+          - definition [ref=e278]:
+            - strong [ref=e279]: "Posts:"
+            - text: "236"
+          - definition [ref=e280]:
+            - strong [ref=e281]: "Joined:"
+            - text: Sat Jun 17, 2017 6:27 am
+          - definition [ref=e282]:
+            - strong [ref=e283]: "Location:"
+            - text: Tokyo, Japan
+        - generic [ref=e285]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e286]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e287] [cursor=pointer]':
+              - /url: "#p190346"
+          - list [ref=e288]:
+            - listitem [ref=e289]:
+              - link "Quote" [ref=e290] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190346
+                - generic [ref=e291]: 
+                - generic [ref=e292]: Quote
+            - text: 
+          - paragraph [ref=e293]:
+            - link "Post" [ref=e294] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190346#p190346
+              - generic [ref=e295]: 
+              - generic [ref=e296]: Post
+            - generic [ref=e297]:
+              - text: by
+              - strong [ref=e298]:
+                - link "n98Bk9-NT3" [ref=e299] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14468
+              - text: »
+            - text: Tue Nov 26, 2024 7:07 am
+          - generic [ref=e300]:
+            - text: Thanks, wickid,
+            - text: I tried all servers but failed. I would accept this. It's just one patch in a scenery.
+            - text: BTW, is there any criterion to import buildings from OSM?
+            - text: I found there are so many areas without buildings.
+            - text: In Japan, there are too many small buildings. Is that the problem?
+            - text: It is not necessary to import all buildings, but it is unnatural that there are areas where there are no buildings, even though there should be some buildings.
+            - text: If this is limitation of the OSM exporter, I would accept it.
+            - text: But, if I could fix some, I would be so happy.
+            - text: Naoki
+          - generic [ref=e301]:
+            - term [ref=e302]: Attachments
+            - definition [ref=e303]:
+              - term [ref=e305]:
+                - link "Shot32.jpg" [ref=e306] [cursor=pointer]:
+                  - /url: ./download/file.php?id=23297&mode=view
+                  - img "Shot32.jpg" [ref=e307]
+          - link "Image" [ref=e309] [cursor=pointer]:
+            - /url: https://www.condor.club/graduate/0/?id=16467
+            - img "Image" [ref=e310]
+        - link "Top" [ref=e311] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e312]: 
+          - generic [ref=e313]: Top
+      - generic [ref=e315]:
+        - generic [ref=e316]:
+          - term [ref=e317]:
+            - link "User avatar" [ref=e319] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e320]
+            - link "wickid" [ref=e321] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e322]
+          - definition [ref=e323]:
+            - strong [ref=e324]: "Posts:"
+            - text: "3889"
+          - definition [ref=e325]:
+            - strong [ref=e326]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e327]:
+            - strong [ref=e328]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e329]:
+            - strong [ref=e330]: "Contact:"
+            - link "Contact wickid" [ref=e332] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e333]: 
+              - generic [ref=e334]: Contact wickid
+        - generic [ref=e336]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e337]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e338] [cursor=pointer]':
+              - /url: "#p190357"
+          - list [ref=e339]:
+            - listitem [ref=e340]:
+              - link "Quote" [ref=e341] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190357
+                - generic [ref=e342]: 
+                - generic [ref=e343]: Quote
+            - text: 
+          - paragraph [ref=e344]:
+            - link "Post" [ref=e345] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190357#p190357
+              - generic [ref=e346]: 
+              - generic [ref=e347]: Post
+            - generic [ref=e348]:
+              - text: by
+              - strong [ref=e349]:
+                - link "wickid" [ref=e350] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Tue Nov 26, 2024 12:56 pm
+          - generic [ref=e351]: Depends if the data is in the OSM database. If the buildings are not in the database, the exporter can't make them.
+          - generic [ref=e352]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e353] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e354]: 
+          - generic [ref=e355]: Top
+      - generic [ref=e357]:
+        - generic [ref=e358]:
+          - term [ref=e359]:
+            - link "n98Bk9-NT3" [ref=e360] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14468
+            - generic "Offline" [ref=e361]
+          - definition [ref=e362]:
+            - strong [ref=e363]: "Posts:"
+            - text: "236"
+          - definition [ref=e364]:
+            - strong [ref=e365]: "Joined:"
+            - text: Sat Jun 17, 2017 6:27 am
+          - definition [ref=e366]:
+            - strong [ref=e367]: "Location:"
+            - text: Tokyo, Japan
+        - generic [ref=e369]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e370]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e371] [cursor=pointer]':
+              - /url: "#p190387"
+          - list [ref=e372]:
+            - listitem [ref=e373]:
+              - link "Quote" [ref=e374] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=190387
+                - generic [ref=e375]: 
+                - generic [ref=e376]: Quote
+            - text: 
+          - paragraph [ref=e377]:
+            - link "Post" [ref=e378] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=190387#p190387
+              - generic [ref=e379]: 
+              - generic [ref=e380]: Post
+            - generic [ref=e381]:
+              - text: by
+              - strong [ref=e382]:
+                - link "n98Bk9-NT3" [ref=e383] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14468
+              - text: »
+            - text: Wed Nov 27, 2024 12:44 am
+          - generic [ref=e384]:
+            - text: Mmm, attached is almost the same area viewed from the ArcGIS Scene Viewer.
+            - text: There should be some building data.
+          - generic [ref=e385]:
+            - term [ref=e386]: Attachments
+            - definition [ref=e387]:
+              - term [ref=e389]:
+                - link "arcgis.jpg" [ref=e390] [cursor=pointer]:
+                  - /url: ./download/file.php?id=23307&mode=view
+                  - img "arcgis.jpg" [ref=e391]
+          - link "Image" [ref=e393] [cursor=pointer]:
+            - /url: https://www.condor.club/graduate/0/?id=16467
+            - img "Image" [ref=e394]
+        - link "Top" [ref=e395] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e396]: 
+          - generic [ref=e397]: Top
+      - generic [ref=e399]:
+        - generic [ref=e400]:
+          - term [ref=e401]:
+            - link "danielvelez" [ref=e402] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1634
+            - generic "Offline" [ref=e403]
+          - definition [ref=e404]:
+            - strong [ref=e405]: "Posts:"
+            - text: "108"
+          - definition [ref=e406]:
+            - strong [ref=e407]: "Joined:"
+            - text: Thu Mar 09, 2006 2:11 pm
+          - definition [ref=e408]:
+            - strong [ref=e409]: "Location:"
+            - text: Colombia
+        - generic [ref=e411]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e412]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e413] [cursor=pointer]':
+              - /url: "#p197769"
+          - list [ref=e414]:
+            - listitem [ref=e415]:
+              - link "Quote" [ref=e416] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=197769
+                - generic [ref=e417]: 
+                - generic [ref=e418]: Quote
+            - text: 
+          - paragraph [ref=e419]:
+            - link "Post" [ref=e420] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=197769#p197769
+              - generic [ref=e421]: 
+              - generic [ref=e422]: Post
+            - generic [ref=e423]:
+              - text: by
+              - strong [ref=e424]:
+                - link "danielvelez" [ref=e425] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1634
+              - text: »
+            - text: Tue Nov 25, 2025 10:32 pm
+          - generic [ref=e426]:
+            - text: Hello there. Just posting a comment on OSM_Exporter.
+            - text: First of all, what a nice tool you´ve pulled off.
+            - text: Now on a second note, to anyone doing a full scenery export, I think I found a bug when there is a patch with no "building" on it.
+            - text: Just after exporting to C3D, look for the 1k files created. Usually those are files (patches) without buildings. Delete them from the autogen folder (or move them out to a "autogen_off" folder).
+            - text: It was generating some elevator cheat effect and the OHA (Object, or autogen hash file) was not fixing it. Once you delete or remove them from the autogen, then run once more the "Export autogen hash". Should fix the "anticheat behaviour over that patch".
+        - link "Top" [ref=e427] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e428]: 
+          - generic [ref=e429]: Top
+      - generic [ref=e431]:
+        - generic [ref=e432]:
+          - term [ref=e433]:
+            - link "User avatar" [ref=e435] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=4802
+              - img "User avatar" [ref=e436]
+            - link "dgtfer" [ref=e437] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=4802
+            - generic "Offline" [ref=e438]
+          - definition [ref=e439]:
+            - strong [ref=e440]: "Posts:"
+            - text: "681"
+          - definition [ref=e441]:
+            - strong [ref=e442]: "Joined:"
+            - text: Mon Nov 19, 2007 9:49 am
+          - definition [ref=e443]:
+            - strong [ref=e444]: "Location:"
+            - text: Marseille - france
+        - generic [ref=e446]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e447]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e448] [cursor=pointer]':
+              - /url: "#p197796"
+          - list [ref=e449]:
+            - listitem [ref=e450]:
+              - link "Quote" [ref=e451] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=197796
+                - generic [ref=e452]: 
+                - generic [ref=e453]: Quote
+            - text: 
+          - paragraph [ref=e454]:
+            - link "Post" [ref=e455] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=197796#p197796
+              - generic [ref=e456]: 
+              - generic [ref=e457]: Post
+            - generic [ref=e458]:
+              - text: by
+              - strong [ref=e459]:
+                - link "dgtfer" [ref=e460] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=4802
+              - text: »
+            - text: Fri Nov 28, 2025 3:59 pm
+          - generic [ref=e461]:
+            - blockquote [ref=e462]:
+              - generic [ref=e463]:
+                - generic [ref=e464]:
+                  - link "n98Bk9-NT3" [ref=e465] [cursor=pointer]:
+                    - /url: ./memberlist.php?mode=viewprofile&u=14468
+                  - text: "wrote:"
+                  - link "↑" [ref=e466] [cursor=pointer]:
+                    - /url: ./viewtopic.php?p=190387#p190387
+                  - generic [ref=e467]: Wed Nov 27, 2024 12:44 am
+                - text: Mmm, attached is almost the same area viewed from the ArcGIS Scene Viewer.
+                - text: There should be some building data.
+            - text: Actually, the Esri 3D Buildings scene layer includes 3D buildings acquired from TomTom and Maxar, in addition to Esri Community Maps data. The Esri 3D Buildings scene layer is intended as an alternative to the OpenStreetMap (OSM) 3D Buildings scene layer, particularly for areas where the OSM data is missing accurate 3D attributes.
+          - link "Image" [ref=e469] [cursor=pointer]:
+            - /url: http://www.condor.cc/pilot_details.php?id=11431
+            - img "Image" [ref=e470]
+        - link "Top" [ref=e471] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e472]: 
+          - generic [ref=e473]: Top
+      - generic [ref=e475]:
+        - generic [ref=e476]:
+          - term [ref=e477]:
+            - link "danielvelez" [ref=e478] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=1634
+            - generic "Offline" [ref=e479]
+          - definition [ref=e480]:
+            - strong [ref=e481]: "Posts:"
+            - text: "108"
+          - definition [ref=e482]:
+            - strong [ref=e483]: "Joined:"
+            - text: Thu Mar 09, 2006 2:11 pm
+          - definition [ref=e484]:
+            - strong [ref=e485]: "Location:"
+            - text: Colombia
+        - generic [ref=e487]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e488]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e489] [cursor=pointer]':
+              - /url: "#p197811"
+          - list [ref=e490]:
+            - listitem [ref=e491]:
+              - link "Quote" [ref=e492] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=197811
+                - generic [ref=e493]: 
+                - generic [ref=e494]: Quote
+            - text: 
+          - paragraph [ref=e495]:
+            - link "Post" [ref=e496] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=197811#p197811
+              - generic [ref=e497]: 
+              - generic [ref=e498]: Post
+            - generic [ref=e499]:
+              - text: by
+              - strong [ref=e500]:
+                - link "danielvelez" [ref=e501] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=1634
+              - text: »
+            - text: Sun Nov 30, 2025 5:06 am
+          - generic [ref=e502]:
+            - text: Not sure if im getting out of context, but this seems like a good place to post.
+            - text: Have you guys noticed any "Autogen" issues when getting to the edge of the scenery?
+            - term [ref=e505]:
+              - link "Shot2.jpg" [ref=e506] [cursor=pointer]:
+                - /url: ./download/file.php?id=24526&mode=view
+                - img "Shot2.jpg" [ref=e507]
+            - term [ref=e510]:
+              - link "Shot4.jpg" [ref=e511] [cursor=pointer]:
+                - /url: ./download/file.php?id=24527&mode=view
+                - img "Shot4.jpg" [ref=e512]
+        - link "Top" [ref=e513] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e514]: 
+          - generic [ref=e515]: Top
+      - generic [ref=e517]:
+        - generic [ref=e518]:
+          - term [ref=e519]:
+            - link "User avatar" [ref=e521] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e522]
+            - link "wickid" [ref=e523] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e524]
+          - definition [ref=e525]:
+            - strong [ref=e526]: "Posts:"
+            - text: "3889"
+          - definition [ref=e527]:
+            - strong [ref=e528]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e529]:
+            - strong [ref=e530]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e531]:
+            - strong [ref=e532]: "Contact:"
+            - link "Contact wickid" [ref=e534] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e535]: 
+              - generic [ref=e536]: Contact wickid
+        - generic [ref=e538]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e539]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e540] [cursor=pointer]':
+              - /url: "#p197812"
+          - list [ref=e541]:
+            - listitem [ref=e542]:
+              - link "Quote" [ref=e543] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=197812
+                - generic [ref=e544]: 
+                - generic [ref=e545]: Quote
+            - text: 
+          - paragraph [ref=e546]:
+            - link "Post" [ref=e547] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=197812#p197812
+              - generic [ref=e548]: 
+              - generic [ref=e549]: Post
+            - generic [ref=e550]:
+              - text: by
+              - strong [ref=e551]:
+                - link "wickid" [ref=e552] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Sun Nov 30, 2025 8:41 am
+          - generic [ref=e553]: Yes. The last strip of patches along the scenery edge has height data. So the program puts the buildings at elevation. But Condor slopes the scenery down to 0 elevation from half way down the patch towards the edge. You should delete those buildings.
+          - generic [ref=e554]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e555] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e556]: 
+          - generic [ref=e557]: Top
+      - generic [ref=e559]:
+        - generic [ref=e560]:
+          - term [ref=e561]:
+            - link "NickB" [ref=e562] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=8086
+            - generic "Offline" [ref=e563]
+          - definition [ref=e564]:
+            - strong [ref=e565]: "Posts:"
+            - text: "172"
+          - definition [ref=e566]:
+            - strong [ref=e567]: "Joined:"
+            - text: Mon Oct 25, 2010 4:07 am
+          - definition [ref=e568]:
+            - strong [ref=e569]: "Location:"
+            - text: Canada
+        - generic [ref=e571]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e572]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e573] [cursor=pointer]':
+              - /url: "#p199307"
+          - list [ref=e574]:
+            - listitem [ref=e575]:
+              - link "Quote" [ref=e576] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=199307
+                - generic [ref=e577]: 
+                - generic [ref=e578]: Quote
+            - text: 
+          - paragraph [ref=e579]:
+            - link "Post" [ref=e580] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=199307#p199307
+              - generic [ref=e581]: 
+              - generic [ref=e582]: Post
+            - generic [ref=e583]:
+              - text: by
+              - strong [ref=e584]:
+                - link "NickB" [ref=e585] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=8086
+              - text: »
+            - text: Mon Mar 16, 2026 4:28 pm
+          - generic [ref=e586]:
+            - text: I've encountered a 'division by 0' during an AutoGen generation. It looks like one of the buildings in the OSM data has a WIDTH of 0. I cannot tell which itme in the OSM data is at fault, and I don't know how to restart the script if I could delete the item from the OSM data anyway. This only happened in one patch out of 2464. I tried again the next day, and the number of buildings has changed, but I got the same error. See below both attempts.
+            - text: Can the script be modified to ignore a building if its WIDTH is 0 and skip over this problem and continue?
+            - generic [ref=e587]:
+              - paragraph [ref=e588]:
+                - text: "Code:"
+                - link "Select all" [ref=e589] [cursor=pointer]:
+                  - /url: "#"
+              - code [ref=e591]: "---------------------------------------- --- link removed --- bbox=-73.86441040039062,45.489715576171875,-73.78959655761719,45.54230880737305... Saving the file to F:\\Blender_OSM_Data\\osm\\map_1604.osm... Parsing OSM file F:\\Blender_OSM_Data\\osm\\map_1604.osm... Time for parsing OSM file: 0:00:12.764876 Processing the parsed OSM data... The number of buildings: 21204 Time for processing of the parsed OSM data: 0:00:02.953210 Creating meshes in Blender... Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do seTraceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109 Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109 Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. -------------------------------------------------------------------- Importing OSM data Processing patch: 003022 Info: Deleted 125 data-block(s) OBJ import of 'h003022.obj' took 115.4 ms Imported name: TR3003022 -- link removed -- bbox=-73.86441040039062,45.489715576171875,-73.78959655761719,45.54230880737305... Saving the file to F:\\Blender_OSM_Data\\osm\\map_3914.osm... Parsing OSM file F:\\Blender_OSM_Data\\osm\\map_3914.osm... Time for parsing OSM file: 0:00:11.992537 Processing the parsed OSM data... The number of buildings: 21281 Time for processing of the parsed OSM data: 0:00:03.308973 Creating meshes in Blender... Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do seTraceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109 Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 1243, in execute ImportOSMData() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\CondorOSMImporter.py\", line 765, in ImportOSMData bpy.ops.blosm.import_data() File \"C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py\", line 109, in __call__ ret = _op_call(self.idname_py(), kw) RuntimeError: Error: Python: Traceback (most recent call last): File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 225, in execute return self.importOsm(context) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\__init__.py\", line 324, in importOsm a.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\app\\blender.py\", line 442, in render m.render() File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building\\manager.py\", line 81, in render self.renderer.render(building, self.data) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\building2\\renderer.py\", line 156, in render action.do(building, itemClass, buildingStyle, self) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 93, in do self.generateVolume(footprint, element.getData(self.data)) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\__init__.py\", line 100, in generateVolume volumeGenerator.do(footprint, coords) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof.py\", line 83, in do self.render(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 22, in render self.extrude(footprint, roofItem) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 64, in extrude facades.append(Facade.getItem( File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\item\\facade.py\", line 49, in getItem volumeGenerator.initFacadeItem(item) File \"C:\\Users\\Nick\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons\\blosm\\action\\volume\\roof_flat.py\", line 89, in initFacadeItem item.normal = bottomVec.cross(zAxis)/width ZeroDivisionError: Vector division: divide by zero error Location: C:\\Program Files\\Blender Foundation\\Blender 4.0\\4.0\\scripts\\modules\\bpy\\ops.py:109 Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed. Unable to load non-power-of-two DXT image resolution, falling back to uncompressed."
+        - link "Top" [ref=e592] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e593]: 
+          - generic [ref=e594]: Top
+      - generic [ref=e596]:
+        - generic [ref=e597]:
+          - term [ref=e598]:
+            - link "User avatar" [ref=e600] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - img "User avatar" [ref=e601]
+            - link "wickid" [ref=e602] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=3242
+            - generic "Offline" [ref=e603]
+          - definition [ref=e604]:
+            - strong [ref=e605]: "Posts:"
+            - text: "3889"
+          - definition [ref=e606]:
+            - strong [ref=e607]: "Joined:"
+            - text: Mon Dec 04, 2006 7:32 pm
+          - definition [ref=e608]:
+            - strong [ref=e609]: "Location:"
+            - text: Venlo, NL
+          - definition [ref=e610]:
+            - strong [ref=e611]: "Contact:"
+            - link "Contact wickid" [ref=e613] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e614]: 
+              - generic [ref=e615]: Contact wickid
+        - generic [ref=e617]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e618]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e619] [cursor=pointer]':
+              - /url: "#p199308"
+          - list [ref=e620]:
+            - listitem [ref=e621]:
+              - link "Quote" [ref=e622] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=199308
+                - generic [ref=e623]: 
+                - generic [ref=e624]: Quote
+            - text: 
+          - paragraph [ref=e625]:
+            - link "Post" [ref=e626] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=199308#p199308
+              - generic [ref=e627]: 
+              - generic [ref=e628]: Post
+            - generic [ref=e629]:
+              - text: by
+              - strong [ref=e630]:
+                - link "wickid" [ref=e631] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=3242
+              - text: »
+            - text: Mon Mar 16, 2026 4:37 pm
+          - generic [ref=e632]: Easiest is to find and correct the OSM data on the OSM website. You can modify the script yourself if you like. We are currently working on a completely new version, so I won't modify the current one anymore.
+          - generic [ref=e633]:
+            - text: PH-1504, KOE
+            - text: Condor beta team/Plane developer
+        - link "Top" [ref=e634] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e635]: 
+          - generic [ref=e636]: Top
+      - generic [ref=e638]:
+        - generic [ref=e639]:
+          - term [ref=e640]:
+            - link "User avatar" [ref=e642] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14055
+              - img "User avatar" [ref=e643]
+            - link "Bre901" [ref=e644] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=14055
+            - generic "Offline" [ref=e645]
+          - definition [ref=e646]:
+            - strong [ref=e647]: "Posts:"
+            - text: "2481"
+          - definition [ref=e648]:
+            - strong [ref=e649]: "Joined:"
+            - text: Tue Nov 22, 2016 8:57 pm
+          - definition [ref=e650]:
+            - strong [ref=e651]: "Location:"
+            - text: N. of Annecy (France)
+          - definition [ref=e652]:
+            - strong [ref=e653]: "Contact:"
+            - link "Contact Bre901" [ref=e655] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e656]: 
+              - generic [ref=e657]: Contact Bre901
+        - generic [ref=e659]:
+          - 'heading "Re: Condor_OSM_Exporter" [level=3] [ref=e660]':
+            - 'link "Re: Condor_OSM_Exporter" [ref=e661] [cursor=pointer]':
+              - /url: "#p199309"
+          - list [ref=e662]:
+            - listitem [ref=e663]:
+              - link "Quote" [ref=e664] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=37&p=199309
+                - generic [ref=e665]: 
+                - generic [ref=e666]: Quote
+            - text: 
+          - paragraph [ref=e667]:
+            - link "Post" [ref=e668] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=199309#p199309
+              - generic [ref=e669]: 
+              - generic [ref=e670]: Post
+            - generic [ref=e671]:
+              - text: by
+              - strong [ref=e672]:
+                - link "Bre901" [ref=e673] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=14055
+              - text: »
+            - text: Mon Mar 16, 2026 5:15 pm
+          - generic [ref=e674]: When posting large text files like log files, please use the code tags ( </> button in the toolbar above the text input box )
+          - generic [ref=e675]: "CN: MPT — Condor beta team — CondorUTill webpage: https://condorutill.fr/"
+        - link "Top" [ref=e676] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e677]: 
+          - generic [ref=e678]: Top
+      - generic [ref=e679]:
+        - link "Post Reply" [ref=e680] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=37&t=22543
+          - text: Post Reply
+          - generic [ref=e681]: 
+        - generic [ref=e682]:
+          - generic "Topic tools" [ref=e683] [cursor=pointer]:
+            - generic [ref=e684]: 
+            - generic [ref=e686]: 
+          - text: 
+        - generic "Display and sorting options" [ref=e688] [cursor=pointer]:
+          - generic [ref=e689]: 
+          - generic [ref=e691]: 
+        - generic [ref=e692]:
+          - text: 20 posts
+          - list [ref=e693]:
+            - listitem [ref=e694]:
+              - generic [ref=e695]: "1"
+            - listitem [ref=e696]:
+              - button "2" [ref=e697] [cursor=pointer]
+            - listitem [ref=e698]:
+              - button "Next" [ref=e699] [cursor=pointer]:
+                - generic [ref=e700]: 
+                - generic [ref=e701]: Next
+      - generic [ref=e702]:
+        - paragraph:
+          - link "Return to “Landscapes”" [ref=e703] [cursor=pointer]:
+            - /url: ./viewforum.php?f=37
+            - generic [ref=e704]: 
+            - text: Return to “Landscapes”
+    - generic [ref=e705]:
+      - heading "Who is online" [level=3] [ref=e706]:
+        - link "Who is online" [ref=e707] [cursor=pointer]:
+          - /url: ./viewonline.php
+      - paragraph [ref=e708]: "Users browsing this forum: No registered users"
+  - contentinfo [ref=e709]:
+    - navigation [ref=e710]:
+      - menubar [ref=e712]:
+        - listitem [ref=e713]:
+          - link "Condor" [ref=e715] [cursor=pointer]:
+            - /url: https://www.condorsoaring.com
+            - generic [ref=e716]: 
+            - text: Condor
+          - generic [ref=e717]:
+            - text: »
+            - link "Board index" [ref=e718] [cursor=pointer]:
+              - /url: ./index.php
+        - text: 
+        - listitem [ref=e719]: All times are UTC+02:00
+        - listitem [ref=e720]:
+          - menuitem "Delete cookies" [ref=e721] [cursor=pointer]:
+            - generic [ref=e722]: 
+            - text: Delete cookies
+        - listitem [ref=e723]:
+          - menuitem "Members" [ref=e724] [cursor=pointer]:
+            - generic [ref=e725]: 
+            - text: Members
+        - listitem [ref=e726]:
+          - menuitem "FAQ" [ref=e727] [cursor=pointer]:
+            - generic [ref=e728]: 
+            - text: FAQ
+        - listitem [ref=e729]:
+          - menuitem "The team" [ref=e730] [cursor=pointer]:
+            - generic [ref=e731]: 
+            - text: The team
+        - listitem [ref=e732]:
+          - menuitem "Contact us" [ref=e733] [cursor=pointer]:
+            - generic [ref=e734]: 
+            - text: Contact us
+    - paragraph [ref=e735]: It is currently Sun Jun 21, 2026 12:16 am
+    - generic [ref=e736]:
+      - text: Powered by
+      - link "phpBB" [ref=e737] [cursor=pointer]:
+        - /url: https://www.phpbb.com/
+      - text: ® Forum Software © phpBB Limited
+      - generic [ref=e738]:
+        - text: phpBB Metro Theme by
+        - link "PixelGoose Studio" [ref=e739] [cursor=pointer]:
+          - /url: http://pixelgoose.com/

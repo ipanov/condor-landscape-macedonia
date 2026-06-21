@@ -1,0 +1,291 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - menubar [ref=e6]:
+        - listitem [ref=e7]:
+          - menuitem "Login" [ref=e8] [cursor=pointer]:
+            - generic [ref=e9]: 
+            - text: Login
+          - text: 
+        - listitem [ref=e10]:
+          - menuitem "Register" [ref=e11] [cursor=pointer]:
+            - generic [ref=e12]: 
+            - text: Register
+        - text: 
+    - banner [ref=e13]:
+      - generic [ref=e15]:
+        - link "Condor" [ref=e16] [cursor=pointer]:
+          - /url: https://www.condorsoaring.com
+        - paragraph [ref=e18]:
+          - link "Skip to content" [ref=e19] [cursor=pointer]:
+            - /url: "#start_here"
+    - navigation [ref=e20]:
+      - generic [ref=e21]:
+        - menubar [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Quick links" [ref=e24] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e25]: Quick links
+            - text:  
+        - menubar [ref=e26]:
+          - listitem [ref=e27]:
+            - link " Condor" [ref=e29] [cursor=pointer]:
+              - /url: https://www.condorsoaring.com
+              - generic [ref=e30]: 
+              - text: Condor
+            - generic [ref=e31]:
+              - text: »
+              - link " Board index" [ref=e32] [cursor=pointer]:
+                - /url: ./index.php
+                - generic [ref=e33]: 
+                - text: Board index
+            - generic [ref=e34]:
+              - text: »
+              - link:
+                - /url: ""
+            - generic [ref=e35]:
+              - text: »
+              - link:
+                - /url: ""
+  - main [ref=e36]:
+    - heading "Relationship between Objects in Landscape Editor and airport O and G files" [level=2] [ref=e37]:
+      - link "Relationship between Objects in Landscape Editor and airport O and G files" [ref=e38] [cursor=pointer]:
+        - /url: ./viewtopic.php?f=38&t=20470
+    - paragraph [ref=e39]:
+      - strong [ref=e40]: "Moderators:"
+      - link "Uros" [ref=e41] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=3
+      - text: ","
+      - link "OXO" [ref=e42] [cursor=pointer]:
+        - /url: ./memberlist.php?mode=viewprofile&u=1470
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - link "Post Reply" [ref=e45] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=38&t=20470
+          - text: Post Reply
+          - generic [ref=e46]: 
+        - generic [ref=e47]:
+          - generic "Topic tools" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e51]: 
+          - text: 
+        - generic [ref=e52]:
+          - text: 3 posts • Page
+          - strong [ref=e53]: "1"
+          - text: of
+          - strong [ref=e54]: "1"
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - term [ref=e58]:
+            - link "edwalker" [ref=e59] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=303
+            - generic "Offline" [ref=e60]
+          - definition [ref=e61]:
+            - strong [ref=e62]: "Posts:"
+            - text: "28"
+          - definition [ref=e63]:
+            - strong [ref=e64]: "Joined:"
+            - text: Tue May 17, 2005 4:22 am
+        - generic [ref=e66]:
+          - heading "Relationship between Objects in Landscape Editor and airport O and G files" [level=3] [ref=e67]:
+            - link "Relationship between Objects in Landscape Editor and airport O and G files" [ref=e68] [cursor=pointer]:
+              - /url: "#p174247"
+          - list [ref=e69]:
+            - listitem [ref=e70]:
+              - link "Quote" [ref=e71] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=174247
+                - generic [ref=e72]: 
+                - generic [ref=e73]: Quote
+            - text: 
+          - paragraph [ref=e74]:
+            - link "Post" [ref=e75] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=174247#p174247
+              - generic [ref=e76]: 
+              - generic [ref=e77]: Post
+            - generic [ref=e78]:
+              - text: by
+              - strong [ref=e79]:
+                - link "edwalker" [ref=e80] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=303
+              - text: »
+            - text: Tue Jan 26, 2021 6:17 pm
+          - generic [ref=e81]:
+            - text: I've recently done some small trial landscapes and added airports using landscape editor, placing objects around the airfield using the editor. I am now learning how to use Wings3D to construct more detailed airports. I am grateful for the work that so many of you have done, especially Xavier Delaborde, in clearly giving step by step instructions re how to construct high quality landscapes and airports.
+            - text: It occurs to me now that I don't fully understand how these two approaches integrate. For example, if I decorate an airport with objects in LE and then construct a more detailed version of the same airport with Wings3D, creating new G and O files, how does Condor2 prioritize which objects are chosen? Are they all integrated together, or is there some hierarchy about which objects are given preference. Are there some guidelines about which objects should be added via each method? Thanks for the assistance.
+            - text: Ed
+        - link "Top" [ref=e82] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e83]: 
+          - generic [ref=e84]: Top
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - term [ref=e88]:
+            - link "Xavier" [ref=e89] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=5590
+            - generic "Offline" [ref=e90]
+          - definition [ref=e91]:
+            - strong [ref=e92]: "Posts:"
+            - text: "635"
+          - definition [ref=e93]:
+            - strong [ref=e94]: "Joined:"
+            - text: Fri Jun 20, 2008 2:22 pm
+          - definition [ref=e95]:
+            - strong [ref=e96]: "Location:"
+            - text: France
+        - generic [ref=e98]:
+          - 'heading "Re: Relationship between Objects in Landscape Editor and airport O and G files" [level=3] [ref=e99]':
+            - 'link "Re: Relationship between Objects in Landscape Editor and airport O and G files" [ref=e100] [cursor=pointer]':
+              - /url: "#p174250"
+          - list [ref=e101]:
+            - listitem [ref=e102]:
+              - link "Quote" [ref=e103] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=174250
+                - generic [ref=e104]: 
+                - generic [ref=e105]: Quote
+            - text: 
+          - paragraph [ref=e106]:
+            - link "Post" [ref=e107] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=174250#p174250
+              - generic [ref=e108]: 
+              - generic [ref=e109]: Post
+            - generic [ref=e110]:
+              - text: by
+              - strong [ref=e111]:
+                - link "Xavier" [ref=e112] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=5590
+              - text: »
+            - text: Tue Jan 26, 2021 8:42 pm
+          - generic [ref=e113]:
+            - text: Hi Ed,
+            - text: Generally I put only buildings in the O file of an airport, because they are in most times "single" in scenery.
+            - text: All the other objects relative to one airport are only one instance of the object standing in the World directory of the scenery, which can be easily duplicated for all the different airports of the scenery in Landscape Editor. If you put this kind of object in the O file, you will increase the numbers of vertices of the O File for each instance of the objects.
+            - text: "There are other technical reasons:"
+            - text: "1/ when a glider approaches from an airport:"
+            - text: The G and O files are loaded when it reaches 23 km in the pilot screen.
+            - text: The other objects are only loaded at 5 km.
+            - text: This may avoid too many things to be loaded in the same time.
+            - text: 2/ It is easier to move one instance of one object in Landscape Editor than to open W3D to move the object. Make a new O file, etc.
+            - text: 3/ It is easy to change the position and direction of an airport in Landscape Editor with airport properties, but it is also very easy to move and rotate all the other objects relative to one airport because you can select all of them in Landscape Editor and apply the same transformation.
+            - text: Choose the right compromise.
+            - text: My two little pennies.
+            - text: "PS: Thank you for your kind words!"
+          - generic [ref=e114]: "*****- Xavier - (XDL - VR FAN) *****"
+        - link "Top" [ref=e115] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e116]: 
+          - generic [ref=e117]: Top
+      - generic [ref=e119]:
+        - generic [ref=e120]:
+          - term [ref=e121]:
+            - link "GregHart1965" [ref=e122] [cursor=pointer]:
+              - /url: ./memberlist.php?mode=viewprofile&u=13075
+            - generic "Offline" [ref=e123]
+          - definition [ref=e124]:
+            - strong [ref=e125]: "Posts:"
+            - text: "653"
+          - definition [ref=e126]:
+            - strong [ref=e127]: "Joined:"
+            - text: Sun Apr 12, 2015 7:21 am
+        - generic [ref=e129]:
+          - 'heading "Re: Relationship between Objects in Landscape Editor and airport O and G files" [level=3] [ref=e130]':
+            - 'link "Re: Relationship between Objects in Landscape Editor and airport O and G files" [ref=e131] [cursor=pointer]':
+              - /url: "#p174382"
+          - list [ref=e132]:
+            - listitem [ref=e133]:
+              - link "Quote" [ref=e134] [cursor=pointer]:
+                - /url: ./posting.php?mode=quote&f=38&p=174382
+                - generic [ref=e135]: 
+                - generic [ref=e136]: Quote
+            - text: 
+          - paragraph [ref=e137]:
+            - link "Post" [ref=e138] [cursor=pointer]:
+              - /url: ./viewtopic.php?p=174382#p174382
+              - generic [ref=e139]: 
+              - generic [ref=e140]: Post
+            - generic [ref=e141]:
+              - text: by
+              - strong [ref=e142]:
+                - link "GregHart1965" [ref=e143] [cursor=pointer]:
+                  - /url: ./memberlist.php?mode=viewprofile&u=13075
+              - text: »
+            - text: Sat Jan 30, 2021 4:47 pm
+          - generic [ref=e144]:
+            - text: Yes create a Wings file with all of the airport buildings in it using a properly scaled background image to place things correctly Make the runway first to exact measurements (work at 1:10 and only enlarge just before writing the .obj - check relationships and placement on the ground after resizing) and then scale the background image to match your runway. There are limits to how many buildings you can make into one object - group them into approximately 250meter blocks otherwise you can run into complications with a large object which Condor doesn't seem to like too much suffering a drop in frames per second of playback. (This is only really an issue in very extensive airports). Map all the buildings onto one image per block.
+            - text: Other objects like cars etc. should be placed in LE.
+        - link "Top" [ref=e145] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e146]: 
+          - generic [ref=e147]: Top
+      - generic [ref=e148]:
+        - link "Post Reply" [ref=e149] [cursor=pointer]:
+          - /url: ./posting.php?mode=reply&f=38&t=20470
+          - text: Post Reply
+          - generic [ref=e150]: 
+        - generic [ref=e151]:
+          - generic "Topic tools" [ref=e152] [cursor=pointer]:
+            - generic [ref=e153]: 
+            - generic [ref=e155]: 
+          - text: 
+        - generic "Display and sorting options" [ref=e157] [cursor=pointer]:
+          - generic [ref=e158]: 
+          - generic [ref=e160]: 
+        - generic [ref=e161]:
+          - text: 3 posts • Page
+          - strong [ref=e162]: "1"
+          - text: of
+          - strong [ref=e163]: "1"
+      - generic [ref=e164]:
+        - paragraph:
+          - link "Return to “Airports and landscape objects”" [ref=e165] [cursor=pointer]:
+            - /url: ./viewforum.php?f=38
+            - generic [ref=e166]: 
+            - text: Return to “Airports and landscape objects”
+    - generic [ref=e167]:
+      - heading "Who is online" [level=3] [ref=e168]:
+        - link "Who is online" [ref=e169] [cursor=pointer]:
+          - /url: ./viewonline.php
+      - paragraph [ref=e170]: "Users browsing this forum: No registered users"
+  - contentinfo [ref=e171]:
+    - navigation [ref=e172]:
+      - menubar [ref=e174]:
+        - listitem [ref=e175]:
+          - link "Condor" [ref=e177] [cursor=pointer]:
+            - /url: https://www.condorsoaring.com
+            - generic [ref=e178]: 
+            - text: Condor
+          - generic [ref=e179]:
+            - text: »
+            - link "Board index" [ref=e180] [cursor=pointer]:
+              - /url: ./index.php
+        - text: 
+        - listitem [ref=e181]: All times are UTC+02:00
+        - listitem [ref=e182]:
+          - menuitem "Delete cookies" [ref=e183] [cursor=pointer]:
+            - generic [ref=e184]: 
+            - text: Delete cookies
+        - listitem [ref=e185]:
+          - menuitem "Members" [ref=e186] [cursor=pointer]:
+            - generic [ref=e187]: 
+            - text: Members
+        - listitem [ref=e188]:
+          - menuitem "FAQ" [ref=e189] [cursor=pointer]:
+            - generic [ref=e190]: 
+            - text: FAQ
+        - listitem [ref=e191]:
+          - menuitem "The team" [ref=e192] [cursor=pointer]:
+            - generic [ref=e193]: 
+            - text: The team
+        - listitem [ref=e194]:
+          - menuitem "Contact us" [ref=e195] [cursor=pointer]:
+            - generic [ref=e196]: 
+            - text: Contact us
+    - paragraph [ref=e197]: It is currently Sun Jun 21, 2026 12:16 am
+    - generic [ref=e198]:
+      - text: Powered by
+      - link "phpBB" [ref=e199] [cursor=pointer]:
+        - /url: https://www.phpbb.com/
+      - text: ® Forum Software © phpBB Limited
+      - generic [ref=e200]:
+        - text: phpBB Metro Theme by
+        - link "PixelGoose Studio" [ref=e201] [cursor=pointer]:
+          - /url: http://pixelgoose.com/

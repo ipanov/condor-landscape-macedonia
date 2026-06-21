@@ -38,10 +38,10 @@
     {
       "icao": "LWSN",
       "name": "Stenkovec",
-      "lat": 42.059444,
-      "lon": 21.38875,
+      "lat": 42.059396,
+      "lon": 21.388712,
       "elevation_m": 318,
-      "source": "Aeroklub Skopje VFR manual / airfield chart; ARP and runway-end coordinates",
+      "source": "Aeroklub Skopje VFR manual / airfield chart; ARP and runway-end coordinates. Center re-aligned 2026-06-21b to put the AEROTOW GLIDER spawn on the USED grass-strip centerline. SPAWN CONVENTION (AERO p.16/p.20/p.49, verified on Slovenia2 Novo Mesto/Ptuj/Celje ortho): the glider spawns ON the .apt axis with ZERO lateral offset; the tug spawns St=50 m (for width=50) to one side (left here, flags2=0x100). In-sim the glider was off the RIGHT strip edge and the tug near the LEFT edge => the .apt axis sat ~26 m RIGHT of the used-strip center. Measured from installed ortho t0704.dds: a regular row of 50-m-spaced grass runway markers (the used-strip centerline) and the worn-grass brightness ridge both lie ~29-31 m NW (left of the 121deg heading) of the OLD axis (532162.2/4656444.0). Net fix: shift center 26.5 m NW (perpendicular, az 31deg) to UTM 532175.9/4656466.7; +2.6 m of leftward heading-rounding throw at the 600 m-back spawn nets the glider ~29 m left = on the used-strip center within ~2 m. Heading kept whole-degree 121 (corridor 120.7 / ends 120.5 / markers 121.3 all round to 121). Width kept 50 (aerotow needs it). Ends translated by the same 26.5 m NW so they stay on the new axis.",
       "runways": [
         {
           "designation": "12/30",
@@ -49,19 +49,19 @@
           "width_m": 50,
           "surface": "grass",
           "true_heading": 120.81,
-          "center_lat": 42.059444,
-          "center_lon": 21.38875,
+          "center_lat": 42.0596,
+          "center_lon": 21.388878,
           "ends": [
             {
               "designation": "12",
-              "lat": 42.062222,
-              "lon": 21.3825,
+              "lat": 42.062426,
+              "lon": 21.382666,
               "elevation_m": 318.5
             },
             {
               "designation": "30",
-              "lat": 42.056667,
-              "lon": 21.395,
+              "lat": 42.056871,
+              "lon": 21.395166,
               "elevation_m": 318.8
             }
           ]

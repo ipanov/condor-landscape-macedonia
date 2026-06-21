@@ -11,11 +11,15 @@ Output: under .sandbox/bridge_out/<source>/ -- one extruded-prism `bNNNN.c3d`
 
 Per-footprint placement (all VERIFIED, see docs/condor_landscape_spec.md sec 11 and
 the in-sim-proven scripts/place_increment.py):
-  centroid (E,N)  -> posX = HDR_E - E , posY = N - HDR_N   (HDR = .trn header
-                     575910.0 / 4631130.0)
+  centroid (E,N)  -> posX/posY via condor_grid.obj_record_xy: anchor = the SE
+                     CORNER of the landscape = .trn-header BR (575910/4631130) +
+                     half a 90 m pixel = 575955/4631085. posX = anchor_E - E,
+                     posY = N - anchor_N. (The bare BR pixel CENTRE was the old
+                     ~50 m bug -- off by +45/-45 m.)
   posZ            -> DEM altitude at the centroid (absolute metres, never 0)
   ori             -> azimuth of the LONG edge of the shapely
-                     minimum_rotated_rectangle, in radians
+                     minimum_rotated_rectangle, in radians (compass bearing of
+                     the model local +Y; see condor_grid.heading_deg_to_ori)
   scale           -> 1.0
   height          -> 'height' property, else num_floors/levels*3+3, else 9 m
   geometry        -> c3d.make_prism on the footprint in local (x=E,y=N) metres
@@ -25,9 +29,9 @@ the in-sim-proven scripts/place_increment.py):
                      (square-ish) bounding alignment. Colour is the mean of the
                      installed DDS pixels under the footprint (untextured prism).
 
-This module is the single source of truth for the footprint->Condor transform; it
-is imported by validate_bridge.py so the validator decodes records through the
-exact same constants.
+The world transform (anchor + ori convention) is owned by scripts/condor_grid.py
+(obj_record_xy / footprint_to_local / heading_deg_to_ori); this module only adds
+the building-specific policy (height, colour, long-edge ori) on top of it.
 """
 from __future__ import annotations
 
@@ -53,7 +57,12 @@ DEMF = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
 INSTALL_TEX = Path("C:/Condor2/Landscapes/MacedoniaSkopje/Textures")
 OUT_ROOT = ROOT / ".sandbox" / "bridge_out"
 
-HDR_E, HDR_N = 575910.0, 4631130.0            # .trn header origin (posX/posY anchor)
+import condor_grid as _cg  # noqa: E402  authoritative placement transform
+# Object anchor = SE corner of the landscape (.trn-header BR +/- half a 90 m pixel).
+# CALIBRATED from Slovenia2 (residual ~0 m on rooftops); the old (575910/4631130)
+# pixel-CENTRE anchor was off by exactly +45/-45 m (the ~50 m bug). See
+# condor_grid.OBJ_ANCHOR_* and docs/condor_landscape_spec.md sec 11.
+HDR_E, HDR_N = _cg.OBJ_ANCHOR_E, _cg.OBJ_ANCHOR_N   # 575955.0 / 4631085.0
 DEM_NWX, DEM_NWY = 506880.0, 4700160.0        # DEM NW corner
 DEM_PX, DEM_W = 30.0, 2305                    # 30 m/px, 2305x2305
 
@@ -173,11 +182,16 @@ def height_of(props: dict) -> float:
 
 
 def record(name: str, E: float, N: float, z: float, ori: float, scale: float = 1.0) -> bytes:
-    """152-byte .obj placement record (spec sec 11)."""
+    """152-byte .obj placement record (spec sec 11).
+
+    posX/posY come from the authoritative ``condor_grid.obj_record_xy`` (SE-corner
+    anchor), so this stays in lock-step with the calibrated transform.
+    """
     nm = name.encode("ascii")
     if len(nm) > 131:
         raise ValueError(f"name too long: {name!r}")
-    return (struct.pack("<5f", HDR_E - E, N - HDR_N, z, scale, ori)
+    pos_x, pos_y = _cg.obj_record_xy(E, N, anchor=(HDR_E, HDR_N))
+    return (struct.pack("<5f", pos_x, pos_y, z, scale, ori)
             + bytes([len(nm)]) + nm.ljust(131, b"\x00"))
 
 

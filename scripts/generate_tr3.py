@@ -30,9 +30,15 @@ PATCHES_Y = 12  # (HEIGHT - 1) / INTERVAL
 
 # Paths
 ROOT = Path(__file__).resolve().parent.parent
-# Canonical EXACTLY-30m raw (NW pixel-center 506880/4700160). The old
-# *_2305_flat.raw was at 29.987 m/px and caused texture-vs-mesh drift.
-SOURCE_RAW = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
+# DEFAULT = the RUNWAY-FLATTENED exactly-30m raw (NW pixel-center 506880/4700160,
+# produced by flatten_runways.py from macedonia_skopje_dem_30m_2305.raw). The
+# installed heightmaps MUST use the flattened DEM, otherwise the runway plateaus
+# are bumpy and Condor will NOT spawn the aerotow towplane (AERO guide: a tug needs
+# terrain flattened to the .apt altitude). The unflattened raw is still available
+# via --source for non-airport experiments.
+#   NOTE: both rasters are EXACTLY 30 m/px; the old 29.987 m drift file is retired.
+SOURCE_RAW = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
+SOURCE_RAW_UNFLAT = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
 OUT_DIR = Path("C:/Condor2/Landscapes/MacedoniaSkopje/HeightMaps")
 
 
@@ -90,7 +96,7 @@ def main(source_raw: Path = SOURCE_RAW, out_dir: Path = OUT_DIR):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Generate 144 .tr3 patches from a 30m raw DEM")
     ap.add_argument("--source", default=str(SOURCE_RAW),
-                    help="source int16 2305x2305 raw (default: canonical 30m raw)")
+                    help="source int16 2305x2305 raw (default: runway-FLATTENED 30m raw)")
     ap.add_argument("--out", default=str(OUT_DIR),
                     help="output HeightMaps dir (default: installed Condor HeightMaps)")
     args = ap.parse_args()

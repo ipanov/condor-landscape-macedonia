@@ -206,16 +206,19 @@ else:
         name_len = record[0]
         name = record[1:1+name_len].decode("ascii", errors="replace")
 
-        # Parse fields
-        (unused, lat, lon, elev, rwy_dir, rwy_len, freq) = struct.unpack(
+        # Parse fields. Offset 56 is runway WIDTH in metres (verified vs Slovenia2.apt:
+        # 25/85/65/80/55/18 ... = real widths), NOT a frequency/id. Offset 64 holds
+        # the radio frequency MHz (123.5/121.0). Width drives the aerotow tug offset.
+        (unused, lat, lon, elev, rwy_dir, rwy_len, width) = struct.unpack(
             "<f f f f i i i", record[32:60])
+        freq_mhz = struct.unpack("<f", record[64:68])[0]
 
         detail_lines = [
             f"Airport #{i+1}: '{name}'",
             f"  Lat: {lat:.6f}, Lon: {lon:.6f}",
             f"  Elevation: {elev:.1f}m",
-            f"  Runway dir: {rwy_dir} deg, length: {rwy_len}m",
-            f"  Frequency/flags: {freq}",
+            f"  Runway dir: {rwy_dir} deg, length: {rwy_len}m, width: {width}m",
+            f"  Frequency: {freq_mhz:.2f} MHz",
         ]
 
         # Try to match with reference

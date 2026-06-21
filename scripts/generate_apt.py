@@ -2,19 +2,26 @@
 """
 Generate Condor 2 .apt binary airport file directly from data/airports.json.
 
-Record layout (72 bytes, little-endian), verified against Slovenia2.apt:
+Record layout (72 bytes, little-endian). VERIFIED by decoding all 8 records of the
+shipping Slovenia2.apt on 2026-06-21 (the field meanings at offsets 56/64 differ
+from the older docs/condor_landscape_spec.md guess -- the Slovenia2 values prove
+offset 56 = WIDTH and offset 64 = FREQUENCY, see below):
   byte   0       name length (uint8)
   bytes  1-31    airport name, null-padded ASCII
   bytes 32-35    float 0.0 (unused)
   bytes 36-39    latitude  (float32, decimal degrees)
   bytes 40-43    longitude (float32, decimal degrees)
   bytes 44-47    elevation (float32, metres)
-  bytes 48-51    runway direction (int32, degrees true)
+  bytes 48-51    runway direction (int32, WHOLE degrees -- decimals crash C2)
   bytes 52-55    runway length (int32, metres)
-  bytes 56-59    frequency / airport ID (int32)
-  bytes 60-63    flags / has_aviation (int32, Slovenia2 uses 0 or 1)
-  bytes 64-67    flatten radius (float32, Slovenia2 uses ~120 m)
-  bytes 68-71    unknown flags (int32, Slovenia2 uses 0x00000100 or 0x00010000)
+  bytes 56-59    runway WIDTH (int32, metres)   <-- Slovenia2: 25,85,65,80,55,60,95,18
+                 Drives the tug's lateral start offset St (AERO p.20). A bogus
+                 value here breaks the aerotow ballet -> no towplane spawns.
+  bytes 60-63    flags1 (uint32) -- Slovenia2 is 0 for all airports except one
+                 (SLOVENJ GRADEC=1); NOT a simple "enabled" flag. Use 0.
+  bytes 64-67    frequency MHz (float32)         <-- Slovenia2: 123.5 / 121.0
+  bytes 68-71    flags2 (uint32) -- Slovenia2 uses 0x00000100 or 0x00010000
+                 (the tow-side / primary-reversed checkbox bits). Use 0x00000100.
 
 For Phase 1 we store the primary runway of each airport.
 """
@@ -47,11 +54,12 @@ def encode_airport(ap: dict, index: int) -> bytes:
     lat = float(rwy.get("center_lat", ap["lat"]))
     lon = float(rwy.get("center_lon", ap["lon"]))
     elev = float(ap["elevation_m"])
-    # Heading is stored as DEGREES x 1000 (verified vs Northern_Greece.apt, whose
-    # Macedonian airports read 119320, 122100, ...). Whole degrees lose ~0.5 deg =
-    # several metres of lateral spawn error. Use the exact UTM-grid azimuth from the
-    # runway ENDS (the projection the ortho/painted runway lives in), not the chart
-    # true-north heading, so the .apt axis overlies the painted runway.
+    # HEADING: WHOLE DEGREES ONLY. Fractional/millidegree headings crash Condor
+    # with "Airport is not installed" (verified on this landscape). Slovenia2 stores
+    # plain whole-degree int32 (134, 111, 273, ...). Use the UTM-grid azimuth from
+    # the runway ENDS -- that is the projection the ortho/painted runway lives in,
+    # so the rounded .apt axis overlies the painted strip as closely as a whole
+    # degree allows (residual lateral throw at the strip end is only a few metres).
     ends = rwy.get("ends")
     if ends and len(ends) >= 2:
         import math as _m
@@ -62,27 +70,31 @@ def encode_airport(ap: dict, index: int) -> bytes:
         _az = _m.degrees(_m.atan2(_b[0] - _a[0], _b[1] - _a[1])) % 360.0
     else:
         _az = float(rwy["true_heading"])
-    rwdir = int(round(_az))           # whole degrees (Slovenia2 convention; millidegrees crashed)
+    rwdir = int(round(_az))           # WHOLE degrees (Slovenia2 convention)
     # Condor spawns a ground start ~170 m IN from the .apt runway end (into wind),
     # NOT at the threshold. Extend the declared length by ~340 m (2x170) so the
     # spawn lands on the REAL threshold; the flattened plateau (flatten_runways.py)
     # is sized to cover it. Verified: Condor forum t=19413 / t=22592.
     rwlen = int(rwy["length_m"]) + 340
-    # Use a synthetic airport ID / frequency
-    freq = int(ap.get("frequency_khz", 0)) or (120000 + index * 250)
+    # WIDTH (offset 56) -- VERIFIED as runway width in metres from Slovenia2
+    # (25/85/65/80/55/60/95/18). This sets the tug's lateral start offset St
+    # (AERO p.20): 0-25 m -> St 41 m, 50 m -> 50, 75 m -> 60, 100 m -> 72. A wrong
+    # value here (the old code wrote a ~120000 frequency-ID into this field) breaks
+    # the aerotow ballet so NO towplane spawns. Use the real runway width.
+    width = int(round(float(rwy.get("width_m", 50))))
+    # FREQUENCY (offset 64), MHz float -- Slovenia2 stores 123.5 / 121.0 here (it is
+    # NOT a flatten radius; Condor never flattens from the .apt). Default 123.50.
+    freq_mhz = float(ap.get("frequency_mhz", 123.50))
 
     record = b""
     record += struct.pack("<B", len(name))
     record += name_bytes
-    record += struct.pack("<f", 0.0)          # unused
-    record += struct.pack("<fff", lat, lon, elev)
-    record += struct.pack("<iii", rwdir, rwlen, freq)
-    record += struct.pack("<I", 1)            # has_aviation / enabled
-    # Offset 64 is NOT a flatten radius -- Condor never flattens terrain from the
-    # .apt (flattening is done in the .tr3 heightmap; see flatten_runways.py).
-    # Slovenia2 stores a constant 123.5 here; we match it. The value has no effect.
-    record += struct.pack("<f", 123.5)
-    record += struct.pack("<I", 0x00000100)   # flags pattern from Slovenia2
+    record += struct.pack("<f", 0.0)          # [32] unused, always 0.0
+    record += struct.pack("<fff", lat, lon, elev)   # [36][40][44]
+    record += struct.pack("<iii", rwdir, rwlen, width)  # [48] dir [52] len [56] WIDTH
+    record += struct.pack("<I", 0)            # [60] flags1 (Slovenia2 = 0)
+    record += struct.pack("<f", freq_mhz)     # [64] frequency MHz (Slovenia2 = 123.5)
+    record += struct.pack("<I", 0x00000100)   # [68] flags2 pattern from Slovenia2
     assert len(record) == 72, f"Record length is {len(record)}"
     return record
 

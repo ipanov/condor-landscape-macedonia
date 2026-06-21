@@ -77,12 +77,19 @@ at 90m resolution. Full 30m resolution is in .tr3 patches.
 | 36-39 | float32 | latitude | WGS-84 decimal degrees |
 | 40-43 | float32 | longitude | WGS-84 decimal degrees |
 | 44-47 | float32 | elevation | Meters ASL |
-| 48-51 | int32 | runway_direction | Degrees true |
+| 48-51 | int32 | runway_direction | **WHOLE** degrees true (decimals/millidegrees crash Condor with "Airport is not installed") |
 | 52-55 | int32 | runway_length | Meters |
-| 56-59 | int32 | freq_or_id | |
-| 60-63 | uint32 | flags1 | 0x00000000 |
-| 64-67 | float32 | flatten_radius | ~120-150 meters |
-| 68-71 | uint32 | flags2 | 0x00010000 or 0x00000100 |
+| 56-59 | int32 | **runway_width** | **Meters.** Drives the aerotow tug's lateral start offset St (AERO p.20: 0-25 m→St 41, 50→50, 75→60, 100→72). A bogus value here breaks the tow ballet → no towplane spawns. |
+| 60-63 | uint32 | flags1 | Usually 0x00000000 |
+| 64-67 | float32 | **frequency_mhz** | **Radio frequency, MHz** (e.g. 123.50, 121.00). NOT a flatten radius — Condor never flattens terrain from the .apt (flattening lives in the .tr3 heightmap). |
+| 68-71 | uint32 | flags2 | 0x00010000 or 0x00000100 (tow-side / primary-reversed checkbox bits) |
+
+> **Verified 2026-06-21** by decoding all 8 records of the shipping `Slovenia2.apt`:
+> offset 56 holds real runway widths (25/85/65/80/55/60/95/**18** m — SLOVENJ GRADEC
+> is a narrow strip) and offset 64 holds 123.5/121.0 MHz. The earlier
+> "freq_or_id" / "flatten_radius" labels were incorrect; `generate_apt.py` now
+> writes width at 56 and frequency at 64 (a wrong width was why the Stenkovec
+> aerotow tug never spawned).
 
 **Airport name must match .c3d filenames** in Airports/ directory:
 - `<Name>G.c3d` — ground model
@@ -148,26 +155,62 @@ SeeYou CSV format. `DDMM.mmmH` coordinates. `m` suffix on elevation.
 
 | Offset | Type | Field |
 |--------|------|-------|
-| 0-3 | float32 | posX (header_easting - absolute_easting) |
-| 4-7 | float32 | posY (absolute_northing - header_northing) |
-| 8-11 | float32 | posZ (altitude) |
+| 0-3 | float32 | posX = anchor_E − absolute_easting |
+| 4-7 | float32 | posY = absolute_northing − anchor_N |
+| 8-11 | float32 | posZ (absolute terrain altitude, metres) |
 | 12-15 | float32 | scale (1.0 = original) |
-| 16-19 | float32 | orientation (radians) |
+| 16-19 | float32 | orientation `ori` (radians; compass azimuth of model local +Y) |
 | 20 | uint8 | name_length |
-| 21-151 | char[131] | c3d filename (null-padded) |
+| 21-151 | char[131] | c3d filename incl. `.c3d` (null-padded) |
 
-**VERIFIED against Slovenia2.obj (2026-06-21) — three things the table above hides,
-each of which makes objects silently invisible if wrong:**
-- **The name MUST include the `.c3d` extension** (Slovenia2 stores `"C1R.c3d"`, len=7),
-  not the bare stem. Wrong → Condor can't resolve the model, object never appears.
-- **posZ is the ABSOLUTE terrain altitude** at the placement (Slovenia2 rec=488 m),
-  NOT 0 and NOT a height offset. Sample the DEM; posZ=0 buries objects at sea level.
-- **origin = the `.trn` HEADER easting/northing** (floats at byte 14/18 of the .trn;
-  MacedoniaSkopje = 575910 / 4631130), NOT the grid/patch corner. posX = header_E −
-  E, posY = N − header_N. Using the grid corner shifts everything by one 90 m pixel.
-- The 131-byte name field after the string is **leftover editor heap memory** (a
-  constant template of stale pointers across all records) — Condor ignores it, so
-  null-padding on write is correct.
+**CALIBRATED against the shipping Slovenia2.obj (2026-06-21), 371 building objects on
+8 dense patches, cross-correlated against the installed ortho. The authoritative
+implementation is `scripts/condor_grid.py` (`obj_record_xy`, `obj_world_xy`,
+`footprint_to_local`, `heading_deg_to_ori`); import from there, do not re-derive.**
+
+POSITION — anchor is the **SE CORNER of the landscape**, i.e. the `.trn` header BR
+pixel-CENTRE shifted by **+half a 90 m pixel East and −half a pixel North**:
+```
+anchor_E = TRN_BR_E + 45      (grid EAST edge)
+anchor_N = TRN_BR_N − 45      (grid SOUTH edge)
+posX = anchor_E − E           (metres west of the east edge)
+posY = N − anchor_N           (metres north of the south edge)
+```
+- The `.trn` header BR easting/northing are float32 at **offset 20 / 24** of the
+  `.trn` (the 90 m overview grid). For MacedoniaSkopje TRN_BR = 575910 / 4631130, so
+  anchor = **575955 / 4631085**.
+- The earlier "anchor = header pixel CENTRE" rule was the **~50 m bug**: it put every
+  object dE = +50.6 m / dN = −45.0 m off the rooftops — exactly half a 90 m pixel in
+  BOTH axes. With the SE-corner anchor the residual is ~0 (weighted-mean dE = −0.6 m,
+  dN = +3.3 m over 371 buildings). Validation: `.sandbox/s2_village_tight.png` (before,
+  markers float in the trees) vs `.sandbox/VALIDATE_slovenia2_objects_on_rooftops.png`
+  (after, on the roofs).
+- NOTE: `TRN_BR` (768×90 m grid) is **not** the 30 m-DEM BR (`BR_EASTING`=576000 in
+  condor_grid); they differ by 90 m. The object anchor uses the `.trn`-header value.
+  The installed Macedonia textures were warped to the DEM grid, so a raw overlay of
+  correctly-placed objects on those DDS appears ~90 m shifted — a *texture*
+  georeferencing artefact, not a placement error (objects are correct in-sim, which
+  drapes textures per-patch onto the `.tr3` mesh).
+
+ORIENTATION — `ori` is the **compass azimuth in radians (clockwise from North)** that
+the model's local **+Y** reference axis should point to. Condor applies
+`world = ref + R(−ori)·local` (R = math-CCW), so local (0,1)→azimuth `ori`, local
+(1,0)→azimuth `ori`+90°.
+- VERIFIED: every Slovenia2 airport `GrassPaint` runway is modelled with its long axis
+  at local azimuth 0/180 regardless of real heading (so the heading is applied at
+  placement, not baked in), and the Slovenia2 `ori` values are clean whole-degree
+  headings (0, 15, 74, 107, 147°…). The Novo Mesto runway (rwdir 50°) traces the
+  painted grass under R(−ori): `.sandbox/s2_rw_centerline.png`.
+- A footprint built relative to its centroid in true (x=E, y=N) metres is extruded
+  with `ori=0` (north-true); `ori` alone then rotates the whole prism. Use
+  `condor_grid.footprint_to_local` so the mesh is never pre-rotated.
+
+OTHER (still verified):
+- **Name MUST include `.c3d`** (Slovenia2 stores `"C1R.c3d"`, len=7), not the bare stem.
+- **posZ is ABSOLUTE terrain altitude** at the placement (sample the DEM); posZ=0 sinks
+  objects to sea level.
+- The 131-byte name field after the string is leftover editor heap memory Condor
+  ignores; null-pad on write.
 
 ## 12. Loading Screens
 

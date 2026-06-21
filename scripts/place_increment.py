@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""INCREMENTAL object placement -- buildings (exact footprints) + landmarks.
+"""DIAGNOSTIC object placement -- isolate why nothing renders, in ONE in-sim test.
 
-FORMAT FIXES (verified against Slovenia2.obj + our MacedoniaSkopje.trn header):
-  * .obj record name MUST include the ".c3d" extension (Slovenia2: "C1R.c3d").
-  * posZ is the ABSOLUTE terrain altitude at the object (Slovenia2 rec=488 m), not 0
-    -- sampled here from the flattened DEM, else buildings sit at sea level (buried).
-  * origin = the .trn HEADER easting/northing (575910 / 4631130), not the grid corner
-    -- posX = header_E - E, posY = N - header_N (spec 11 + Slovenia2-confirmed).
+  * CONTROL  ZZ_TEST.c3d : a KNOWN-GOOD Slovenia2 building (B-PZ4) retextured into our
+    landscape, at Stenkovec, scale 3 (~70 m, unmissable). If this does NOT appear, the
+    bug is the .obj mechanism itself (LandscapeEditor compile needed), not our models.
+  * Buildings: our cadastre prisms, now TEXTURED (Slovenia2 G10 facade) + ortho colour.
+  * Millennium Cross: left UNTEXTURED -> cross-vs-control tells us if a texture is
+    MANDATORY for an object to render.
+  * Our World/Textures was EMPTY (Slovenia2 has 93); now populated.
 
-Buildings: each MK-cadastre footprint extruded to its cadastre height, coloured from
-the aerial ortho over its own footprint. Landmarks: Millennium Cross on Vodno (a
-custom white cross), so there is at least one recognisable object from altitude.
-Local frame x=east, y=north about each centroid; ori=0 (mesh carries orientation).
-No GUI, no hash.
+Outcomes: nothing -> .obj needs the editor; control only -> our prism c3d is bad;
+control+buildings, no cross -> texture mandatory; all -> fixed. Format per spec 11 +
+Slovenia2 (name+.c3d, posZ=terrain alt, origin=.trn header). No GUI.
 """
 import json
 import struct
@@ -29,33 +28,33 @@ import c3d
 
 ROOT = Path(__file__).resolve().parent.parent
 CAD = ROOT / ".sandbox" / "buildings" / "cadastre_buildings.geojson"
-DEM = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
+DEMF = ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305_flat.raw"
 INSTALL = Path("C:/Condor2/Landscapes/MacedoniaSkopje")
+SLO = Path("C:/Condor2/Landscapes/Slovenia2")
 OBJDIR = INSTALL / "World" / "Objects"
+WTEX = INSTALL / "World" / "Textures"
 TEX = INSTALL / "Textures"
 OBJFILE = INSTALL / "MacedoniaSkopje.obj"
-
-HDR_E, HDR_N = 575910.0, 4631130.0                 # .trn header easting/northing (.obj origin)
-ULX_W, ULY_N = 506880.0, 4700160.0                 # DEM/grid NW corner
-SOUTH0 = 4631040.0
+HDR_E, HDR_N = 575910.0, 4631130.0
+ULX_W, ULY_N, SOUTH0 = 506880.0, 4700160.0, 4631040.0
 PATCH, PXN, NCOL, XDIM, DEMW = 5760.0, 2048, 12, 30.0, 2305
+BLDG_TEX = "landscapes/MacedoniaSkopje/world/textures/G10.dds"
 
-_dem = np.fromfile(DEM, dtype="<u2").reshape(DEMW, DEMW)
+_dem = np.fromfile(DEMF, dtype="<u2").reshape(DEMW, DEMW)
 _cache: dict = {}
 
 
 def altitude(E, N):
-    col = min(max(int(round((E - ULX_W) / XDIM)), 0), DEMW - 1)
-    row = min(max(int(round((ULY_N - N) / XDIM)), 0), DEMW - 1)
-    return float(_dem[row, col])
+    c = min(max(int(round((E - ULX_W) / XDIM)), 0), DEMW - 1)
+    r = min(max(int(round((ULY_N - N) / XDIM)), 0), DEMW - 1)
+    return float(_dem[r, c])
 
 
 def load_patch(col, row):
     if (col, row) not in _cache:
         p = TEX / f"t{NCOL - 1 - col:02d}{row:02d}.dds"
-        arr = (np.asarray(Image.open(p).convert("RGB").resize((PXN, PXN)),
-                          dtype=np.float32) / 255.0) if p.exists() else None
-        _cache[(col, row)] = arr
+        _cache[(col, row)] = ((np.asarray(Image.open(p).convert("RGB").resize((PXN, PXN)),
+                                          dtype=np.float32) / 255.0) if p.exists() else None)
     return _cache[(col, row)]
 
 
@@ -76,10 +75,18 @@ def roof_colour(poly):
     return (float(c[0]), float(c[1]), float(c[2]))
 
 
-def record(name_c3d, E, N, z, ori=0.0, scale=1.0):
-    nm = name_c3d.encode("ascii")
+def record(name, E, N, z, ori=0.0, scale=1.0):
+    nm = name.encode("ascii")
     return (struct.pack("<5f", HDR_E - E, N - HDR_N, z, scale, ori)
             + bytes([len(nm)]) + nm.ljust(131, b"\x00"))
+
+
+def copy_tex():
+    WTEX.mkdir(parents=True, exist_ok=True)
+    for f in ("G10.dds", "G8a.dds"):
+        s = SLO / "World" / "Textures" / f
+        if s.exists():
+            (WTEX / f).write_bytes(s.read_bytes())
 
 
 def place_buildings(recs):
@@ -107,31 +114,66 @@ def place_buildings(recs):
     return n
 
 
-def place_millennium_cross(recs):
-    """White cross on Vodno summit (41.96369 N, 21.40978 E) -- vertical + arms."""
+def place_cross(recs):
     tx = Transformer.from_crs("EPSG:4326", "EPSG:32634", always_xy=True)
     E, N = tx.transform(21.40978, 41.96369)
     W = c3d.WHITE_MATERIAL
-    pillar = c3d.make_box("CrossV", 7.0, 7.0, 0.0, 66.0, texture="", material=W)
-    arms = c3d.make_box("CrossH", 30.0, 5.0, 38.0, 48.0, texture="", material=W)
+    pillar = c3d.make_box("CrossV", 7, 7, 0, 66, texture="", material=W)
+    arms = c3d.make_box("CrossH", 30, 5, 38, 48, texture="", material=W)
     c3d.write_c3d(c3d.C3DFile(objects=[pillar, arms]), OBJDIR / "MillenniumCross.c3d")
-    z = altitude(E, N)
-    recs.append(record("MillenniumCross.c3d", E, N, z))
-    print(f"  Millennium Cross @ UTM {E:.0f},{N:.0f}  alt {z:.0f} m")
+    recs.append(record("MillenniumCross.c3d", E, N, altitude(E, N)))
+
+
+def place_airport_tests(recs):
+    """Three objects in a row at Stenkovec (inside the ~5 km render range, in the spawn
+    view) to ISOLATE our geometry from the pipeline:
+      ZZ_CONTROL = Slovenia2 B-PZ4   grey/textured  (proven; the one you already saw)
+      ZZ_MYPRISM = our make_prism     RED/untextured (tests the BUILDING geometry)
+      ZZ_MYBOX   = our make_box       WHITE/untextured (tests the CROSS geometry)
+    If grey shows but red/white don't, our c3d writer is the bug -> compare to B-PZ4."""
+    tx = Transformer.from_crs("EPSG:4326", "EPSG:32634", always_xy=True)
+    E0, N0 = tx.transform(21.3888, 42.0594)        # Stenkovec LWSN
+    z = altitude(E0, N0)
+    src = c3d.parse_c3d(str(SLO / "World" / "Objects" / "B-PZ4.c3d"))
+    for o in src.objects:
+        if o.texture:
+            base = o.texture.replace("\\", "/").split("/")[-1]
+            (WTEX / base).write_bytes((SLO / "World" / "Textures" / base).read_bytes())
+            o.texture = f"landscapes/MacedoniaSkopje/world/textures/{base}"
+    c3d.write_c3d(src, OBJDIR / "ZZ_CONTROL.c3d")
+    recs.append(record("ZZ_CONTROL.c3d", E0, N0, z, scale=3.0))
+    rect = [(-20, -10), (20, -10), (20, 10), (-20, 10)]          # 40x20 m, 30 m tall
+    pr = c3d.make_prism("ZZ_MYPRISM", rect, 30.0, texture="", material=(0.9, 0.1, 0.1, 1, 1, 1))
+    c3d.write_c3d(c3d.C3DFile(objects=[pr]), OBJDIR / "ZZ_MYPRISM.c3d")
+    recs.append(record("ZZ_MYPRISM.c3d", E0 + 90, N0, z))
+    bx = c3d.make_box("ZZ_MYBOX", 24, 24, 0, 40, texture="", material=c3d.WHITE_MATERIAL)
+    c3d.write_c3d(c3d.C3DFile(objects=[bx]), OBJDIR / "ZZ_MYBOX.c3d")
+    recs.append(record("ZZ_MYBOX.c3d", E0 + 180, N0, z))
+    # my box TEXTURED, with B-PZ4's exact material (1,1,1,1,0,0.1) -- if only THIS of
+    # my four shows, a texture is mandatory and I must texture every building.
+    bxt = c3d.make_box("ZZ_MYBOXT", 24, 24, 0, 40,
+                       texture="landscapes/MacedoniaSkopje/world/textures/G8a.dds",
+                       material=(1.0, 1.0, 1.0, 1.0, 0.0, 0.1))
+    c3d.write_c3d(c3d.C3DFile(objects=[bxt]), OBJDIR / "ZZ_MYBOXT.c3d")
+    recs.append(record("ZZ_MYBOXT.c3d", E0 + 270, N0, z))
+    print(f"  airport tests @ {E0:.0f},{N0:.0f}: ZZ_CONTROL(grey,sl2) ZZ_MYPRISM(red,+90) "
+          f"ZZ_MYBOX(white,+180) ZZ_MYBOXT(textured,+270)")
 
 
 def main():
     OBJDIR.mkdir(parents=True, exist_ok=True)
-    for old in list(OBJDIR.glob("blk*.c3d")) + list(OBJDIR.glob("b[0-9]*.c3d")):
+    for old in (list(OBJDIR.glob("blk*.c3d")) + list(OBJDIR.glob("b[0-9]*.c3d"))
+                + list(OBJDIR.glob("ZZ_*.c3d"))):
         old.unlink()
-    print(f"DEM sanity: central Skopje alt={altitude(534900,4649000):.0f} m, "
-          f"Vodno alt={altitude(*[float(v) for v in __import__('pyproj').Transformer.from_crs('EPSG:4326','EPSG:32634',always_xy=True).transform(21.40978,41.96369)]):.0f} m")
+    copy_tex()
     recs = []
     nb = place_buildings(recs)
-    place_millennium_cross(recs)
+    place_cross(recs)
+    place_airport_tests(recs)
     OBJFILE.write_bytes(b"".join(recs))
-    print(f"placed {nb} buildings + 1 landmark = {len(recs)} records -> {OBJFILE} "
-          f"({OBJFILE.stat().st_size} bytes)")
+    print(f"placed {nb} buildings(textured) + cross(untextured) + 1 control = "
+          f"{len(recs)} records -> {OBJFILE.stat().st_size} B")
+    print(f"World/Textures now has {len(list(WTEX.glob('*.dds')))} dds")
 
 
 if __name__ == "__main__":

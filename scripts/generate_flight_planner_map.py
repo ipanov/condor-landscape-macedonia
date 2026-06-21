@@ -99,38 +99,57 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "condor-landscape/1.0"
 
 # ---------------------------------------------------------------------------
-# Colour / style definitions (RGB), measured from Slovenia2.bmp
+# Colour / style definitions (RGB)
 # ---------------------------------------------------------------------------
-# Cool, desaturated green -> khaki -> cream hypsometric ramp. Macedonia/Skopje
-# DEM range ~194..2489 m, so the stops span that band. Interpolated linearly.
+# HYPSOMETRIC RAMP — a clean, saturated Bartholomew / ICAO-VFR topographic
+# gradient: green lowland -> yellow-green -> tan -> brown highland -> pale grey
+# peaks.  This is the conventional cartographic scheme (green 0-1000 m, browns
+# 1000-2700 m, near-white above) used by ICAO Annex 4 Appendix 4 hypsometric
+# tints and the wiki-2.0 / Patterson-Jenny cross-blended palettes.
+#
+# WHY NOT copy Slovenia2's tint:  decoding Slovenia2.bmp against its .trn shows
+# its terrain tint is a near-CONSTANT green-grey (~150,175,150) at EVERY
+# elevation 0..2400 m -- all of its green->cream variation is the HILLSHADE, not
+# a hypsometric ramp.  The brief calls for a real green->brown ramp over the
+# landscape's actual range (NM 0..2741 m, Skopje ~194..2489 m), so we use proper
+# elevation tints AND a strong wide hillshade (the Slovenia2 lesson) for crisp,
+# readable relief instead of the previous muddy cool-grey wash.  Interpolated
+# linearly between stops; values below the first / above the last stop clamp.
 ELEV_STOPS: list[tuple[float, tuple[int, int, int]]] = [
-    (150.0,  (120, 150, 138)),   # valley floor: cool grey-green
-    (300.0,  (135, 162, 145)),
-    (500.0,  (158, 178, 152)),
-    (750.0,  (185, 198, 165)),
-    (1050.0, (210, 219, 178)),
-    (1400.0, (236, 242, 192)),
-    (1800.0, (250, 252, 208)),   # high: pale cream
-    (2500.0, (252, 250, 220)),
+    (0.0,    (150, 188, 130)),   # sea level / river plain: saturated green  (#96bc82)
+    (250.0,  (156, 192, 121)),   # lowland green                              (#9cc079)
+    (500.0,  (181, 202, 120)),   # rising ground: yellow-green
+    (750.0,  (207, 209, 124)),   # foothills: yellow
+    (1000.0, (214, 192, 124)),   # straw / light tan
+    (1300.0, (198, 162, 110)),   # tan
+    (1700.0, (170, 130,  90)),   # brown highland
+    (2100.0, (138, 106,  74)),   # dark brown                                  (#8a6a4a)
+    (2450.0, (170, 150, 138)),   # rock grey-brown near the tops
+    (2750.0, (224, 222, 220)),   # peaks: pale grey-white (snow line)
 ]
 
-# Overlay colours (Slovenia2-measured)
-WATER_COLOR = np.array([21, 85, 149], dtype=np.uint8)     # opaque lake/reservoir blue
-RIVER_COLOR = np.array([40, 110, 170], dtype=np.uint8)    # river/stream blue
-URBAN_COLOR = np.array([243, 227, 16], dtype=np.uint8)    # settlement yellow
-ROAD_MAJOR_COLOR = np.array([222, 88, 44], dtype=np.uint8)      # motorway/trunk/primary orange
-ROAD_SECONDARY_COLOR = np.array([232, 150, 60], dtype=np.uint8) # secondary orange
-ROAD_MINOR_COLOR = np.array([90, 70, 60], dtype=np.uint8)       # minor dark brown
-RAILWAY_COLOR = np.array([31, 33, 32], dtype=np.uint8)         # near-black, thin
+# Overlay colours.  WATER is a readable topographic blue (lighter than a navy
+# fill so labels/relief read against it) per the brief's #5b8fb5..#7fb0d0 range.
+WATER_COLOR = np.array([95, 143, 181], dtype=np.uint8)    # lake/reservoir blue   (#5f8fb5)
+RIVER_COLOR = np.array([74, 124, 168], dtype=np.uint8)    # river/stream blue     (#4a7ca8)
+URBAN_COLOR = np.array([243, 227, 16], dtype=np.uint8)    # settlement yellow (Slovenia2-measured)
+ROAD_MAJOR_COLOR = np.array([214, 38, 32], dtype=np.uint8)     # motorway/trunk red  (ICAO major)
+ROAD_PRIMARY_COLOR = np.array([224, 84, 43], dtype=np.uint8)   # primary orange-red (Slovenia2-measured)
+ROAD_SECONDARY_COLOR = np.array([236, 146, 56], dtype=np.uint8)# secondary orange
+ROAD_MINOR_COLOR = np.array([120, 96, 78], dtype=np.uint8)     # minor brown-grey
+RAILWAY_COLOR = np.array([28, 28, 28], dtype=np.uint8)        # near-black, thin
 GRID_COLOR = np.array([90, 90, 90], dtype=np.uint8)
-AIRPORT_COLOR = np.array([220, 40, 40], dtype=np.uint8)
+AIRPORT_COLOR = np.array([200, 32, 32], dtype=np.uint8)
 
-# Hillshade parameters (measured from Slovenia2): soft so colours stay light.
+# Hillshade parameters.  Strong + WIDE like Slovenia2 (whose relief luminance
+# spans ~0.78..1.45 around the base tint) so slopes read crisply; the previous
+# 0.55..1.15 range was too dark+narrow and muddied the hue.  Multiplier range
+# here = HS_SHADE_BASE .. HS_SHADE_BASE+HS_SHADE_GAIN = 0.72 .. 1.42.
 HS_AZIMUTH = 315.0
 HS_ALTITUDE = 45.0
-HS_Z_FACTOR = 2.0
-HS_SHADE_BASE = 0.55         # shade = HS_SHADE_BASE + HS_SHADE_GAIN * hs
-HS_SHADE_GAIN = 0.60         # -> multiplier range 0.55 .. 1.15
+HS_Z_FACTOR = 1.6
+HS_SHADE_BASE = 0.72         # shade = HS_SHADE_BASE + HS_SHADE_GAIN * hs
+HS_SHADE_GAIN = 0.70         # -> multiplier range 0.72 .. 1.42 (bright sunlit faces)
 
 BOUNDS_UTM = (ULXMAP, BR_NORTHING, BR_EASTING, ULYMAP)
 
@@ -308,7 +327,18 @@ def project_features(fc: dict):
     for feat in fc.get("features", []):
         try:
             geom = shapely_transform(_trans, shape(feat.get("geometry")))
-            if geom and not geom.is_empty and geom.is_valid:
+            if geom is None or geom.is_empty:
+                continue
+            # Repair self-intersecting polygons (common in OSM lake/reservoir
+            # relations -- e.g. Ohrid/Prespa/Dojran are invalid MultiPolygons in
+            # the raw data). buffer(0) heals the topology; WITHOUT this the
+            # invalid lakes were silently dropped and never rendered blue. Lines
+            # are kept as-is (buffer(0) would erase them).
+            if geom.geom_type in ("Polygon", "MultiPolygon") and not geom.is_valid:
+                fixed = geom.buffer(0)
+                if not fixed.is_empty:
+                    geom = fixed
+            if not geom.is_empty:
                 geoms.append(geom)
                 props.append(feat.get("properties", {}))
         except Exception:
@@ -451,7 +481,11 @@ def colorize_elevation(dem: np.ndarray) -> np.ndarray:
 
 
 def hillshade(dem: np.ndarray, cellsize: float) -> np.ndarray:
-    """Soft analytical hillshade multiplier in 0.55 .. 1.15 (light, not dark)."""
+    """Analytical hillshade multiplier in HS_SHADE_BASE .. BASE+GAIN.
+
+    Strong + wide (0.72..1.42) so slopes read crisply, matching the Slovenia2
+    relief whose luminance spans ~0.78..1.45 around its base tint.
+    """
     dy, dx = np.gradient(dem * HS_Z_FACTOR, cellsize, cellsize)
     slope = np.pi / 2.0 - np.arctan(np.hypot(dx, dy))
     aspect = np.arctan2(-dx, dy)
@@ -460,6 +494,26 @@ def hillshade(dem: np.ndarray, cellsize: float) -> np.ndarray:
     hs = np.sin(alt) * np.sin(slope) + np.cos(alt) * np.cos(slope) * np.cos(az - aspect)
     hs = np.clip(hs, 0.0, 1.0)
     return HS_SHADE_BASE + HS_SHADE_GAIN * hs
+
+
+def apply_relief(relief: np.ndarray, shade: np.ndarray) -> np.ndarray:
+    """Combine the hypsometric tint with the hillshade, keeping hue readable.
+
+    A plain ``tint * shade`` darkens fine but a bright multiplier just scales the
+    green/brown up until it clips, which muddies the hue.  Instead we keep the
+    multiply for the SHADOW half (shade < 1, slopes darken naturally) and, for
+    the LIT half (shade > 1), blend the tint toward warm white -- exactly how
+    Slovenia2's sunlit faces go to a desaturated cream rather than a saturated
+    bright green.  Result: saturated valleys, crisp sunlit ridgelines, no mud.
+    """
+    relief = relief.astype(np.float32)
+    s = shade[..., None].astype(np.float32)
+    lit = np.maximum(s - 1.0, 0.0)          # 0 .. ~0.42 on sunlit faces
+    dark = np.minimum(s, 1.0)               # <=1 in shadow
+    warm_white = np.array([252.0, 250.0, 235.0], dtype=np.float32)
+    out = relief * dark                      # shadows: straight multiply
+    out = out + (warm_white - out) * (lit * 0.78)  # highlights: lift toward cream
+    return np.clip(out, 0, 255).astype(np.uint8)
 
 
 # ---------------------------------------------------------------------------
@@ -594,69 +648,112 @@ def draw_airports(width: int, height: int) -> Image.Image:
     return layer
 
 
+def _population(prop: dict) -> int:
+    """Parse the OSM population tag to an int, 0 if missing/garbage."""
+    raw = prop.get("population")
+    if not raw:
+        return 0
+    try:
+        return int(str(raw).replace(" ", "").replace(",", "").split(".")[0])
+    except Exception:
+        return 0
+
+
 def draw_place_markers(geoms, props, width, height) -> Image.Image:
-    """Draw city/town dots with name labels (dark text, light halo)."""
+    """Draw settlement dots (yellow, sized by population) with bold name labels.
+
+    Cartography per docs/quality-standards.md: yellow settlement dots scaled by
+    population, bold legible city/town labels.  On the country-scale NM map only
+    the significant places are labelled (all cities+towns, plus villages above a
+    population threshold) so the chart does not drown in ~3000 toponyms; the
+    small Skopje map labels cities/towns/villages.  Dot/label sizes are driven by
+    DOWNSCALE so they look the same at either master resolution.
+    """
     from PIL import ImageFont
     layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     if not geoms:
         return layer
     draw = ImageDraw.Draw(layer)
 
-    font_city = font_town = font_village = None
-    try:
-        bold = Path("C:/Windows/Fonts/arialbd.ttf")
-        regular = Path("C:/Windows/Fonts/arial.ttf")
-        if bold.exists():
-            font_city = ImageFont.truetype(str(bold), max(14, width // 90))
-            font_town = ImageFont.truetype(str(bold), max(11, width // 130))
-        if regular.exists():
-            font_village = ImageFont.truetype(str(regular), max(9, width // 170))
-    except Exception:
-        pass
+    # Fonts sized off DOWNSCALE (master is DOWNSCALE x final), so a city label is
+    # ~17 px and a village ~10 px at the final 768/2048-row scale.
+    bold = Path("C:/Windows/Fonts/arialbd.ttf")
+    regular = Path("C:/Windows/Fonts/arial.ttf")
+    bpath = str(bold) if bold.exists() else (str(regular) if regular.exists() else None)
+    rpath = str(regular) if regular.exists() else bpath
+
+    def _font(path, px):
+        try:
+            return ImageFont.truetype(path, px) if path else None
+        except Exception:
+            return None
+
+    font_city = _font(bpath, 17 * DOWNSCALE)
+    font_town = _font(bpath, 12 * DOWNSCALE)
+    font_village = _font(rpath, 9 * DOWNSCALE)
+
+    YELLOW = (243, 218, 40)          # settlement dot fill
+    OUTLINE = (40, 40, 40, 235)
+
+    # On NM, only label villages with at least this population (towns/cities
+    # always labelled); on Skopje, label every village.
+    village_label_floor = 2500 if _NM else 0
 
     def _halo_text(tx, ty, name, font, text_color):
-        # Light halo (8-neighbour) for readability over relief, then dark text.
-        halo = (250, 250, 250, 200)
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
+        halo = (252, 252, 250, 210)
+        off = max(1, DOWNSCALE - 1)
+        for dx in (-off, 0, off):
+            for dy in (-off, 0, off):
                 if dx or dy:
                     draw.text((tx + dx, ty + dy), name, font=font, fill=halo)
         draw.text((tx, ty), name, font=font, fill=text_color)
 
-    for geom, prop in zip(geoms, props):
+    # Draw the biggest places last so their labels sit on top.
+    order = sorted(
+        range(len(geoms)),
+        key=lambda i: ({"city": 3, "town": 2, "village": 1}.get(props[i].get("place", ""), 0),
+                       _population(props[i])),
+    )
+
+    for i in order:
+        geom, prop = geoms[i], props[i]
         if geom.geom_type != "Point":
             continue
         x, y = _utm_to_px(geom.x, geom.y, width, height)
         place = prop.get("place", "")
         name = prop.get("name", prop.get("name:en", ""))
+        pop = _population(prop)
 
         if place == "city":
-            r = max(4, 2 * DOWNSCALE)
-            dot_color = (40, 40, 40, 230)
+            # radius grows with population (sqrt), clamped.
+            r = int(min(7, 4 + (pop / 120000.0) ** 0.5 * 4)) * DOWNSCALE // 2
+            r = max(3 * DOWNSCALE // 2, r)
             font = font_city
-            text_color = (25, 25, 25, 245)
+            text_color = (20, 20, 20, 250)
+            do_label = True
         elif place == "town":
-            r = max(3, DOWNSCALE + 1)
-            dot_color = (60, 60, 60, 210)
+            r = max(2 * DOWNSCALE // 2, int(2 + (pop / 30000.0) ** 0.5 * 2) * DOWNSCALE // 2)
             font = font_town
-            text_color = (35, 35, 35, 230)
+            text_color = (30, 30, 30, 240)
+            do_label = True
         elif place == "village":
-            r = max(2, DOWNSCALE)
-            dot_color = (80, 80, 80, 170)
+            r = max(1, DOWNSCALE - 1)
             font = font_village
-            text_color = (55, 55, 55, 200)
+            text_color = (45, 45, 45, 225)
+            do_label = pop >= village_label_floor
         else:
             continue  # skip hamlets/other to avoid clutter
 
         draw.ellipse(
             [(x - r, y - r), (x + r, y + r)],
-            fill=dot_color,
-            outline=(0, 0, 0, 210),
+            fill=YELLOW,
+            outline=OUTLINE,
+            width=max(1, DOWNSCALE - 1),
         )
 
-        if name and font and place in ("city", "town", "village"):
-            tx = x + r + 3
-            ty = y - r - 2
+        if name and font and do_label:
+            tx = x + r + 2 * DOWNSCALE
+            ty = y - r - DOWNSCALE
             _halo_text(tx, ty, name, font, text_color)
 
     return layer
@@ -668,22 +765,27 @@ def draw_place_markers(geoms, props, width, height) -> Image.Image:
 def road_width(prop: dict, scale: float) -> int:
     cls = prop.get("highway", "")
     base = {
-        "motorway": 4, "trunk": 4, "primary": 3,
+        "motorway": 6, "motorway_link": 4, "trunk": 6, "trunk_link": 4,
+        "primary": 4, "primary_link": 3,
         "secondary": 3, "tertiary": 2, "unclassified": 2,
-        "residential": 2, "living_street": 2, "service": 2,
-        "track": 2, "path": 1, "cycleway": 1,
+        "residential": 2, "living_street": 2, "service": 1,
+        "track": 1, "path": 1, "cycleway": 1,
         "pedestrian": 2, "road": 2,
     }.get(cls, 2)
-    return max(2, int(round(base * scale)))
+    # Minor tracks/paths/service collapse to 1 px at final scale (declutter);
+    # everything else stays >= 2 px so it survives the LANCZOS downsample.
+    floor = 1 if cls in ("track", "path", "cycleway", "service") else 2
+    return max(floor, int(round(base * scale)))
 
 
 def road_color(prop: dict) -> np.ndarray:
     cls = prop.get("highway", "")
-    if cls in ("motorway", "motorway_link", "trunk", "trunk_link",
-               "primary", "primary_link"):
-        return ROAD_MAJOR_COLOR
+    if cls in ("motorway", "motorway_link", "trunk", "trunk_link"):
+        return ROAD_MAJOR_COLOR        # bold red highways
+    if cls in ("primary", "primary_link"):
+        return ROAD_PRIMARY_COLOR      # primary orange-red
     if cls in ("secondary", "secondary_link"):
-        return ROAD_SECONDARY_COLOR
+        return ROAD_SECONDARY_COLOR    # secondary orange
     return ROAD_MINOR_COLOR
 
 
@@ -707,40 +809,62 @@ def generate_master(width: int, height: int, layers: dict) -> Image.Image:
     bounds = BOUNDS_UTM
     print(f"\n[Map] Generating {width}x{height} master (scale={scale:.3f})...")
 
-    # Relief + soft hillshade
+    # Relief = hypsometric tint + strong wide hillshade (hue kept readable).
     dem = load_dem(width, height)
     relief = colorize_elevation(dem)
     cellsize = (bounds[2] - bounds[0]) / width
     shade = hillshade(dem, cellsize)
-    base = (relief.astype(np.float32) * shade[..., None]).clip(0, 255).astype(np.uint8)
+    base = apply_relief(relief, shade)
 
     # Composite order:
     #   relief+hillshade -> water -> rivers -> settlements -> minor roads ->
     #   secondary -> major roads -> railways -> grid -> labels -> airports
     print("[Render] Compositing layers...")
 
-    # Water polygons (opaque)
+    # Water polygons (opaque blue). Drop tiny ponds at country scale so the map
+    # stays clean; keep everything for the small Skopje map.
+    water_geoms = layers["water"][0]
+    if _NM:
+        min_area = 80_000.0  # m^2 (~0.08 km^2): keep lakes/reservoirs, drop ponds
+        water_geoms = [g for g in water_geoms if g.area >= min_area]
     base = _blend(base, rasterize_polygon_layer(
-        layers["water"][0], bounds, width, height, WATER_COLOR, 1.0, "water"))
+        water_geoms, bounds, width, height, WATER_COLOR, 1.0, "water"))
 
-    # Rivers / streams
+    # Rivers / streams (blue lines by importance). At country scale, streams are
+    # noise -> draw rivers + canals only; the Skopje map keeps streams too.
+    wj_geoms, wj_props = layers["waterways"]
+    if _NM:
+        keep = [i for i, p in enumerate(wj_props)
+                if p.get("waterway", "") in ("river", "canal")]
+        wj_geoms = [wj_geoms[i] for i in keep]
+        wj_props = [wj_props[i] for i in keep]
     base = _blend(base, draw_line_layer(
-        layers["waterways"][0], layers["waterways"][1], width, height,
+        wj_geoms, wj_props, width, height,
         lambda p: river_width(p, scale), lambda p: RIVER_COLOR, "rivers/streams"))
 
     # Settlements (yellow, semi-opaque)
     base = _blend(base, rasterize_polygon_layer(
         layers["settlements"][0], bounds, width, height, URBAN_COLOR, 0.72, "settlements"))
 
-    # Roads, drawn minor -> secondary -> major so majors stay on top.
+    # Roads. Classify into minor / secondary / primary / highway and draw from
+    # least to most important so highways stay on top. Clutter classes
+    # (track/path/cycleway/service) are dropped -- they have no place on a
+    # flight-planner chart and dominate the country-scale OSM extract.
     road_geoms, road_props = layers["roads"]
-    minor_idx, sec_idx, major_idx = [], [], []
+    SKIP = {"track", "path", "cycleway", "service"}
+    HIWAY = {"motorway", "motorway_link", "trunk", "trunk_link"}
+    PRIMARY = {"primary", "primary_link"}
+    SECONDARY = {"secondary", "secondary_link"}
+    minor_idx, sec_idx, prim_idx, hi_idx = [], [], [], []
     for i, p in enumerate(road_props):
         cls = p.get("highway", "")
-        if cls in ("motorway", "motorway_link", "trunk", "trunk_link",
-                   "primary", "primary_link"):
-            major_idx.append(i)
-        elif cls in ("secondary", "secondary_link"):
+        if cls in SKIP:
+            continue
+        if cls in HIWAY:
+            hi_idx.append(i)
+        elif cls in PRIMARY:
+            prim_idx.append(i)
+        elif cls in SECONDARY:
             sec_idx.append(i)
         else:
             minor_idx.append(i)
@@ -748,15 +872,11 @@ def generate_master(width: int, height: int, layers: dict) -> Image.Image:
     def _subset(idxs):
         return [road_geoms[i] for i in idxs], [road_props[i] for i in idxs]
 
-    g, pr = _subset(minor_idx)
-    base = _blend(base, draw_line_layer(g, pr, width, height,
-                  lambda p: road_width(p, scale), road_color, "minor roads"))
-    g, pr = _subset(sec_idx)
-    base = _blend(base, draw_line_layer(g, pr, width, height,
-                  lambda p: road_width(p, scale), road_color, "secondary roads"))
-    g, pr = _subset(major_idx)
-    base = _blend(base, draw_line_layer(g, pr, width, height,
-                  lambda p: road_width(p, scale), road_color, "major roads"))
+    for idxs, label in ((minor_idx, "minor roads"), (sec_idx, "secondary roads"),
+                        (prim_idx, "primary roads"), (hi_idx, "highways")):
+        g, pr = _subset(idxs)
+        base = _blend(base, draw_line_layer(g, pr, width, height,
+                      lambda p: road_width(p, scale), road_color, label))
 
     # Railways (near-black, thin) -- above roads
     base = _blend(base, draw_line_layer(

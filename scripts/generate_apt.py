@@ -47,7 +47,22 @@ def encode_airport(ap: dict, index: int) -> bytes:
     lat = float(rwy.get("center_lat", ap["lat"]))
     lon = float(rwy.get("center_lon", ap["lon"]))
     elev = float(ap["elevation_m"])
-    rwdir = int(round(rwy["true_heading"]))
+    # Heading is stored as DEGREES x 1000 (verified vs Northern_Greece.apt, whose
+    # Macedonian airports read 119320, 122100, ...). Whole degrees lose ~0.5 deg =
+    # several metres of lateral spawn error. Use the exact UTM-grid azimuth from the
+    # runway ENDS (the projection the ortho/painted runway lives in), not the chart
+    # true-north heading, so the .apt axis overlies the painted runway.
+    ends = rwy.get("ends")
+    if ends and len(ends) >= 2:
+        import math as _m
+        from pyproj import Transformer as _T
+        _tx = _T.from_crs("EPSG:4326", "EPSG:32634", always_xy=True)
+        _a = _tx.transform(ends[0]["lon"], ends[0]["lat"])
+        _b = _tx.transform(ends[1]["lon"], ends[1]["lat"])
+        _az = _m.degrees(_m.atan2(_b[0] - _a[0], _b[1] - _a[1])) % 360.0
+    else:
+        _az = float(rwy["true_heading"])
+    rwdir = int(round(_az * 1000.0))
     # Condor spawns a ground start ~170 m IN from the .apt runway end (into wind),
     # NOT at the threshold. Extend the declared length by ~340 m (2x170) so the
     # spawn lands on the REAL threshold; the flattened plateau (flatten_runways.py)

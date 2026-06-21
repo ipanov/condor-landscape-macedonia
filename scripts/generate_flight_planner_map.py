@@ -46,7 +46,12 @@ from shapely.geometry import LineString, shape
 from shapely.ops import transform as shapely_transform
 from tqdm import tqdm
 
-# Condor landscape calibration (UTM 34N)
+# Condor landscape calibration (UTM 34N). Grid-driven via condor_grid:
+# CONDOR_LANDSCAPE switches skopje (768x768 .bmp) <-> nm (2560x2048 .bmp). The
+# .bmp MUST match the .trn overview dimensions (patches x 64); the script renders
+# at a 3x master then LANCZOS-downsamples. BOUNDS_UTM is derived from the grid so
+# relief + OSM overlays register pixel-perfectly for either landscape.
+import condor_grid as _g
 from condor_grid import (
     BR_EASTING,
     BR_NORTHING,
@@ -57,25 +62,38 @@ from condor_grid import (
     WGS84_CRS,
     ULXMAP,
     ULYMAP,
+    LANDSCAPE_NAME,
 )
 from rasterize import rasterize_mask
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-# Canonical exactly-30 m DEM: int16, 2305x2305, NW pixel-centre 506880/4700160,
-# negatives/NoData clamped to 0. Its SE corner is 576000/4631040, which is
-# exactly BOUNDS_UTM below -> relief and OSM overlays register pixel-perfectly.
-DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
-DEM_N = 2305
-DEM_CELL_M = 30.0
-OSM_DIR = PROJECT_ROOT / ".sandbox" / "osm"
-OUT_DIR = PROJECT_ROOT / "output" / "maps"
-AIRPORTS_JSON = PROJECT_ROOT / "data" / "airports.json"
+_NM = LANDSCAPE_NAME == "NorthMacedonia"
 
-# Output sizes. MASTER is an exact 3x multiple of 768 so the LANCZOS downsample
-# is clean and line-width scaling is predictable (a 6 px master line -> 2 px).
-LOW_SIZE = 768
-MASTER_SIZE = 2304          # 3 x 768
-DOWNSCALE = MASTER_SIZE // LOW_SIZE   # = 3
+# Canonical exactly-30 m DEM (int16, patches*192+1 per side, NW pixel-centre =
+# ULXMAP/ULYMAP, negatives/NoData clamped to 0). Its extent equals BOUNDS_UTM, so
+# a straight resize keeps relief registered with the OSM overlays.
+#   skopje: macedonia_skopje_dem_30m_2305.raw  (2305x2305)
+#   nm    : northmacedonia_dem_30m_7681x6145.raw (7681x6145)
+if _NM:
+    DEM_PATH = PROJECT_ROOT / "sources" / "dem" / f"northmacedonia_dem_30m_{_g.WIDTH}x{_g.HEIGHT}.raw"
+else:
+    DEM_PATH = PROJECT_ROOT / "sources" / "dem" / "macedonia_skopje_dem_30m_2305.raw"
+DEM_W = _g.WIDTH
+DEM_H = _g.HEIGHT
+DEM_CELL_M = 30.0
+# Per-landscape OSM cache (download_osm_nm.py writes .sandbox/osm_nm for NM).
+OSM_DIR = PROJECT_ROOT / ".sandbox" / ("osm_nm" if _NM else "osm")
+OUT_DIR = PROJECT_ROOT / "output" / "maps"
+AIRPORTS_JSON = PROJECT_ROOT / "data" / ("airports_nm.json" if _NM else "airports.json")
+
+# Output sizes = .trn overview (patches x 64). MASTER is an exact 3x multiple per
+# axis so the LANCZOS downsample is clean and line-width scaling is predictable
+# (a 6 px master line -> 2 px). NM is non-square (2560x2048).
+LOW_W = _g.PATCHES_X * 64          # skopje 768 ; nm 2560
+LOW_H = _g.PATCHES_Y * 64          # skopje 768 ; nm 2048
+DOWNSCALE = 3
+MASTER_W = LOW_W * DOWNSCALE        # skopje 2304 ; nm 7680
+MASTER_H = LOW_H * DOWNSCALE        # skopje 2304 ; nm 6144
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "condor-landscape/1.0"
@@ -385,27 +403,29 @@ def load_osm_layers() -> dict:
 # ---------------------------------------------------------------------------
 # DEM / relief
 # ---------------------------------------------------------------------------
-def load_dem(size: int) -> np.ndarray:
-    """Read the canonical 30 m int16 DEM and resample to ``size``x``size``.
+def load_dem(out_w: int, out_h: int) -> np.ndarray:
+    """Read the canonical 30 m int16 DEM and resample to ``out_w``x``out_h``.
 
-    The DEM's geographic extent equals BOUNDS_UTM exactly (NW pixel-centre
-    506880/4700160, 2305 px, 30 m -> SE 576000/4631040), so a straight resize
-    keeps relief registered with the OSM overlays. Negatives/NoData are clamped
-    to 0 (per the DEM header).
+    The DEM's geographic extent equals BOUNDS_UTM exactly (NW pixel-centre =
+    ULXMAP/ULYMAP, patches*192+1 px, 30 m), so a straight resize keeps relief
+    registered with the OSM overlays. Negatives/NoData are clamped to 0 (per the
+    DEM header). Both axes are resampled independently so non-square (NM) maps
+    stay registered.
     """
-    print(f"[DEM] Reading {DEM_PATH.name} ({DEM_N}x{DEM_N} int16) and resampling to {size}x{size}...")
+    print(f"[DEM] Reading {DEM_PATH.name} ({DEM_W}x{DEM_H} int16) and resampling to {out_w}x{out_h}...")
     raw = np.fromfile(DEM_PATH, dtype="<i2")
-    if raw.size != DEM_N * DEM_N:
+    if raw.size != DEM_W * DEM_H:
         raise ValueError(
-            f"DEM {DEM_PATH} has {raw.size} samples, expected {DEM_N*DEM_N} "
-            f"({DEM_N}x{DEM_N})"
+            f"DEM {DEM_PATH} has {raw.size} samples, expected {DEM_W*DEM_H} "
+            f"({DEM_W}x{DEM_H})"
         )
-    dem = raw.astype(np.float32).reshape(DEM_N, DEM_N)
+    dem = raw.astype(np.float32).reshape(DEM_H, DEM_W)
     dem = np.where(dem < 0, 0.0, dem)
 
-    if size != DEM_N:
+    if (out_w, out_h) != (DEM_W, DEM_H):
         # Bilinear resample via Pillow F-mode (float32) for a smooth relief.
-        dem_img = Image.fromarray(dem, mode="F").resize((size, size), Image.Resampling.BILINEAR)
+        # PIL.resize takes (width, height).
+        dem_img = Image.fromarray(dem, mode="F").resize((out_w, out_h), Image.Resampling.BILINEAR)
         dem = np.asarray(dem_img, dtype=np.float32)
     print(f"[DEM] Elevation range: {dem.min():.0f} - {dem.max():.0f} m")
     return dem
@@ -681,15 +701,14 @@ def railway_width(prop: dict, scale: float) -> int:
 # ---------------------------------------------------------------------------
 # Main map generation
 # ---------------------------------------------------------------------------
-def generate_master(size: int, layers: dict) -> Image.Image:
+def generate_master(width: int, height: int, layers: dict) -> Image.Image:
     """Render the full map at the master resolution (RGB)."""
-    width = height = size
-    scale = size / MASTER_SIZE
+    scale = width / MASTER_W   # 1.0 at master; keeps line-width scaling correct
     bounds = BOUNDS_UTM
     print(f"\n[Map] Generating {width}x{height} master (scale={scale:.3f})...")
 
     # Relief + soft hillshade
-    dem = load_dem(size)
+    dem = load_dem(width, height)
     relief = colorize_elevation(dem)
     cellsize = (bounds[2] - bounds[0]) / width
     shade = hillshade(dem, cellsize)
@@ -761,23 +780,23 @@ def main():
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     print("=" * 60)
-    print("Generating Slovenia2-style topographic flight planner map")
+    print(f"Generating Slovenia2-style topographic flight planner map: {LANDSCAPE_NAME}")
     print(f"Bounds UTM34: {BOUNDS_UTM}")
-    print(f"Master {MASTER_SIZE}x{MASTER_SIZE} -> {LOW_SIZE}x{LOW_SIZE} (x{DOWNSCALE})")
+    print(f"Master {MASTER_W}x{MASTER_H} -> {LOW_W}x{LOW_H} (x{DOWNSCALE})")
     print("=" * 60)
 
     layers = load_osm_layers()
 
     # High-res master
-    img_master = generate_master(MASTER_SIZE, layers)
-    master_path = OUT_DIR / f"MacedoniaSkopje_{MASTER_SIZE}.bmp"
+    img_master = generate_master(MASTER_W, MASTER_H, layers)
+    master_path = OUT_DIR / f"{LANDSCAPE_NAME}_{MASTER_W}x{MASTER_H}.bmp"
     img_master.save(master_path, format="BMP")
     print(f"[Out] Saved master map: {master_path} "
           f"({master_path.stat().st_size / (1024*1024):.1f} MB)")
 
-    # Condor-sized downsample (must match .trn dimensions: 768x768, 32-bit).
-    img_low = img_master.resize((LOW_SIZE, LOW_SIZE), Image.Resampling.LANCZOS)
-    low_path = OUT_DIR / "MacedoniaSkopje.bmp"
+    # Condor-sized downsample (must match .trn dimensions, 32-bit).
+    img_low = img_master.resize((LOW_W, LOW_H), Image.Resampling.LANCZOS)
+    low_path = OUT_DIR / f"{LANDSCAPE_NAME}.bmp"
     # RGB -> RGBA -> BMP: Pillow writes a 32-bit bottom-up Windows BMP with the
     # correct channel order. Do NOT hand-pack BGRA bytes.
     img_low.convert("RGBA").save(low_path, format="BMP")
@@ -785,7 +804,7 @@ def main():
           f"({low_path.stat().st_size:,} bytes)")
 
     # Install into the Condor landscape, backing up the existing file first.
-    installed = Path("C:/Condor2/Landscapes/MacedoniaSkopje/MacedoniaSkopje.bmp")
+    installed = Path(f"C:/Condor2/Landscapes/{LANDSCAPE_NAME}/{LANDSCAPE_NAME}.bmp")
     if installed.parent.exists():
         if installed.exists():
             backup = installed.with_suffix(".bmp.bak")

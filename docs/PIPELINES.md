@@ -34,6 +34,64 @@ east edge, `r=0` is the south edge. Files: heightmaps `hCCRR.tr3`, textures
 
 ---
 
+## 0a. Mandatory build sequence + completeness gate (read this first)
+
+A landscape ships **all of its files or none of it works**. The NorthMacedonia
+landscape once shipped without its `.bmp`/`.tdm`/`.cup`, so the flight planner
+couldn't display or fly it — caused by hand-running individual generators (some
+hard-coded to the wrong landscape) instead of the orchestrator. Don't do that.
+There is ONE build entry point and ONE gate, both driven by `CONDOR_LANDSCAPE`:
+
+```bash
+# Build EVERYTHING in dependency order for the selected landscape:
+CONDOR_LANDSCAPE=nm python scripts/build_landscape.py                 # FAST metadata
+CONDOR_LANDSCAPE=nm python scripts/build_landscape.py --with-textures --with-forest
+CONDOR_LANDSCAPE=nm python scripts/build_landscape.py --with-all      # + DEM download
+python scripts/build_landscape.py                                    # skopje (default)
+
+# Gate: the definition of "done" (non-zero exit on any missing/STALE file):
+CONDOR_LANDSCAPE=nm python scripts/verify_landscape.py               # full
+CONDOR_LANDSCAPE=nm python scripts/verify_landscape.py --metadata-only
+```
+
+**Dependency order** (every step Condor needs to load+fly), as run by
+`scripts/build_landscape.py`:
+
+```
+dem -> trn -> tr3 -> flatten-runways -> re-tr3 -> apt -> cup -> tdm -> bmp
+    -> textures -> forest -> water-bake -> hash -> verify
+```
+
+- Each step is **idempotent + resumable**: skipped when its output exists and is
+  FRESH (newer than its inputs). `--force` re-runs; `--only/--from/--skip`
+  select; `--list`/`--dry-run` preview. Heavy stages (`dem`, `textures`,
+  `forest`, `water-bake`) are **gated** behind `--with-dem/--with-textures/
+  --with-forest/--with-all`, so the default run is the fast metadata subset.
+- `hash` = `tools/CLT2.7/LandscapeEditor.exe -hash <Name>` (the one safe headless
+  CLT CLI); it re-stamps `.tha`/`.fha` after any `.tr3`/`.for` change.
+
+**`scripts/verify_landscape.py` is the gate.** It REQUIRES (fails, never skips):
+`.ini`, `.trn`, all `.tr3` (count == patches²), `.apt`, `.cup`, `.tdm` (dims ==
+`.trn`), `.bmp` (dims == `.trn`), `.obj` (0 B allowed), `Textures/*.dds`
+(count, 2048², DXT1/DXT3) + `empty.dds`, `ForestMaps/*.for` (count), `.tha`/`.fha`
+(entries ≥ patches²), `Images/*.jpg` (≥1). It also enforces **freshness** — the
+bug this exists to catch:
+
+| File | Must be newer than | Why |
+|------|--------------------|-----|
+| `.bmp`, `.tdm` | `.trn` | map area changed → regenerate |
+| `.bmp`, `.cup` | `.apt`  | airports changed → regenerate |
+| `.tha` | newest `.tr3` | mesh changed → re-hash |
+| `.fha` | newest `.for` | forest changed → re-hash |
+
+**The lesson, as a rule:** after ANY change to the map area (DEM/`.trn`) or
+airports (`.apt`), regenerate `.bmp` + `.tdm` + `.cup` and re-hash — or the gate
+fails. A landscape is **not done** until `verify_landscape.py` passes AND the
+flight planner has been opened in-sim. Enforced by the `Stop` hook
+`.claude/hooks/verify_landscapes.sh` (see `.claude/skills/condor-landscape-build/`).
+
+---
+
 ## 1. Phase 1 — Terrain
 
 | Step | Script | Output | Size |
@@ -213,18 +271,31 @@ only expected failures until real MK glider photos are added.)
 
 ## 7. Reproduce from scratch (run order)
 
+**Canonical path — use the orchestrator** (§0a). It runs every step below in the
+right order, idempotently, for the selected landscape, and ends with the gate:
+
+```bash
+python scripts/build_landscape.py --with-all     # skopje: DEM+terrain+textures+forest+hash+verify
+CONDOR_LANDSCAPE=nm python scripts/build_landscape.py --with-all   # full North Macedonia
+```
+
+The explicit per-script sequence the orchestrator drives (handy for running one
+stage by hand; each is grid-driven via `CONDOR_LANDSCAPE` unless noted):
+
 ```bash
 # Phase 1 — terrain
-python scripts/flatten_runways.py
+python scripts/build_dem.py                     # --with-dem; Copernicus GLO-30 -> 30 m raw
 python scripts/generate_trn.py
 python scripts/generate_tr3.py
-python scripts/stage_and_verify_flat_tr3.py     # gates: seams=0, plateau, isolation
+python scripts/flatten_runways.py
+python scripts/generate_tr3.py --source <flattened raw>   # re-extract from flattened DEM
+python scripts/stage_and_verify_flat_tr3.py     # gates: seams=0, plateau, isolation (skopje)
 python scripts/generate_apt.py
-python scripts/generate_cup.py
-python scripts/generate_tdm.py
-python scripts/generate_flight_planner_map.py
+python scripts/generate_cup.py                  # turnpoints; FRESH vs .apt/.trn
+python scripts/generate_tdm.py                  # dims == .trn
+python scripts/generate_flight_planner_map.py   # .bmp; dims == .trn; FRESH vs .trn/.apt
 
-# Phase 2 — textures
+# Phase 2 — textures  (skopje scripts shown; nm uses nm_build_textures / nm_bake_water)
 python scripts/download_mk_ortho_2023_zoom11.py
 python scripts/build_patch_textures.py
 python scripts/bake_water.py
@@ -235,9 +306,15 @@ python scripts/download_forest_rasters.py
 python scripts/generate_forest_maps.py
 
 # Seal + verify
-tools/CLT2.7/LandscapeEditor.exe -hash MacedoniaSkopje
-python scripts/verify_phase1.py
+tools/CLT2.7/LandscapeEditor.exe -hash <Name>   # MacedoniaSkopje | NorthMacedonia
+python scripts/verify_landscape.py              # HARD completeness + freshness gate
 ```
+
+> The hardcoded-to-Skopje generators (`generate_tdm.py`, `generate_cup.py`,
+> `generate_flight_planner_map.py`) are now grid-driven; `verify_landscape.py`
+> supersedes `verify_phase1.py` as the ship gate (it adds the `.bmp/.tdm/.cup`
+> freshness checks). `verify_phase1.py` is retained for its detailed
+> per-airport/elevation diagnostics.
 
 ---
 

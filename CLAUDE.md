@@ -23,6 +23,7 @@ Building a photo-realistic **Condor 2 soaring simulator landscape** for **North 
 7. **No desktop disruption.** Never pop up GUI windows without explicit user approval.
 8. **Loading screens: real Macedonian glider photos ONLY.** No stock photos, no other countries, no paragliders.
 9. **Never guess formats.** Read `docs/condor_landscape_spec.md` first. When in doubt, check Slovenia2 to verify but do NOT treat it as the specification source.
+10. **A landscape is NOT done until `scripts/verify_landscape.py` passes AND the flight planner has been opened in-sim** (map renders + airborne start works). Build via the ONE orchestrator — `CONDOR_LANDSCAPE=<sel> python scripts/build_landscape.py` — never by hand-running individual generators (that is how NorthMacedonia once shipped without its `.bmp`/`.tdm`/`.cup`). **Any change to the map area (DEM/`.trn`) or airports (`.apt`) REQUIRES regenerating `.bmp` + `.tdm` + `.cup`** (then re-hash); `verify_landscape.py`'s freshness checks fail otherwise. The `Stop` hook `.claude/hooks/verify_landscapes.sh` enforces this. All generators are grid-driven via `CONDOR_LANDSCAPE` (`skopje` default, `nm` = NorthMacedonia) — see `.claude/skills/condor-landscape-build/SKILL.md` and `docs/PIPELINES.md` §0a.
 
 ## Landscape Specifications
 
@@ -52,7 +53,11 @@ Building a photo-realistic **Condor 2 soaring simulator landscape** for **North 
 
 ## Pipeline Scripts
 
-All in `scripts/`, run with `python scripts/<name>.py`.
+All in `scripts/`, run with `python scripts/<name>.py`. Everything is grid-driven via `CONDOR_LANDSCAPE` (`skopje` default, `nm` = NorthMacedonia).
+
+### Orchestrator + gate (use these, not the individual generators)
+- **`build_landscape.py`** — ONE entry point; runs every step in dependency order (`dem → trn → tr3 → flatten-runways → re-tr3 → apt → cup → tdm → bmp → textures → forest → water-bake → hash → verify`), idempotent + resumable. Heavy stages gated behind `--with-dem/--with-textures/--with-forest/--with-all`; default = fast metadata. `CONDOR_LANDSCAPE=nm python scripts/build_landscape.py`.
+- **`verify_landscape.py`** — HARD completeness + freshness gate (the definition of "done"). Fails on any missing OR stale file (`.bmp`/`.tdm`/`.cup` older than `.trn`/`.apt` ⇒ stale). `--metadata-only` for the fast subset. See `docs/PIPELINES.md` §0a and `.claude/skills/condor-landscape-build/`.
 
 ### Phase 1 — Terrain
 1. `flatten_runways.py` — Flatten runway areas in source DEM
@@ -109,10 +114,14 @@ All in `scripts/`, run with `python scripts/<name>.py`.
 
 Condor 2 runs as **elevated process** with custom DirectX UI. Standard input injection (SendInput, mouse_event, PostMessage) is blocked by UIPI. The MCP `ui_click` tool works intermittently. For visual testing, coordinate with the user for clicks, then take screenshots with `screenshot_control`. DPI scaling is 125%.
 
-## Current Status (2026-06-20)
+## Current Status (2026-06-21)
 
-**Complete & verified:** .trn (768×768/90m), .tr3 (144, anti-transpose, seams 0m, runways flattened + gated), .apt, .cup, .tdm, .bmp, .ini, DDS textures (144 @2048×2048 + 86 water-baked DXT3 + 6 colour-fixed tiles), **forest maps (144, continuous satellite-canopy algorithm, 35.2% cover, IoU 0.79 vs canopy, seam-free)**, hashes (.tha/.fha regenerated). `verify_phase1.py` → 49/52 PASS.
+**MacedoniaSkopje (12×12) — complete & verified:** .trn (768×768/90m), .tr3 (144, anti-transpose, seams 0m, runways flattened + gated), .apt, .cup, .tdm, .bmp, .ini, .obj (0 B), DDS textures (144 @2048×2048 + 86 water-baked DXT3 + 6 colour-fixed tiles), **forest maps (144, continuous satellite-canopy algorithm, 35.2% cover, IoU 0.79 vs canopy, seam-free)**, hashes (.tha/.fha), Images/. **`verify_landscape.py` → PASS (43/43, full gate).**
 
-**Needs testing:** Launch Condor (fully exit+relaunch to clear terrain cache), verify no crash, check airport positions and mesh.
+**NorthMacedonia (40×32, `CONDOR_LANDSCAPE=nm`) — complete & verified:** .trn (2560×2048), .tr3 (1280, flattened), .apt (14 airports), **.cup (14 airports), .tdm (2560×2048), .bmp (2560×2048) — newly generated (were missing)**, .ini, .obj (0 B), DDS textures (1280 @2048×2048 + water-baked), forest maps (1280), hashes (.tha/.fha), Images/ (3 TEMP placeholder jpgs — real MK glider photos pending). **`verify_landscape.py` → PASS (43/43, full gate).**
 
-**Remaining:** Loading screens (real MK glider photos — the only `verify_phase1` failures), 3D objects, complete ortho download. Then expand to full North Macedonia (see `docs/PIPELINES.md` §8).
+**Workflow now enforced:** build via `scripts/build_landscape.py` (generic orchestrator); ship-gate `scripts/verify_landscape.py` (fails on missing/stale); `Stop` hook `.claude/hooks/verify_landscapes.sh` blocks an incomplete/stale landscape from being declared done. See `docs/PIPELINES.md` §0a and `.claude/skills/condor-landscape-build/`.
+
+**Needs in-sim testing (the human/parent confirms):** open the flight planner for NorthMacedonia, confirm the map renders and an airborne start works (the disk-side gate passes; in-sim is the other half of "done").
+
+**Remaining:** real MK glider loading screens (NM + Skopje), 3D objects. Both landscapes' metadata/terrain/textures/forest are complete.

@@ -1,13 +1,36 @@
 #!/usr/bin/env python3
-"""Generate SeeYou .cup turnpoint file for MacedoniaSkopje."""
+"""Generate a SeeYou .cup turnpoint file for the selected Condor landscape.
+
+Grid-driven via condor_grid (CONDOR_LANDSCAPE switches skopje<->nm):
+  * skopje (default): the 3 pilot-area airports from data/airports.json plus a
+    curated set of city/mountain/lake landmark turnpoints. The Skopje output is
+    preserved BYTE-FOR-BYTE (the installed/verified .cup), so the default-env
+    regression stays green.
+  * nm: the 14 North-Macedonia airports from data/airports_nm.json as turnpoints
+    (each runway centre, with heading/length), giving the flight planner a usable
+    task-point set spanning the whole country. (Curated scenic turnpoints are a
+    later enrichment; airports are the minimum the planner needs.)
+
+The .cup is written to output/<NAME>.cup AND installed into the Condor landscape
+folder (C:/Condor2/Landscapes/<NAME>/<NAME>.cup) so the flight planner finds it.
+Deterministic: identical airport JSON -> byte-identical .cup.
+"""
 import json
-import math
+import shutil
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from condor_grid import LANDSCAPE_NAME  # honours CONDOR_LANDSCAPE
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-OUT = ROOT / "output" / "MacedoniaSkopje.cup"
+_NM = LANDSCAPE_NAME == "NorthMacedonia"
+
+AIRPORTS_JSON = DATA / ("airports_nm.json" if _NM else "airports.json")
+OUT = ROOT / "output" / f"{LANDSCAPE_NAME}.cup"
 OUT.parent.mkdir(parents=True, exist_ok=True)
+INSTALL = Path(f"C:/Condor2/Landscapes/{LANDSCAPE_NAME}/{LANDSCAPE_NAME}.cup")
 
 
 def dd_to_seeyou(lat, lon):
@@ -30,7 +53,8 @@ def elev_m_to_ft(m):
     return int(round(m * 3.28084))
 
 
-# Additional turnpoints: name, code, lat, lon, elev_m, style, rwdir, rwlen_m, freq, desc
+# Curated Skopje-pilot turnpoints: name, code, lat, lon, elev_m, style, rwdir,
+# rwlen_m, freq, desc. (Skopje only -- byte-identity is pinned to this list.)
 TURNPOINTS = [
     # Major cities / landmarks
     ("Skopje", "SKOPJE", 41.9981, 21.4254, 240, 1, 0, 0, "", "Capital city of North Macedonia"),
@@ -54,15 +78,9 @@ TURNPOINTS = [
 ]
 
 
-def main():
-    with open(DATA / "airports.json") as f:
-        data = json.load(f)
-
-    lines = [
-        "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,desc"
-    ]
-
-    # Add airports first
+def _airport_lines(data):
+    """Render every airport in `data` as an airfield-style .cup row."""
+    lines = []
     for ap in data["airports"]:
         lat, lon = dd_to_seeyou(ap["lat"], ap["lon"])
         elev_ft = elev_m_to_ft(ap["elevation_m"])
@@ -74,22 +92,45 @@ def main():
         name = ap["name"]
         freq = ""
         if code == "LWSK":
-            freq = "129.400"
+            # Skopje legacy used 129.400; NM JSON carries 118.1. Preserve the
+            # skopje byte-for-byte value; use the JSON freq for NM.
+            freq = "129.400" if not _NM else f"{ap.get('frequency_mhz', 0):.3f}".rstrip("0").rstrip(".")
+        elif _NM and ap.get("frequency_mhz"):
+            freq = f"{ap['frequency_mhz']:.3f}".rstrip("0").rstrip(".")
         desc = ap.get("source", "")
         lines.append(
             f'"{name}","{code}",MK,{lat},{lon},{elev_ft}ft,{style},{rwdir},{rwlen_m}m,{freq},"{desc}"'
         )
+    return lines
 
-    # Add turnpoints
-    for name, code, lat, lon, elev_m, style, rwdir, rwlen_m, freq, desc in TURNPOINTS:
-        lat_s, lon_s = dd_to_seeyou(lat, lon)
-        elev_ft = elev_m_to_ft(elev_m)
-        lines.append(
-            f'"{name}","{code}",MK,{lat_s},{lon_s},{elev_ft}ft,{style},{rwdir},{rwlen_m}m,{freq},"{desc}"'
-        )
+
+def main():
+    with open(AIRPORTS_JSON, encoding="utf-8") as f:
+        data = json.load(f)
+
+    lines = ["name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,desc"]
+    lines += _airport_lines(data)
+
+    if not _NM:
+        # Skopje: append the curated scenic turnpoints (byte-identity).
+        for name, code, lat, lon, elev_m, style, rwdir, rwlen_m, freq, desc in TURNPOINTS:
+            lat_s, lon_s = dd_to_seeyou(lat, lon)
+            elev_ft = elev_m_to_ft(elev_m)
+            lines.append(
+                f'"{name}","{code}",MK,{lat_s},{lon_s},{elev_ft}ft,{style},{rwdir},{rwlen_m}m,{freq},"{desc}"'
+            )
 
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Landscape: {LANDSCAPE_NAME}")
+    print(f"Source:    {AIRPORTS_JSON.name} ({len(data['airports'])} airports)")
     print(f"Wrote {len(lines)-1} turnpoints to {OUT}")
+
+    # Install into the Condor landscape folder so the flight planner finds it.
+    if INSTALL.parent.exists():
+        shutil.copy2(OUT, INSTALL)
+        print(f"Installed -> {INSTALL} ({INSTALL.stat().st_size:,} bytes)")
+    else:
+        print(f"WARNING: {INSTALL.parent} not found; skipped install")
 
 
 if __name__ == "__main__":

@@ -10,16 +10,25 @@ from pathlib import Path
 import pyproj
 
 # Landscape calibration (UTM 34N, EPSG:32634)
-ULXMAP = 506880.0
-ULYMAP = 4700160.0
+import os as _os
+# Landscape selection (PIPELINES.md §8): CONDOR_LANDSCAPE=nm builds the full North
+# Macedonia grid (40x32 patches, NW 447690/4694070, excludes Sofia/Pristina/
+# Thessaloniki/Tirana); default is the original 12x12 Skopje pilot. Expansion is a pure
+# reparameterisation -- every script importing condor_grid rescales automatically.
+_LS = _os.environ.get("CONDOR_LANDSCAPE", "skopje").lower()
+_NM = _LS in ("nm", "northmacedonia", "full")
+LANDSCAPE_NAME = "NorthMacedonia" if _NM else "MacedoniaSkopje"
+ULXMAP = 447690.0 if _NM else 506880.0
+ULYMAP = 4694070.0 if _NM else 4700160.0
 # EXACTLY 30 m. The DEM was previously 29.9869848156182 m/px, which drifted the
 # texture grid ~30 m from the mesh grid at the SE corner. The mesh (.trn/.tr3)
 # is built on exact 30 m, so textures must use 30 m too. NOTE: textures already
 # installed predate this fix (built on 29.987 m) — rebuild them via
 # build_patch_textures.py to get pixel-perfect mesh/texture registration.
-XDIM = 30.0
-WIDTH = 2305
-HEIGHT = 2305
+XDIM = 30.0                              # EXACTLY 30 m (a 29.987 m grid drifts mesh vs texture)
+_PX, _PY = (40, 32) if _NM else (12, 12)
+WIDTH = _PX * 192 + 1                     # skopje 2305 ; nm 7681
+HEIGHT = _PY * 192 + 1                    # skopje 2305 ; nm 6145
 
 UTM_CRS = pyproj.CRS.from_epsg(32634)
 WGS84_CRS = pyproj.CRS.from_epsg(4326)
@@ -31,10 +40,10 @@ BR_NORTHING = ULYMAP - (HEIGHT - 1) * XDIM
 # Tile / patch geometry
 TILE_SIZE_M = 23040.0  # 23.04 km
 PATCH_SIZE_M = 5760.0  # 5.76 km
-TILES_X = 3
-TILES_Y = 3
-PATCHES_X = 12
-PATCHES_Y = 12
+TILES_X = (_PX + 3) // 4
+TILES_Y = (_PY + 3) // 4
+PATCHES_X = _PX
+PATCHES_Y = _PY
 
 # Texture / mask resolutions
 TILE_MASK_SIZE = 8192

@@ -156,6 +156,19 @@ SeeYou CSV format. `DDMM.mmmH` coordinates. `m` suffix on elevation.
 | 20 | uint8 | name_length |
 | 21-151 | char[131] | c3d filename (null-padded) |
 
+**VERIFIED against Slovenia2.obj (2026-06-21) — three things the table above hides,
+each of which makes objects silently invisible if wrong:**
+- **The name MUST include the `.c3d` extension** (Slovenia2 stores `"C1R.c3d"`, len=7),
+  not the bare stem. Wrong → Condor can't resolve the model, object never appears.
+- **posZ is the ABSOLUTE terrain altitude** at the placement (Slovenia2 rec=488 m),
+  NOT 0 and NOT a height offset. Sample the DEM; posZ=0 buries objects at sea level.
+- **origin = the `.trn` HEADER easting/northing** (floats at byte 14/18 of the .trn;
+  MacedoniaSkopje = 575910 / 4631130), NOT the grid/patch corner. posX = header_E −
+  E, posY = N − header_N. Using the grid corner shifts everything by one 90 m pixel.
+- The 131-byte name field after the string is **leftover editor heap memory** (a
+  constant template of stale pointers across all records) — Condor ignores it, so
+  null-padding on write is correct.
+
 ## 12. Loading Screens
 
 - JPEG format, `Images/0.jpg` through `Images/N.jpg`.

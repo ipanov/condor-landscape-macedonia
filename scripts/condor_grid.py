@@ -76,3 +76,159 @@ def utm_to_pixel(e, n, bounds, width, height):
     px = (e - min_e) / (max_e - min_e) * width
     py = (max_n - n) / (max_n - min_n) * height
     return px, py
+
+
+# =========================================================================== #
+# AUTHORITATIVE Condor-2 object-placement transform (.obj records + .c3d).
+#
+# This block is the SINGLE SOURCE OF TRUTH for converting a real-world UTM
+# footprint into a Condor `.obj` placement record and a `.c3d` local mesh.
+# Every placement script MUST import these functions; do not re-derive the
+# constants anywhere else.
+#
+# --- HOW IT WAS CALIBRATED (observable ground truth, no guessing) ----------
+# Reverse-engineered from the Slovenia2 reference landscape (a correctly-made,
+# shipping Condor 2 landscape) on 2026-06-21:
+#   * Decoded all 7496 records of Slovenia2.obj (152-byte records:
+#     posX,posY,posZ,scale,ori_radians, u8 namelen, name incl '.c3d').
+#   * Decoded the Slovenia2.trn header: BR pixel-CENTRE = (616140, 5040540),
+#     2560x1792 @ 90 m, zone 33N.
+#   * Overlaid the decoded building objects (B1/B2/B3/B-PZ models) on the
+#     INSTALLED Slovenia2 ortho DDS at high zoom over 8 dense patches
+#     (371 buildings) and cross-correlated the markers against bright rooftops.
+#
+# --- POSITION (verified) ---------------------------------------------------
+# The naive "anchor = .trn header BR pixel CENTRE" decode put every object
+# dE=+50.6 m / dN=-45.0 m off the rooftops -- i.e. exactly HALF a 90 m TRN
+# pixel in BOTH axes (45 = 90/2). This is the ~50 m "objects are off" bug.
+# The correct anchor is the SOUTH-EAST CORNER of the BR pixel:
+#       anchor_E = BR_E + 45  (east edge of the landscape grid)
+#       anchor_N = BR_N - 45  (south edge of the landscape grid)
+#   posX = anchor_E - E      (metres WEST of the east edge)
+#   posY = N - anchor_N      (metres NORTH of the south edge)
+# After this fix the residual over 371 buildings on 6 patches is
+#   weighted-mean dE=-0.6 m, dN=+3.3 m  (median dE=0.0, dN=+2.8 m) -- i.e.
+# objects land ON the painted rooftops, within one 2.8 m texel.  (Validation
+# images: .sandbox/s2_village_tight.png  = before, off in the trees;
+#          .sandbox/s2_village_CORRECTED.png = after, on the roofs.)
+#
+# --- ORIENTATION (verified) ------------------------------------------------
+# c3d meshes are modelled with the object's reference axis along LOCAL +Y
+# (proven: every Slovenia2 airport GrassPaint runway has its long axis at
+# local azimuth 0/180 regardless of the real runway heading -- the heading is
+# applied at placement, not baked into the mesh).  `ori` is the COMPASS
+# AZIMUTH (radians, clockwise from North) that local +Y should point to in the
+# world; Slovenia2's ori values are clean whole-degree headings (0,15,74,107,
+# 147 deg...).  The world placement Condor performs is:
+#       world = ref + R(-ori) . local         (R = standard math CCW)
+#   so   local (0,1) [+Y]  ->  world (sin ori, cos ori)  == azimuth `ori`
+#        local (1,0) [+X]  ->  world (cos ori,-sin ori)  == azimuth `ori`+90
+# Verified against the Novo Mesto runway centreline (rwdir 50 deg traces the
+# painted grass: .sandbox/s2_rw_centerline.png) and B-PZ barn footprints
+# (.sandbox/s2_BPZ_final.png).
+#
+# Because the mesh reference axis is +Y, a footprint built relative to its
+# centroid in (x=East, y=North) metres needs ori=0 to appear true-north, and
+# ori = the building's long-edge azimuth to appear rotated -- footprint_to_local
+# below keeps the polygon in true E/N so the prism is NOT pre-rotated and ori
+# alone spins it.
+# =========================================================================== #
+
+# SE-corner object anchor for MacedoniaSkopje (BR pixel centre +/- half pixel).
+#
+# CRITICAL: the anchor is derived from the **.trn header BR pixel-CENTRE**, which
+# is the 90 m overview grid (768 x 90 m), NOT from BR_EASTING/BR_NORTHING above.
+# BR_EASTING/BR_NORTHING are computed from the 30 m DEM (2305 x 30 m) and are 90 m
+# different (576000 / 4631040) because a 2305@30 m grid does not share the same SE
+# corner as a 768@90 m grid. The Slovenia2 calibration was done against the .trn
+# header, so the object anchor MUST use the header values. Always prefer
+# obj_anchor_from_trn(<installed .trn>) when expanding the region.
+TRN_BR_EASTING = ULXMAP + (PATCHES_X * 64 - 1) * 90.0   # 575910.0  (.trn header BR_E)
+TRN_BR_NORTHING = ULYMAP - (PATCHES_Y * 64 - 1) * 90.0  # 4631130.0 (.trn header BR_N)
+_HALF_TRN_PX = 45.0                          # half of the 90 m TRN overview pixel
+OBJ_ANCHOR_E = TRN_BR_EASTING + _HALF_TRN_PX   # 575955.0  (grid EAST edge)
+OBJ_ANCHOR_N = TRN_BR_NORTHING - _HALF_TRN_PX  # 4631085.0 (grid SOUTH edge)
+
+# Verified Slovenia2 residual (reported so callers can cite the calibration).
+OBJ_TRANSFORM_RESIDUAL_M = (-0.6, 3.3)    # (dE, dN) weighted-mean over 371 bldgs
+
+
+def obj_anchor_from_trn(trn_path):
+    """Return the SE-corner object anchor (anchor_E, anchor_N) for ANY landscape
+    by reading its ``.trn`` header BR pixel-centre and adding the half-pixel.
+
+    Use this when the region is re-parameterised (expanded) so the anchor stays
+    derived from the actual installed header rather than a hard-coded constant.
+    """
+    import struct
+    data = Path(trn_path).read_bytes()
+    br_e, br_n = struct.unpack_from("<2f", data, 20)
+    return br_e + _HALF_TRN_PX, br_n - _HALF_TRN_PX
+
+
+def obj_record_xy(e, n, anchor=None):
+    """UTM (E, N) metres -> Condor ``.obj`` (posX, posY) placement offsets.
+
+    posX = anchor_E - E  (metres west of the grid east edge),
+    posY = N - anchor_N  (metres north of the grid south edge).
+    `anchor` defaults to the MacedoniaSkopje SE corner (OBJ_ANCHOR_E/N); pass
+    the result of obj_anchor_from_trn() for a different/expanded landscape.
+
+    VERIFIED against Slovenia2.obj: residual ~0 m on painted rooftops (the
+    earlier centre-of-pixel anchor was off by exactly +45/-45 m).
+    """
+    if anchor is None:
+        ax, ay = OBJ_ANCHOR_E, OBJ_ANCHOR_N
+    else:
+        ax, ay = anchor
+    return ax - e, n - ay
+
+
+def obj_world_xy(pos_x, pos_y, anchor=None):
+    """Inverse of :func:`obj_record_xy`: (posX, posY) -> UTM (E, N).
+
+    E = anchor_E - posX ;  N = anchor_N + posY.  Used by validators that decode
+    installed records back to the ground.
+    """
+    if anchor is None:
+        ax, ay = OBJ_ANCHOR_E, OBJ_ANCHOR_N
+    else:
+        ax, ay = anchor
+    return ax - pos_x, ay + pos_y
+
+
+def heading_deg_to_ori(azimuth_deg):
+    """Compass heading in degrees (clockwise from North) -> ``.obj`` ``ori``
+    radians, folded to [0, 2*pi).
+
+    ``ori`` is simply the azimuth in radians: Condor rotates the mesh so its
+    local +Y reference axis points to this compass bearing (world = ref +
+    R(-ori).local).  So a north-aligned model uses ori=0; a model whose long
+    axis runs 050 deg uses ori = radians(50).  VERIFIED: Slovenia2 ori values
+    are exactly whole-degree headings.
+    """
+    import math
+    return math.radians(float(azimuth_deg)) % (2.0 * math.pi)
+
+
+def heading_rad_to_ori(azimuth_rad):
+    """As :func:`heading_deg_to_ori` but the input bearing is already radians."""
+    import math
+    return float(azimuth_rad) % (2.0 * math.pi)
+
+
+def footprint_to_local(coords, centroid):
+    """Footprint exterior ring -> c3d LOCAL (x=East, y=North) metres about the
+    centroid, ready for ``c3d.make_prism`` (which extrudes it as ori=0, i.e.
+    true-north; ``ori`` then rotates the whole prism at placement).
+
+    `coords`   : iterable of (E, N) UTM vertex pairs (the building outline).
+    `centroid` : (cE, cN) UTM centroid used as the local origin.
+
+    The polygon is NOT pre-rotated -- it keeps its true plan shape in true E/N,
+    matching the Slovenia2 convention where the mesh is north-true and the only
+    rotation is the per-record ``ori``.  +x is East, +y is North, consistent
+    with the c3d vertex frame (px=E, py=N, pz=up).
+    """
+    cE, cN = centroid
+    return [(float(x) - cE, float(y) - cN) for (x, y) in coords]

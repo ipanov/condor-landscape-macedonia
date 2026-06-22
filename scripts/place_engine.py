@@ -135,6 +135,16 @@ def place_one(obj, install, search_m=30.0):
     objdir = Path(install) / "World" / "Objects"
     c3d_path = objdir / obj["c3d"]
     mf = ME.model_footprint(c3d_path)
+    fp = obj["footprint"]
+    if fp["source"] == "static":
+        # non-building objects (aircraft, monuments, towers) have no painted footprint to
+        # match -> placed at fixed OBJECT-GRID coords + heading from the manifest.
+        cE, cN = float(fp["E"]), float(fp["N"]); ori = float(fp.get("ori", 0.0))
+        scale = float(obj.get("scale", 1.0)); z = dem_alt(cE, cN)
+        col, row = patch_of(cE, cN)
+        img, affine = texture_crop(col, row, (cE, cN), max(mf["nat_L"], mf["nat_W"]) + 20, install)
+        return dict(id=obj["id"], c3d=obj["c3d"], cE=cE, cN=cN, ori=ori, scale=scale, z=z,
+                    score=1.0, col=col, row=row, mf=mf, img=img, affine=affine)
     seed, az = seed_and_prior(obj)
     scale = 1.0 if obj.get("scale_mode", "native") == "native" else float(obj.get("scale", 1.0))
     col, row = patch_of(*seed)

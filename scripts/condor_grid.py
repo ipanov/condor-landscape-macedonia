@@ -241,3 +241,94 @@ def footprint_to_local(coords, centroid):
     """
     cE, cN = centroid
     return [(float(x) - cE, float(y) - cN) for (x, y) in coords]
+
+
+# =========================================================================== #
+# OBJECT-GRID patch bounds + the texture<->object frame correction.
+#
+# THE ~45 m DRIFT (verified, see docs/OBJECT_PLACEMENT.md and the
+# reference_object_texture_grid_drift memory):
+#   * Textures are gdalwarp'd to patch_bounds_utm() == the 30 m DEM grid
+#     (SE corner BR_EASTING/BR_NORTHING = 576000/4631040 for Skopje).
+#   * Objects place on the .trn/object grid (OBJ_ANCHOR_E/N = 575955/4631085).
+#   * Constant delta = (OBJ_ANCHOR_E - BR_EASTING, OBJ_ANCHOR_N - BR_NORTHING)
+#     = (-45 E, +45 N) = -16/+16 texels on a 2048 patch.
+#
+# `patch_bounds_condor` is a SEPARATE function from `patch_bounds_utm` ON PURPOSE
+# (Codex review): DEM/.tr3 EXTRACTION depends on patch_bounds_utm, so we must NOT
+# redefine it. The Phase-0a permanent fix re-warps the RASTER layers (textures,
+# water bake, forest) to patch_bounds_condor so the painted ground lands on the
+# .trn/object grid the mesh + objects already use; then object-at-true-UTM needs
+# NO correction and the installed DDS becomes a trustworthy validation raster.
+# =========================================================================== #
+
+# (dE, dN) to add to a TRUE-UTM point to target the building as PAINTED in the
+# CURRENT (DEM-grid) installed textures. After the Phase-0a re-warp this becomes
+# (0, 0). Sign: painted = true + correction  (= true E-45, true N+45 for Skopje).
+TEXTURE_FRAME_CORRECTION = (OBJ_ANCHOR_E - BR_EASTING, OBJ_ANCHOR_N - BR_NORTHING)
+
+
+def patch_bounds_condor(patch_col, patch_row, anchor=None):
+    """Patch UTM box on the OBJECT/.trn grid (what objects + mesh use).
+
+    Same shape as patch_bounds_utm but anchored at OBJ_ANCHOR (the .trn-header SE
+    corner) instead of the 30 m-DEM SE corner. Use THIS as the gdalwarp ``-te`` for
+    the Phase-0a texture/water/forest re-warp so the painted raster shares the
+    object grid. `anchor` defaults to (OBJ_ANCHOR_E, OBJ_ANCHOR_N); pass the result
+    of obj_anchor_from_trn() for an expanded landscape.
+    """
+    ax, ay = (OBJ_ANCHOR_E, OBJ_ANCHOR_N) if anchor is None else anchor
+    e_max = ax - patch_col * PATCH_SIZE_M
+    e_min = e_max - PATCH_SIZE_M
+    n_min = ay + patch_row * PATCH_SIZE_M
+    n_max = n_min + PATCH_SIZE_M
+    return e_min, n_min, e_max, n_max
+
+
+def painted_texture_xy(e, n):
+    """Map a TRUE-UTM (E, N) to the point that lands on the building as PAINTED in
+    the CURRENT DEM-grid installed textures (applies TEXTURE_FRAME_CORRECTION).
+
+    Use for placement on TODAY's textures (target_frame='installed_texture_dem_grid').
+    After the Phase-0a re-warp, TEXTURE_FRAME_CORRECTION is (0,0) and this is identity.
+    """
+    return e + TEXTURE_FRAME_CORRECTION[0], n + TEXTURE_FRAME_CORRECTION[1]
+
+
+# --------------------------------------------------------------------------- #
+# Datum-pinned transformers (CRS sync — the user's "no projection errors" rule).
+#
+# EPSG:6316 (MGI 1901 / Balkans 7) -> 32634 defaults to a 5 m-accuracy Helmert
+# because no North-Macedonia transformation grid is installed. We PIN one
+# operation and reuse it everywhere so the texture warp and every footprint
+# reprojection share one datum realization. IMPORTANT: to place on the EXISTING
+# installed textures (built with the GDAL DEFAULT op), use pinned=False so the
+# footprint reproject is common-mode with those textures; switch to pinned=True
+# only after a re-warp that also used the pinned op. Always verify EMPIRICALLY
+# (a known cadastre point must land on the known ortho pixel) — see §4 of the doc.
+# --------------------------------------------------------------------------- #
+_CADASTRE_CRS_EPSG = 6316
+
+
+def transformer_to_utm(src_epsg, pinned=False):
+    """pyproj Transformer from `src_epsg` to UTM 34N (always_xy).
+
+    For src 4326 (OSM/MS/Overture) the datum is clean and `pinned` is irrelevant.
+    For src 6316 (cadastre/ortho) `pinned=True` requests the higher-accuracy NM
+    operation; `pinned=False` (default) uses PROJ's default op — the one the
+    installed DEM-grid textures were built with.
+    """
+    if pinned and int(src_epsg) == _CADASTRE_CRS_EPSG:
+        try:
+            # Prefer the higher-accuracy NM operation when available, restricting
+            # candidate ops to the landscape's area of use so PROJ ranks NM first.
+            from pyproj.transformer import TransformerGroup
+            aoi = pyproj.aoi.AreaOfInterest(20.45, 40.85, 23.05, 42.40)  # NM bbox
+            grp = TransformerGroup(f"EPSG:{src_epsg}", "EPSG:32634",
+                                   always_xy=True, area_of_interest=aoi)
+            if grp.transformers:
+                # transformers are ordered best-accuracy-first within the AOI
+                return grp.transformers[0]
+        except Exception:
+            pass
+    return pyproj.Transformer.from_crs(f"EPSG:{src_epsg}", UTM_CRS, always_xy=True)

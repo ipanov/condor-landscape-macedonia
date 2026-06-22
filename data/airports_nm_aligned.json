@@ -1,0 +1,500 @@
+{
+  "comment": "Full North Macedonia airfield set for the Condor 'NorthMacedonia' landscape. Coordinates WGS-84 decimal degrees; elevations metres MSL. Runway centres / ends and true headings are taken from OSM aeroway=runway geometry (endpoints transformed to UTM 34N, azimuth computed from the ends) cross-checked against OurAirports and the Macedonian eAIP. The .apt builder re-derives the whole-degree UTM-grid heading from `ends`, so the `true_heading` here is the OSM-geometry azimuth. Foreign fields inside the bbox (Kukes/Panicarevo) are intentionally excluded. The Skopje pilot's three airports keep their hand-verified eAIP geometry; the rest come from OSM. Generated 2026-06-21.",
+  "airports": [
+    {
+      "icao": "LWSK",
+      "name": "Skopje International",
+      "lat": 41.963792,
+      "lon": 21.620672,
+      "elevation_m": 238,
+      "frequency_mhz": 118.1,
+      "source": "Macedonian eAIP AD 2 LWSK (aerodrome chart true bearings + threshold coords)",
+      "runways": [
+        {
+          "designation": "16/34",
+          "length_m": 2950,
+          "width_m": 45,
+          "surface": "asphalt",
+          "true_heading": 165.43,
+          "center_lat": 41.963792,
+          "center_lon": 21.620672,
+          "ends": [
+            {
+              "designation": "16",
+              "lat": 41.97666,
+              "lon": 21.616191,
+              "elevation_m": 237.85
+            },
+            {
+              "designation": "34",
+              "lat": 41.950925,
+              "lon": 21.625153,
+              "elevation_m": 234.13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LWOH",
+      "name": "Ohrid St Paul the Apostle",
+      "lat": 41.179925,
+      "lon": 20.742237,
+      "elevation_m": 705,
+      "frequency_mhz": 119.2,
+      "source": "OSM aeroway=runway (ref 01/19) + OurAirports LWOH; eAIP elev 705 m",
+      "runways": [
+        {
+          "designation": "01/19",
+          "length_m": 2550,
+          "width_m": 45,
+          "surface": "asphalt",
+          "true_heading": 16.31,
+          "center_lat": 41.179925,
+          "center_lon": 20.742237,
+          "ends": [
+            {
+              "designation": "01",
+              "lat": 41.169045,
+              "lon": 20.737637,
+              "elevation_m": 705
+            },
+            {
+              "designation": "19",
+              "lat": 41.190815,
+              "lon": 20.746827,
+              "elevation_m": 705
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "hough+profile",
+          "_lateral_correction_m": -5.53
+        }
+      ]
+    },
+    {
+      "icao": "LWSN",
+      "name": "Stenkovec Brazda",
+      "lat": 42.059575,
+      "lon": 21.388932,
+      "elevation_m": 351,
+      "frequency_mhz": 123.5,
+      "source": "OSM aeroway=runway (ref 12/30, grass) + aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0421\u0442\u0435\u043d\u043a\u043e\u0432\u0435\u0446' ele 351 m",
+      "runways": [
+        {
+          "designation": "12/30",
+          "length_m": 1150,
+          "width_m": 50,
+          "surface": "grass",
+          "true_heading": 121.0,
+          "center_lat": 42.059575,
+          "center_lon": 21.388932,
+          "ends": [
+            {
+              "designation": "12",
+              "lat": 42.062415,
+              "lon": 21.382702,
+              "elevation_m": 351
+            },
+            {
+              "designation": "30",
+              "lat": 42.056735,
+              "lon": 21.395162,
+              "elevation_m": 351
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "verified Stenkovec fix (airports_aligned.json, in-sim)",
+          "_lateral_correction_m": -24.1
+        }
+      ]
+    },
+    {
+      "icao": "LW67",
+      "name": "Kumanovo",
+      "lat": 42.1578,
+      "lon": 21.693858,
+      "elevation_m": 371,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041a\u0443\u043c\u0430\u043d\u043e\u0432\u043e' ele 371; runway ref 12/30 grass, OurAirports length 1200 m width 43 m",
+      "runways": [
+        {
+          "designation": "12/30",
+          "length_m": 1200,
+          "width_m": 43,
+          "surface": "grass",
+          "true_heading": 127.6,
+          "center_lat": 42.1578,
+          "center_lon": 21.693858,
+          "ends": [
+            {
+              "designation": "12",
+              "lat": 42.16133,
+              "lon": 21.6878,
+              "elevation_m": 371
+            },
+            {
+              "designation": "30",
+              "lat": 42.15427,
+              "lon": 21.69992,
+              "elevation_m": 371
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LW66",
+      "name": "Prilep Malo Konjari",
+      "lat": 41.333744,
+      "lon": 21.44905,
+      "elevation_m": 620,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041f\u0440\u0438\u043b\u0435\u043f (\u041c\u0430\u043b\u043e \u041a\u043e\u045a\u0430\u0440\u0438)' ele 620; runway ref 04/22 grass, length 1060 m width 80 m",
+      "runways": [
+        {
+          "designation": "04/22",
+          "length_m": 1060,
+          "width_m": 80,
+          "surface": "grass",
+          "true_heading": 41.15,
+          "center_lat": 41.333744,
+          "center_lon": 21.44905,
+          "ends": [
+            {
+              "designation": "04",
+              "lat": 41.330334,
+              "lon": 21.44506,
+              "elevation_m": 620
+            },
+            {
+              "designation": "22",
+              "lat": 41.337154,
+              "lon": 21.45305,
+              "elevation_m": 620
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "perp_profile",
+          "_lateral_correction_m": 41.33
+        }
+      ]
+    },
+    {
+      "icao": "LW74",
+      "name": "Bitola Logovardi",
+      "lat": 41.018595,
+      "lon": 21.426555,
+      "elevation_m": 594,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041b\u043e\u0433\u043e\u0432\u0430\u0440\u0434\u0438' (Bitola gliding); runway ref 17/35 grass ~1200 m, OurAirports elev 1950 ft",
+      "runways": [
+        {
+          "designation": "17/35",
+          "length_m": 1198,
+          "width_m": 40,
+          "surface": "grass",
+          "true_heading": 168.84,
+          "center_lat": 41.018595,
+          "center_lon": 21.426555,
+          "ends": [
+            {
+              "designation": "17",
+              "lat": 41.023895,
+              "lon": 21.425205,
+              "elevation_m": 594
+            },
+            {
+              "designation": "35",
+              "lat": 41.013295,
+              "lon": 21.427895,
+              "elevation_m": 594
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "perp_profile",
+          "_lateral_correction_m": -9.02
+        }
+      ]
+    },
+    {
+      "icao": "LWPR",
+      "name": "Prilep Dolneni",
+      "lat": 41.42959,
+      "lon": 21.40217,
+      "elevation_m": 605,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041f\u0440\u0438\u043b\u0435\u043f (\u0414\u043e\u043b\u043d\u0435\u043d\u0438)'; runway ref 01/19 paved 303 m",
+      "runways": [
+        {
+          "designation": "01/19",
+          "length_m": 303,
+          "width_m": 20,
+          "surface": "asphalt",
+          "true_heading": 193.1,
+          "center_lat": 41.42959,
+          "center_lon": 21.40217,
+          "ends": [
+            {
+              "designation": "01",
+              "lat": 41.43089,
+              "lon": 21.40258,
+              "elevation_m": 605
+            },
+            {
+              "designation": "19",
+              "lat": 41.42828,
+              "lon": 21.40175,
+              "elevation_m": 605
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LW70",
+      "name": "Veles",
+      "lat": 41.75962,
+      "lon": 21.84197,
+      "elevation_m": 339,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0412\u0435\u043b\u0435\u0441'; runway ref 13/31 concrete; OurAirports elev 1112 ft",
+      "runways": [
+        {
+          "designation": "13/31",
+          "length_m": 297,
+          "width_m": 18,
+          "surface": "concrete",
+          "true_heading": 137.9,
+          "center_lat": 41.75962,
+          "center_lon": 21.84197,
+          "ends": [
+            {
+              "designation": "13",
+              "lat": 41.76058,
+              "lon": 21.84084,
+              "elevation_m": 339
+            },
+            {
+              "designation": "31",
+              "lat": 41.75866,
+              "lon": 21.8431,
+              "elevation_m": 339
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LW73",
+      "name": "Stip",
+      "lat": 41.79866,
+      "lon": 22.10959,
+      "elevation_m": 274,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0428\u0442\u0438\u043f'; runway ref 16/34 concrete; OurAirports elev 900 ft",
+      "runways": [
+        {
+          "designation": "16/34",
+          "length_m": 300,
+          "width_m": 21,
+          "surface": "concrete",
+          "true_heading": 165.1,
+          "center_lat": 41.79866,
+          "center_lon": 22.10959,
+          "ends": [
+            {
+              "designation": "16",
+              "lat": 41.79997,
+              "lon": 22.10915,
+              "elevation_m": 274
+            },
+            {
+              "designation": "34",
+              "lat": 41.79736,
+              "lon": 22.11003,
+              "elevation_m": 274
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LWST",
+      "name": "Susevo",
+      "lat": 41.759227,
+      "lon": 22.14691,
+      "elevation_m": 310,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0421\u043f\u043e\u0440\u0442\u0441\u043a\u0438 \u0430\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0421\u0443\u0448\u0435\u0432\u043e' ele 310; runway grass 950 m width 50 m",
+      "runways": [
+        {
+          "designation": "14/32",
+          "length_m": 948,
+          "width_m": 50,
+          "surface": "grass",
+          "true_heading": 143.82,
+          "center_lat": 41.759227,
+          "center_lon": 22.14691,
+          "ends": [
+            {
+              "designation": "14",
+              "lat": 41.762707,
+              "lon": 22.14361,
+              "elevation_m": 310
+            },
+            {
+              "designation": "32",
+              "lat": 41.755747,
+              "lon": 22.15022,
+              "elevation_m": 310
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "perp_profile",
+          "_lateral_correction_m": 88.74
+        }
+      ]
+    },
+    {
+      "icao": "LWNE",
+      "name": "Negotino",
+      "lat": 41.518207,
+      "lon": 22.088517,
+      "elevation_m": 181,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041d\u0435\u0433\u043e\u0442\u0438\u043d\u043e'; runway ref 14/32 grass ~564 m. Elevation set to GLO-30 DEM (181 m, flat Vardar-terrace floor) so the .apt spawn matches the flattened plateau.",
+      "runways": [
+        {
+          "designation": "14/32",
+          "length_m": 564,
+          "width_m": 40,
+          "surface": "grass",
+          "true_heading": 141.15,
+          "center_lat": 41.518207,
+          "center_lon": 22.088517,
+          "ends": [
+            {
+              "designation": "14",
+              "lat": 41.520247,
+              "lon": 22.086497,
+              "elevation_m": 181
+            },
+            {
+              "designation": "32",
+              "lat": 41.516167,
+              "lon": 22.090527,
+              "elevation_m": 181
+            }
+          ],
+          "_aligned_from_imagery": true,
+          "_align_method": "hough",
+          "_lateral_correction_m": -16.27
+        }
+      ]
+    },
+    {
+      "icao": "LWDK",
+      "name": "Demir Kapija Radnja",
+      "lat": 41.26636,
+      "lon": 22.18726,
+      "elevation_m": 960,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0414\u0435\u043c\u0438\u0440 \u041a\u0430\u043f\u0438\u0458\u0430 (\u0420\u0430\u0434\u045a\u0430)'; runway ref 02/20 grass ~458 m. The OSM point sits on a uniform 960 m plateau (Radnja, above the Vardar gorge) per GLO-30 DEM; elevation set to the DEM so the .apt spawn matches the flattened plateau.",
+      "runways": [
+        {
+          "designation": "02/20",
+          "length_m": 458,
+          "width_m": 30,
+          "surface": "grass",
+          "true_heading": 206.5,
+          "center_lat": 41.26636,
+          "center_lon": 22.18726,
+          "ends": [
+            {
+              "designation": "02",
+              "lat": 41.26453,
+              "lon": 22.18601,
+              "elevation_m": 960
+            },
+            {
+              "designation": "20",
+              "lat": 41.26819,
+              "lon": 22.18851,
+              "elevation_m": 960
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LWGR",
+      "name": "Gradsko",
+      "lat": 41.55286,
+      "lon": 21.94886,
+      "elevation_m": 145,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u0413\u0440\u0430\u0434\u0441\u043a\u043e'; runway paved ~299 m",
+      "runways": [
+        {
+          "designation": "02/20",
+          "length_m": 299,
+          "width_m": 18,
+          "surface": "asphalt",
+          "true_heading": 15.8,
+          "center_lat": 41.55286,
+          "center_lon": 21.94886,
+          "ends": [
+            {
+              "designation": "02",
+              "lat": 41.55157,
+              "lon": 21.94835,
+              "elevation_m": 145
+            },
+            {
+              "designation": "20",
+              "lat": 41.55415,
+              "lon": 21.94937,
+              "elevation_m": 145
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "icao": "LW71",
+      "name": "Sveti Nikole Peshirovo",
+      "lat": 41.82827,
+      "lon": 21.98575,
+      "elevation_m": 242,
+      "frequency_mhz": 123.5,
+      "source": "OSM aerodrome '\u0410\u0435\u0440\u043e\u0434\u0440\u043e\u043c \u041f\u0435\u0448\u0438\u0440\u043e\u0432\u043e' (Sveti Nikole); OurAirports LW71 elev 794 ft. Runway geometry not mapped in OSM; heading from agricultural strip alignment.",
+      "runways": [
+        {
+          "designation": "10/28",
+          "length_m": 700,
+          "width_m": 40,
+          "surface": "grass",
+          "true_heading": 100.0,
+          "center_lat": 41.82827,
+          "center_lon": 21.98575,
+          "ends": [
+            {
+              "designation": "10",
+              "lat": 41.8283,
+              "lon": 21.98152,
+              "elevation_m": 242
+            },
+            {
+              "designation": "28",
+              "lat": 41.82824,
+              "lon": 21.98998,
+              "elevation_m": 242
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_comment_aligned": "Imagery-aligned NorthMacedonia airports: each runway center moved onto the USED runway centerline measured from the installed ortho t{CC}{RR}.dds with align_runways_nm.py (Canny+HoughLinesP robust fit, fallback luminance PCA), cross-checked vs OSM ends azimuth. Glider spawns ON this axis with zero lateral offset (verified Stenkovec convention), so it now lands on the strip. Headings are whole-degree-safe (generate_apt rounds). Widths kept (they drive the tug). Ends translated by the same lateral vector."
+}

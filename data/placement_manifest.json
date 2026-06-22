@@ -1,0 +1,20 @@
+{
+  "_doc": "ONE generic, object-agnostic placement manifest (docs/OBJECT_PLACEMENT.md). One entry per object; the engine scripts/place_objects.py is the same for a hangar, church, tower, or autogen box. front.model_groups = substrings of c3d object names that define the FRONT face (the model self-cue that resolves the 180 ambiguity); front.world = how the world says the front should point ('apron'|'road'|<azimuth deg>).",
+  "landscape": "MacedoniaSkopje",
+  "objects": [
+    {
+      "id": "StenkovecHangar",
+      "c3d": "StenkovecHangar.c3d",
+      "footprint": {"source": "osm", "filter_key": "aeroway", "filter_val": "hangar",
+                    "near_utm": [531842, 4656466], "radius_m": 300},
+      "front": {"model_groups": ["FRONT", "DOORS"], "world_azimuth": 30,
+                "_note": "the +X facade (FRONT/DOORS groups) faces the airfield ~30deg NE; this resolves the 180. For a symmetric/autogen box, omit -> the 180 is irrelevant."},
+      "symmetry_class": "rect",
+      "scale_mode": "native",
+      "height_source": "dem",
+      "placement_scope": "landscape_obj",
+      "confidence_policy": "reject_if_unresolved",
+      "target_frame": "installed_texture_dem_grid"
+    }
+  ]
+}

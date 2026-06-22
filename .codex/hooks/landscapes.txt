@@ -1,0 +1,5 @@
+# Landscapes the completeness gate (verify_landscapes.sh Stop hook) checks.
+# One landscape FOLDER NAME per line. Restricts the auto-discovery so stock/3rd-party
+# landscapes (e.g. Slovenia2) — which have no CONDOR_LANDSCAPE selector — aren't gated.
+MacedoniaSkopje
+NorthMacedonia

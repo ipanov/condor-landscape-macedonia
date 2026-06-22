@@ -1,0 +1,9 @@
+[mcp_servers.playwright]
+command = "node"
+args = [
+    "D:/Repos/condor-landscape/.sandbox/mcp/playwright/node_modules/@playwright/mcp/cli.js",
+    "--headless",
+]
+
+[mcp_servers.windows-automation]
+command = "D:/Repos/condor-landscape/.sandbox/mcp/windows-mcp-server/Sbroenne.WindowsMcp.exe"

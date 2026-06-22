@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'D:\\Repos\\condor-landscape\\.codex\\hooks\\verify_landscapes.sh'",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

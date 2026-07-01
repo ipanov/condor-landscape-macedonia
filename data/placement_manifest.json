@@ -5,10 +5,24 @@
     {
       "id": "StenkovecHangar",
       "c3d": "StenkovecHangar.c3d",
-      "footprint": {"source": "osm", "filter_key": "aeroway", "filter_val": "hangar",
-                    "near_utm": [531842, 4656466], "radius_m": 300},
-      "front": {"model_groups": ["FRONT", "DOORS"], "world_azimuth": 30,
-                "_note": "the +X facade (FRONT/DOORS groups) faces the airfield ~30deg NE; this resolves the 180. For a symmetric/autogen box, omit -> the 180 is irrelevant."},
+      "footprint": {
+        "source": "osm",
+        "filter_key": "aeroway",
+        "filter_val": "hangar",
+        "near_utm": [
+          531842,
+          4656466
+        ],
+        "radius_m": 300
+      },
+      "front": {
+        "model_groups": [
+          "FRONT",
+          "DOORS"
+        ],
+        "world_azimuth": 30,
+        "_note": "the +X facade (FRONT/DOORS groups) faces the airfield ~30deg NE; this resolves the 180. For a symmetric/autogen box, omit -> the 180 is irrelevant."
+      },
       "symmetry_class": "rect",
       "scale_mode": "native",
       "height_source": "dem",
@@ -19,27 +33,29 @@
     {
       "id": "Cessna172",
       "c3d": "Cessna172.c3d",
-      "footprint": {"source": "static", "E": 531838.0, "N": 4656481.0, "ori": 120.0,
-                    "_note": "parked on the open apron ~33 m SE of the StenkovecHangar (NE side is tree line). Slovenia2 asset -> install-only, NOT git. Nudge E/N/ori from in-sim view."},
+      "footprint": {
+        "source": "static",
+        "E": 531820.0,
+        "N": 4656503.0,
+        "ori": 120.0,
+        "_note": "parked on the cleared apron beside the StenkovecHangar (~13 m ENE). Slovenia2 asset -> install-only, NOT git. Nudge E/N/ori from in-sim view."
+      },
       "scale_mode": "native",
       "scale": 1.0,
       "placement_scope": "landscape_obj"
     },
-
     {
       "id": "MillenniumCross",
       "c3d": "MillenniumCross.c3d",
-      "footprint": {"source": "static", "E": 533913.0, "N": 4645872.1, "ori": 90.0,
-                    "_note": "Krstovar/Vodno peak monument. Terrain-mounted (no painted roof); z from DEM at this obj-grid point. lat=41.96370 lon=21.40980."},
-      "scale_mode": "native",
-      "scale": 1.0,
-      "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "WarriorOnHorse",
-      "c3d": "WarriorOnHorse.c3d",
-      "footprint": {"source": "static", "E": 535690.6, "N": 4649457.1, "ori": 180.0,
-                    "_note": "Macedonia Square fountain monument. lat=41.99591 lon=21.43147."},
+      "footprint": {
+        "source": "footprint",
+        "near_utm": [
+          532693.5,
+          4645976.4
+        ],
+        "min_area": 20,
+        "_note": "Vodno/Krstovar peak base structure. POSE FROM GLOBAL FOOTPRINT (buildings_combined): centroid + edge axis (~19 deg), painted frame. Seed = VERIFIED Wikipedia 41.965098,21.394549. No hand-typed coords/heading."
+      },
       "scale_mode": "native",
       "scale": 1.0,
       "placement_scope": "landscape_obj"
@@ -47,86 +63,18 @@
     {
       "id": "TelecomTowerAEK",
       "c3d": "TelecomTowerAEK.c3d",
-      "footprint": {"source": "static", "E": 532905.2, "N": 4646069.4, "ori": 0.0,
-                    "_note": "AEK / Vodno TV-telecom tower (height 155 m). lat=41.96552 lon=21.39765."},
+      "footprint": {
+        "source": "footprint",
+        "near_utm": [
+          532950,
+          4646025
+        ],
+        "min_area": 50,
+        "_note": "Kula AEK (Vodno telecom tower). POSE FROM GLOBAL FOOTPRINT: centroid + edge axis (~155 deg), painted frame. Seed = VERIFIED OSM 'Кула АЕК' building."
+      },
       "scale_mode": "native",
       "scale": 1.0,
       "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "PortaMacedonia",
-      "c3d": "PortaMacedonia.c3d",
-      "footprint": {"source": "static", "E": 535868.4, "N": 4649201.6, "ori": 64.0,
-                    "_note": "Triumphal arch Porta Macedonia. lat=41.99360 lon=21.43360."},
-      "scale_mode": "native",
-      "scale": 1.0,
-      "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "StoneBridge",
-      "c3d": "StoneBridge.c3d",
-      "footprint": {"source": "static", "E": 535835.7, "N": 4649590.0, "ori": 47.0,
-                    "_note": "Stone Bridge over the Vardar. lat=41.99710 lon=21.43323."},
-      "scale_mode": "native",
-      "scale": 1.0,
-      "placement_scope": "landscape_obj"
-    },
-
-    {
-      "id": "ToseProeskiArena",
-      "c3d": "ToseProeskiArena.c3d",
-      "footprint": {"source": "static", "E": 535195.8, "N": 4650542.8, "ori": 129.0,
-                    "_note": "City Stadium / Nat. Arena. OSM-match unusable: model base ring is degenerate (1056 verts collapsed to a point at z-min, real 242x252 m footprint only above ~10 m), so place static at converted coords. lat=42.00571 lon=21.42556."},
-      "scale_mode": "native",
-      "scale": 1.0,
-      "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "MOB_OperaBallet",
-      "c3d": "MOB_OperaBallet.c3d",
-      "footprint": {"source": "osm", "filter_key": "name", "filter_val": "Македонска Национална опера и балет",
-                    "near_utm": [536189.4, 4649604.3], "radius_m": 200},
-      "scale_mode": "native",
-      "placement_scope": "landscape_obj",
-      "_fallback_static": {"E": 536144.4, "N": 4649649.3, "ori": 34.0}
-    },
-    {
-      "id": "RailwayStationSkopje",
-      "c3d": "RailwayStationSkopje.c3d",
-      "footprint": {"source": "static", "E": 536887.8, "N": 4648913.7, "ori": 39.0,
-                    "_note": "Kenzo Tange Transport Centre. OSM-match unreliable: model base (~320 m viaduct) >> OSM train_station polygon (3475 m2), registration drifted onto the rail yard (score 0.14). Place static at converted coords. lat=41.99096 lon=21.44589."},
-      "scale_mode": "native",
-      "scale": 1.0,
-      "placement_scope": "landscape_obj"
-    },
-
-    {
-      "id": "CC_RadioTower",
-      "c3d": "CC_RadioTower.c3d",
-      "footprint": {"source": "static", "E": 533325.0, "N": 4646025.0, "ori": 0.0,
-                    "_note": "CC-BY Poly-by-Google radio tower stand-in on the Vodno ridge DEM summit (~997 m), NW of TelecomTowerAEK. 50 m tall."},
-      "scale_mode": "native", "scale": 1.0, "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "CC_Stadium",
-      "c3d": "CC_Stadium.c3d",
-      "footprint": {"source": "static", "E": 533411.3, "N": 4650980.1, "ori": 0.0,
-                    "_note": "CC-BY Poly-by-Google stadium stand-in placed on the Boris Trajkovski Sports Centre (real venue, 8972 m2) rather than duplicating the detailed ToseProeskiArena. 214x172 m."},
-      "scale_mode": "native", "scale": 1.0, "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "CC_Skyscraper",
-      "c3d": "CC_Skyscraper.c3d",
-      "footprint": {"source": "static", "E": 533154.9, "N": 4650237.7, "ori": 0.0,
-                    "_note": "CC0 Kenney skyscraper stand-in on a painted Karpos apartment block. 23.5 m base, 80 m tall."},
-      "scale_mode": "native", "scale": 1.0, "placement_scope": "landscape_obj"
-    },
-    {
-      "id": "CC_BusinessBuilding",
-      "c3d": "CC_BusinessBuilding.c3d",
-      "footprint": {"source": "static", "E": 531589.8, "N": 4649771.0, "ori": 0.0,
-                    "_note": "CC0 Quaternius business building stand-in on a large painted Karpos block (6333 m2). 75x62 m base, 40 m tall."},
-      "scale_mode": "native", "scale": 1.0, "placement_scope": "landscape_obj"
     }
   ]
 }

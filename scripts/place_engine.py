@@ -64,6 +64,53 @@ def dem_alt(E, N):
     return float(dem[r, c])
 
 
+# --------------------------------------------------------------------------- #
+# GLOBAL building-footprint source (the authoritative pose: centroid + edge axis).
+# Per docs/OBJECT_PLACEMENT.md: position/orientation come from the VECTOR footprint,
+# NEVER from hand-typed lat/lon. Texture is used only to validate (the overlay).
+# --------------------------------------------------------------------------- #
+_FP_DATASET = REPO / ".sandbox/buildings/buildings_combined_utm.geojson"  # cadastre u MS-GlobalML u OSM
+_FP_CACHE = None
+
+
+def _load_footprints():
+    global _FP_CACHE
+    if _FP_CACHE is None:
+        feats = json.loads(_FP_DATASET.read_text(encoding="utf-8"))["features"]
+        polys = []
+        for f in feats:
+            try:
+                g = shape(f["geometry"])
+            except Exception:
+                continue
+            if not g.is_empty:
+                c = g.centroid
+                polys.append((c.x, c.y, g))
+        _FP_CACHE = polys
+    return _FP_CACHE
+
+
+def footprint_pose(near_utm, min_area=20.0, tol=45.0):
+    """Return (centroid_E, centroid_N, principal_axis_deg, area) of the building
+    footprint at `near_utm` (true UTM) in the global combined dataset, or None.
+    Picks the polygon CONTAINING the seed, else the nearest centroid within `tol`."""
+    from shapely.geometry import Point
+    E, N = float(near_utm[0]), float(near_utm[1])
+    pt = Point(E, N)
+    cand = sorted(((math.hypot(cx - E, cy - N), g) for cx, cy, g in _load_footprints()
+                   if abs(cx - E) < 120 and abs(cy - N) < 120), key=lambda t: t[0])
+    hit = next(((d, g) for d, g in cand[:8] if (g.contains(pt) or d < tol) and g.area >= min_area), None)
+    if hit is None:
+        return None
+    g = hit[1]
+    mrr = g.minimum_rotated_rectangle
+    xs, ys = mrr.exterior.coords.xy
+    axis = max(((math.hypot(xs[i + 1] - xs[i], ys[i + 1] - ys[i]),
+                 math.degrees(math.atan2(xs[i + 1] - xs[i], ys[i + 1] - ys[i])) % 180)
+                for i in range(4)))[1]
+    return float(g.centroid.x), float(g.centroid.y), float(axis), float(g.area)
+
+
 def seed_and_prior(obj):
     fp = obj["footprint"]
     if fp["source"] == "osm":
@@ -145,6 +192,34 @@ def place_one(obj, install, search_m=30.0):
         img, affine = texture_crop(col, row, (cE, cN), max(mf["nat_L"], mf["nat_W"]) + 20, install)
         return dict(id=obj["id"], c3d=obj["c3d"], cE=cE, cN=cN, ori=ori, scale=scale, z=z,
                     score=1.0, col=col, row=row, mf=mf, img=img, affine=affine)
+    if fp["source"] == "footprint":
+        # AUTHORITATIVE: pose from the GLOBAL building footprint (centroid + edge axis),
+        # NOT hand-typed coords. position -> painted-texture frame so it lands on what
+        # Condor draws; orientation -> footprint principal axis folded with the model's
+        # own local axis; the 180 resolved by a directed front cue when present.
+        res = footprint_pose(fp["near_utm"], min_area=fp.get("min_area", 20.0),
+                             tol=fp.get("tol", 45.0))
+        if res is None:
+            raise SystemExit(f"{obj['id']}: NO footprint within tol at {fp['near_utm']} "
+                             f"(use source 'static' for a non-building monument)")
+        tE, tN, axis, area = res
+        cE, cN = G.painted_texture_xy(tE, tN)
+        base_ori = (axis - mf["axis"]) % 180.0
+        cands = [base_ori % 360.0, (base_ori + 180.0) % 360.0]
+        fl = ME.front_local_azimuth(c3d_path, obj.get("front", {}).get("model_groups"),
+                                    obj.get("front", {}).get("rear_groups"))
+        fw = obj.get("front", {}).get("world_azimuth")
+        if fl is not None and fw is not None:
+            ori = min(cands, key=lambda o: abs(((fl + o) % 360 - fw + 180) % 360 - 180))
+        elif fp.get("ori") is not None:        # optional manual 180 pick (axis still from footprint)
+            ori = min(cands, key=lambda o: abs(((o - float(fp["ori"])) + 180) % 360 - 180))
+        else:
+            ori = cands[0]
+        scale = float(obj.get("scale", 1.0)); z = dem_alt(cE, cN)
+        col, row = patch_of(cE, cN)
+        img, affine = texture_crop(col, row, (cE, cN), max(mf["nat_L"], mf["nat_W"]) + 20, install)
+        return dict(id=obj["id"], c3d=obj["c3d"], cE=cE, cN=cN, ori=ori, scale=scale, z=z,
+                    score=1.0, col=col, row=row, mf=mf, img=img, affine=affine, fp_area=area, fp_axis=axis)
     seed, az = seed_and_prior(obj)
     scale = 1.0 if obj.get("scale_mode", "native") == "native" else float(obj.get("scale", 1.0))
     col, row = patch_of(*seed)

@@ -48,14 +48,19 @@ AVAILABLE FOR EXTRACTION (loose files, already installed by MSFS):
   - SimObjects/Landmarks/stenkovec-hangar/texture/*.DDS                (29 texture files)
   - scenery/Stenkovec/LW75/texture/*.DDS                              (236 scenery textures)
 
-RECOMMENDED TOOL (to read the BGL inside the fsarchive):
-  fspackagetool.exe (official MSFS SDK 0.22+)
-  Command: fspackagetool -unpack lixmycig.fsarchive <output_dir>
-  Available via Microsoft Flight Simulator Developer Mode or Xbox SDK.
-  This tool holds the Microsoft Store key material and can decrypt + unpack the archive.
+DECRYPTION IS IMPOSSIBLE (verified — do NOT reattempt):
+  fspackagetool.exe (MSFS SDK, E:/MSFS_SDK/MSFS SDK/Tools/bin/) is a COMPILER ONLY.
+  Its own usage is `fspackagetool <project .xml> [-rebuild] [-mirroring]` — there is NO
+  `-unpack`/`-extract`/`-decrypt` verb (confirmed by running the tool and reading its help).
+  An earlier note here speculated `-unpack` exists; it does NOT. MSFS Dev Mode likewise
+  cannot re-emit an installed encrypted package (Project/Scenery Editors only load YOUR OWN
+  source projects; the Asobo Blender add-on explicitly refuses to import packaged glTF).
+  No community .fsarchive decryptor exists.
+  The ONLY route to the locked geometry is GPU frame capture (RenderDoc/DX11) while MSFS
+  renders it — see docs/objects/msfs_object_recovery.md for the full method + procedure.
 
 This script extracts the AVAILABLE (unencrypted) loose files to .sandbox/sofly_extracted/.
-It does NOT attempt to decrypt the fsarchive (key not available without fspackagetool).
+It does NOT attempt to decrypt the fsarchive (impossible — see above).
 
 Usage:
     python scripts/extract_fsarchive.py [--all-textures]
@@ -247,8 +252,9 @@ def main():
     print("VERDICT    : ENCRYPTED / DRM-PROTECTED")
     print("  The payload (0x140..EOF) has entropy ~7.97 and no recognisable")
     print("  magic bytes.  The key is held by the Microsoft Store license system.")
-    print("  Use fspackagetool.exe (MSFS SDK 0.22+) to decrypt and unpack:")
-    print("    fspackagetool -unpack lixmycig.fsarchive <output_dir>")
+    print("  NO decryptor exists: fspackagetool is a COMPILER (no -unpack verb), Dev Mode")
+    print("  cannot export installed encrypted packages. Recover geometry via GPU capture")
+    print("  (RenderDoc/DX11) -> see docs/objects/msfs_object_recovery.md.")
     print()
     print("  Inferred contents (2 BGL scenery blobs):")
     print("    • LW75 Stenkovec placed objects (restaurant, fences, containers,")

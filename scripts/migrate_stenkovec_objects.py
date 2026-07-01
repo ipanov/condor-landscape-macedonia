@@ -30,7 +30,7 @@ This script converts ONLY the open glTF (the hangar). It:
 SANDBOX ONLY -- does not touch the install, the .apt, or the .obj.
 """
 from __future__ import annotations
-import json, math, struct, subprocess, sys
+import argparse, json, math, struct, subprocess, sys
 from pathlib import Path
 import numpy as np
 
@@ -40,6 +40,11 @@ import c3d  # noqa: E402
 REPO = Path(__file__).resolve().parents[1]
 SRC = Path("F:/FS2020/Official/OneStore/sofly-lwxx-airfields")
 HANGAR_DIR = SRC / "SimObjects/Landmarks/stenkovec-hangar"
+# DEFAULT job = the open glTF main hangar (the one model NOT trapped in the
+# encrypted .fsarchive). Override --gltf/--texdir/--name to migrate ANY other
+# glTF: e.g. a RenderDoc-captured-and-exported SoFly object (restaurant, WingAir
+# church, fences, LW67 hangar, Pipistrel/Bitola), pointed at the unpacked
+# scenery/Stenkovec/LW75/texture/ albedo DDS. See docs/objects/msfs_object_recovery.md.
 GLTF = HANGAR_DIR / "model/LW75_Main_Hangar.gltf"
 TEXDIR = HANGAR_DIR / "texture"
 OUT = REPO / ".sandbox/airport_objects"
@@ -47,6 +52,7 @@ WORK = OUT / "_work"
 PNGDIR = WORK / "tex_png"
 DDSDIR = OUT          # Condor DDS sit next to the .c3d so the engine resolves them
 NVCOMPRESS = Path("C:/Program Files/NVIDIA Corporation/NVIDIA Texture Tools/nvcompress.exe")
+TEX_PREFIX = "STK_"   # DDS filename prefix (overridable per object to avoid clashes)
 
 for d in (OUT, WORK, PNGDIR, DDSDIR):
     d.mkdir(parents=True, exist_ok=True)
@@ -189,8 +195,9 @@ def msfs_dds_has_alpha(msfs_dds: Path) -> bool:
 # --------------------------------------------------------------------------- #
 # Main conversion
 # --------------------------------------------------------------------------- #
-def gltf_to_condor():
-    d, buf = load_gltf(GLTF)
+def gltf_to_condor(gltf: Path = GLTF, texdir: Path = TEXDIR, tex_prefix: str = TEX_PREFIX,
+                   obj_label: str = "Hangar"):
+    d, buf = load_gltf(gltf)
     nodes = d["nodes"]
     scene = d["scenes"][d.get("scene", 0)]
 
@@ -283,14 +290,14 @@ def gltf_to_condor():
         idx_arr = np.asarray(IDX, dtype=np.int64).reshape(-1, 3)[:, ::-1].reshape(-1)
         # texture (convert the referenced MSFS DDS -> Condor DDS)
         if img and img != "__untextured__":
-            msfs = TEXDIR / img
+            msfs = texdir / img
             stem = img.replace(".PNG.DDS", "").replace(".PNG.dds", "")
             alpha = msfs_dds_has_alpha(msfs)
-            tex_name = convert_texture(msfs, "STK_" + stem, alpha)
+            tex_name = convert_texture(msfs, tex_prefix + stem, alpha)
             tex_report[img] = tex_name
         else:
             tex_name = ""
-        obj = c3d.C3DObject(name="Hangar_" + (img.split("_ALBD")[0] if img else "Plain"),
+        obj = c3d.C3DObject(name=obj_label + "_" + (img.split("_ALBD")[0] if img else "Plain"),
                             texture=tex_name, material=c3d.WHITE_MATERIAL,
                             vertices=verts, indices=[int(i) for i in idx_arr])
         objects.append(obj)
@@ -301,10 +308,42 @@ def gltf_to_condor():
                                      dz=float(cz.max() - cz.min()))
 
 
-def main():
-    objects, tex_report, info = gltf_to_condor()
+def _parse_args(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Migrate a glTF (MSFS SoFly hangar by default, or any other "
+                    "glTF — e.g. a RenderDoc-captured SoFly object) to a textured Condor .c3d.")
+    ap.add_argument("--gltf", type=Path, default=GLTF,
+                    help="source glTF 2.0 (default: the open LW75 main hangar).")
+    ap.add_argument("--texdir", type=Path, default=None,
+                    help="dir holding the albedo DDS the glTF references "
+                         "(default: alongside the glTF's own texture/ ; for the SoFly "
+                         "scenery objects point at scenery/Stenkovec/LW75/texture/).")
+    ap.add_argument("--name", default=None,
+                    help="output stem -> <name>.c3d (default: StenkovecHangar for the "
+                         "hangar, else the glTF file stem).")
+    ap.add_argument("--tex-prefix", default=None,
+                    help="DDS filename prefix to avoid clashes between objects "
+                         "(default: STK_ for the hangar, else <NAME>_).")
+    ap.add_argument("--allow-winding", action="store_true",
+                    help="downgrade the CCW-front winding check from a hard fail to a "
+                         "warning. The reverse-winding fix is calibrated for the MSFS "
+                         "hangar's CW-front authoring; a ripped/re-exported glTF may "
+                         "carry different winding, so inspect the QC render before trusting it.")
+    return ap.parse_args(argv)
+
+
+def main(argv=None):
+    args = _parse_args(argv)
+    gltf = args.gltf
+    is_default_hangar = gltf.resolve() == GLTF.resolve()
+    texdir = args.texdir or (gltf.parent.parent / "texture")
+    name = args.name or ("StenkovecHangar" if is_default_hangar else gltf.stem)
+    tex_prefix = args.tex_prefix or ("STK_" if is_default_hangar else name.upper() + "_")
+    obj_label = "Hangar" if is_default_hangar else name
+
+    objects, tex_report, info = gltf_to_condor(gltf, texdir, tex_prefix, obj_label)
     cf = c3d.C3DFile(objects=objects)
-    out_path = OUT / "StenkovecHangar.c3d"
+    out_path = OUT / (name + ".c3d")
     blob = c3d.write_c3d(cf, out_path)
 
     # round-trip verify
@@ -338,7 +377,8 @@ def main():
 
     tot_v = sum(len(o.vertices) for o in objects)
     tot_t = sum(len(o.indices) for o in objects) // 3
-    print("=== StenkovecHangar.c3d ===")
+    print(f"=== {out_path.name} ===")
+    print(f"  source glTF: {gltf}")
     print(f"  objects (one per albedo): {len(objects)}")
     print(f"  total vertices : {tot_v}")
     print(f"  total triangles: {tot_t}")
@@ -351,7 +391,11 @@ def main():
     for src, dst in sorted(tex_report.items()):
         print(f"     {src}  ->  {dst}")
     if not wind_ok:
-        raise SystemExit("WINDING CHECK FAILED: emitted faces are not CCW-front/outward")
+        msg = "WINDING CHECK FAILED: emitted faces are not CCW-front/outward"
+        if args.allow_winding:
+            print("  WARNING: " + msg + " (--allow-winding set; inspect the QC render)")
+        else:
+            raise SystemExit(msg + " (pass --allow-winding for a ripped/re-exported glTF)")
     return out_path, objects, tex_report, info, rt_ok, tot_v, tot_t
 
 
